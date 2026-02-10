@@ -1,4 +1,4 @@
-from generate_embeddings import generate_embeddings
+from .generate_embeddings import generate_embeddings
 from sklearn.neighbors import KNeighborsClassifier
 import torch
 
