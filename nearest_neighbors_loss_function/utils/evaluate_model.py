@@ -3,7 +3,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from skfp.metrics import enrichment_factor
 
 
-def evaluate(X_train, X_test, y_train, y_test):
+def evaluate_model(X_train, X_test, y_train, y_test):
 
     # fit model
     knn = KNeighborsClassifier(n_neighbors=4)
