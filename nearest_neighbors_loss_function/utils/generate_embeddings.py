@@ -14,4 +14,7 @@ def generate_embeddings(model, data_loader, embedding_length):
         labels[offset: offset + n_embeddings] = data.y
         offset += 1
 
+    embeddings = embeddings.detach().numpy()
+    labels = labels.detach().numpy()
+
     return embeddings, labels
