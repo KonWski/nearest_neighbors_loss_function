@@ -3,10 +3,6 @@ import torch
 def generate_embeddings(model, data_loader, embedding_length):
 
     model.eval()
-    original_shuffle = data_loader.shuffle
-    if original_shuffle == True:
-        data_loader.shuffle = False
-
     embeddings = torch.zeros([data_loader.dataset.data.x.shape[0], embedding_length], dtype=float)
     labels = torch.zeros([data_loader.dataset.data.x.shape[0]], dtype=int)
 
@@ -17,8 +13,5 @@ def generate_embeddings(model, data_loader, embedding_length):
         embeddings[offset: offset + n_embeddings] = batch_embeddings
         labels[offset: offset + n_embeddings] = data.y
         offset += 1
-
-    if original_shuffle == True:
-        data_loader.shuffle = True
 
     return embeddings, labels
