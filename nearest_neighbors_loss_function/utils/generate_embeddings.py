@@ -4,7 +4,7 @@ def generate_embeddings(model, data_loader, embedding_length):
 
     model.eval()
     embeddings = torch.zeros([data_loader.dataset.data.x.shape[0], embedding_length], dtype=float)
-    labels = torch.zeros([data_loader.dataset.data.x.shape[0]], dtype=int)
+    labels = torch.zeros([data_loader.dataset.data.x.shape[0], 1], dtype=int)
 
     offset = 0
     for _, data in enumerate(data_loader):
