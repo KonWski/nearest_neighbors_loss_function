@@ -8,7 +8,7 @@ def generate_embeddings(model, data_loader, embedding_length):
 
     offset = 0
     for _, data in enumerate(data_loader):
-        batch_embeddings = model(data.anchor_X, data.anchor_edge_index, data.anchor_batch)
+        batch_embeddings = model(data.x, data.edge_index, data.batch)
         n_embeddings = batch_embeddings.shape[0]
         embeddings[offset: offset + n_embeddings] = batch_embeddings
         labels[offset: offset + n_embeddings] = data.y
