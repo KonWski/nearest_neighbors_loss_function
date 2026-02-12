@@ -31,7 +31,13 @@ class GammaCalculator():
                     sample_embedding = sample_embedding.reshape(1, -1)
                     print(f"After reshape sample_embedding.shape: {sample_embedding.shape}")
                     sample_proba = knn.predict_proba(sample_embedding) - proba_thrash_threshold
+                    print(f"sample_proba: {sample_proba}")
+                    print(f"sample_proba.shape: {sample_proba.shape}")
                     gamma = 2 - sample_proba
+                    print(f"gamma: {gamma}")
+                    print(f"gamma.shape: {gamma.shape}")
+
+
                     gamma_values[sample_id] = gamma
 
             self.gamma_values = gamma_values
