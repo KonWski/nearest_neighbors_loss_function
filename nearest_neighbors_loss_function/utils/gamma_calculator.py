@@ -21,6 +21,10 @@ class GammaCalculator():
             proba_thrash_threshold = 1 / self.n_neighbors
             gamma_values = torch.ones(n_samples)
 
+            # temp
+            self.gamma_values = gamma_values
+            self.n_samples = n_samples
+
             knn = KNeighborsClassifier(n_neighbors=self.n_neighbors)
             knn.fit(X, y)
 

@@ -3,13 +3,13 @@ import torch
 def generate_embeddings(model, data_loader, embedding_length, batch_size):
 
     model.eval()
-    if data_loader.batch_sampler.shuffle is None:    
+    try:
+       original_shuffle = data_loader.batch_sampler.shuffle
+    except AttributeError: 
         original_shuffle = False
-    elif data_loader.batch_sampler.shuffle == True:
-        original_shuffle = True
+
+    if original_shuffle == True:
         data_loader.batch_sampler.shuffle = False
-    else:
-        original_shuffle = False
 
     embeddings = torch.zeros([data_loader.dataset.data.x.shape[0], embedding_length], dtype=float)
     labels = torch.zeros([data_loader.dataset.data.x.shape[0], 1], dtype=int)
