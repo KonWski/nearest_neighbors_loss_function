@@ -11,7 +11,7 @@ def generate_embeddings(model, data_loader, embedding_length, batch_size):
     if original_shuffle == True:
         data_loader.batch_sampler.shuffle = False
 
-    n_samples = data_loader.dataset.data.x.shape[0]
+    n_samples = data_loader.dataset.data.y.shape[0]
     embeddings = torch.zeros([n_samples, embedding_length], dtype=float)
     labels = torch.zeros([n_samples, 1], dtype=int)
     print(f"labels.shape: {labels.shape}")
