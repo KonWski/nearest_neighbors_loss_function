@@ -14,11 +14,15 @@ def generate_embeddings(model, data_loader, embedding_length, batch_size):
     n_samples = data_loader.dataset.data.x.shape[0]
     embeddings = torch.zeros([n_samples, embedding_length], dtype=float)
     labels = torch.zeros([n_samples, 1], dtype=int)
+    print(f"labels.shape: {labels.shape}")
 
     offset = 0
     for _, data in enumerate(data_loader):
 
         batch_embeddings = model(data.x.float(), data.edge_index, data.batch)
+        print(f"batch_embeddings.shape: {batch_embeddings.shape}")
+        print(f"Start: {offset * batch_size}")
+        print(f"End: {min((offset + 1) * batch_size, n_samples)}")
         embeddings[offset * batch_size: min((offset + 1) * batch_size, n_samples)] = batch_embeddings
         labels[offset * batch_size: min((offset + 1) * batch_size, n_samples)] = data.y
         offset += 1
