@@ -26,19 +26,9 @@ class GammaCalculator():
 
             for sample_id, sample_label in enumerate(y):
                 if sample_label == 1:
-                    sample_embedding = X[sample_id, :]
-                    print(f"sample_embedding.shape: {sample_embedding.shape}")
-                    sample_embedding = sample_embedding.reshape(1, -1)
-                    print(f"After reshape sample_embedding.shape: {sample_embedding.shape}")
-                    sample_proba = knn.predict_proba(sample_embedding)[0][1]
-                    sample_proba = sample_proba - proba_thrash_threshold
-                    print(f"sample_proba: {sample_proba}")
-                    print(f"sample_proba.shape: {sample_proba.shape}")
+                    sample_embedding = X[sample_id, :].reshape(1, -1)
+                    sample_proba = knn.predict_proba(sample_embedding)[0][1] - proba_thrash_threshold
                     gamma = 2 - sample_proba
-                    print(f"gamma: {gamma}")
-                    # print(f"gamma.shape: {gamma.shape}")
-
-
                     gamma_values[sample_id] = gamma
 
             self.gamma_values = gamma_values
