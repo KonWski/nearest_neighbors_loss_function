@@ -18,7 +18,8 @@ def generate_embeddings(model, data_loader, embedding_length, batch_size):
 
     offset = 0
     for _, data in enumerate(data_loader):
-
+        
+        print(f"generate_embeddings batch id: {_}")
         batch_embeddings = model(data.x.float(), data.edge_index, data.batch)
         print(f"batch_embeddings.shape: {batch_embeddings.shape}")
         print(f"Start: {offset * batch_size}")
