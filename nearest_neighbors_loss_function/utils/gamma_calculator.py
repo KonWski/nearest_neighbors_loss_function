@@ -36,4 +36,4 @@ class GammaCalculator():
     
 
     def get_gamma_values(self, batch_id):
-        return self.gamma_values[batch_id: (1 + batch_id) * self.batch_size]
+        return self.gamma_values[batch_id * self.batch_size: (1 + batch_id) * self.batch_size]
