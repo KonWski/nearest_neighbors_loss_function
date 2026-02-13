@@ -16,17 +16,15 @@ def generate_embeddings(model, data_loader, embedding_length, batch_size):
     labels = torch.zeros([n_samples, 1], dtype=int)
     print(f"labels.shape: {labels.shape}")
 
-    offset = 0
+    start_id = 0
     for _, data in enumerate(data_loader):
         
-        print(f"generate_embeddings batch id: {_}")
+        n_samples_batch = labels.shape[0]
+        print(f"n_samples_batch: {n_samples_batch}")
         batch_embeddings = model(data.x.float(), data.edge_index, data.batch)
-        print(f"batch_embeddings.shape: {batch_embeddings.shape}")
-        print(f"Start: {offset * batch_size}")
-        print(f"End: {min((offset + 1) * batch_size, n_samples)}")
-        embeddings[offset * batch_size: min((offset + 1) * batch_size, n_samples)] = batch_embeddings
-        labels[offset * batch_size: min((offset + 1) * batch_size, n_samples)] = data.y
-        offset += 1
+        embeddings[start_id: start_id + n_samples_batch] = batch_embeddings
+        labels[start_id: start_id + n_samples_batch] = data.y
+        start_id += n_samples_batch
 
     if original_shuffle == True:
         data_loader.batch_sampler.shuffle = True
