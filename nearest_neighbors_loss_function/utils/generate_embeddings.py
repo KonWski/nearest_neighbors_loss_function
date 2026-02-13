@@ -1,6 +1,6 @@
 import torch
 
-def generate_embeddings(model, data_loader, embedding_length, batch_size):
+def generate_embeddings(model, data_loader, embedding_length):
 
     model.eval()
     try:

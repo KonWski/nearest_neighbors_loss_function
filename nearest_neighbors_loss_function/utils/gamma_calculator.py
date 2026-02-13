@@ -16,7 +16,7 @@ class GammaCalculator():
     def recalculate_gamma_values(self, model, data_loader, batch_id):
         
         if self.recalculation_strategy == 0 and batch_id == 0:
-            X, y = generate_embeddings(model, data_loader, self.embedding_length, self.batch_size)
+            X, y = generate_embeddings(model, data_loader, self.embedding_length)
             n_samples = len(y)
             proba_thrash_threshold = 1 / self.n_neighbors
             gamma_values = torch.ones(n_samples)
