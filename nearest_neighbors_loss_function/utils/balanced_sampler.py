@@ -8,7 +8,7 @@ class BalancedSampler(BatchSampler):
         self.n_minority_samples = n_minority_samples
         self.minority_class = minority_class
         self.minority_per_batch = minority_per_batch
-        self.n_extra_minority_batches = self.n_minority_samples - (self.n_batches * minority_per_batch)
+        self.n_extra_minority_batches = self.n_minority_samples - (n_batches * minority_per_batch)
         self.majority_per_batch = batch_size - minority_per_batch
         self.batch_size = batch_size
         self.n_batches = n_batches
