@@ -37,7 +37,11 @@ class GammaCalculator():
 
             # self.gamma_values = gamma_values
             # self.n_samples = n_samples
-    
+
+        elif self.recalculation_strategy == -1:
+            self.gamma_values = torch.ones(n_samples)
+            self.n_samples = n_samples
+
 
     def get_gamma_values(self, gamma_start_id, gamma_end_id):
         return self.gamma_values[gamma_start_id: gamma_end_id]
