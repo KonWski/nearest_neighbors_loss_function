@@ -19,7 +19,7 @@ def generate_embeddings(model, data_loader, embedding_length, batch_size):
     start_id = 0
     for _, data in enumerate(data_loader):
         
-        n_samples_batch = labels.shape[0]
+        n_samples_batch = data.y.shape[0]
         print(f"n_samples_batch: {n_samples_batch}")
         batch_embeddings = model(data.x.float(), data.edge_index, data.batch)
         embeddings[start_id: start_id + n_samples_batch] = batch_embeddings
