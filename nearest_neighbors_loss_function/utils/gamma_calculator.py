@@ -25,7 +25,7 @@ class GammaCalculator():
             self.gamma_values = gamma_values
             self.n_samples = n_samples
 
-            # knn = KNeighborsClassifier(n_neighbors=self.n_neighbors)
+            # knn = KNeighborsClassifier(n_neighbors=self.n_neighbors, n_jobs=-1)
             # knn.fit(X, y)
 
             # for sample_id, sample_label in enumerate(y):
@@ -39,5 +39,5 @@ class GammaCalculator():
             # self.n_samples = n_samples
     
 
-    def get_gamma_values(self, batch_id):
-        return self.gamma_values[batch_id * self.batch_size: (1 + batch_id) * self.batch_size]
+    def get_gamma_values(self, gamma_start_id, gamma_end_id):
+        return self.gamma_values[gamma_start_id: gamma_end_id]
