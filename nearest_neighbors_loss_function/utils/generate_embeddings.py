@@ -1,6 +1,6 @@
 import torch
 
-def generate_embeddings(model, data_loader, embedding_length):
+def generate_embeddings(model, data_loader, n_samples, embedding_length):
 
     model.eval()
     try:
@@ -11,7 +11,6 @@ def generate_embeddings(model, data_loader, embedding_length):
     if original_shuffle == True:
         data_loader.batch_sampler.shuffle = False
 
-    n_samples = data_loader.dataset.data.y.shape[0]
     embeddings = torch.zeros([n_samples, embedding_length], dtype=float)
     labels = torch.zeros([n_samples, 1], dtype=int)
 
