@@ -1,6 +1,6 @@
 import torch
 
-def generate_embeddings(model, data_loader, n_samples, embedding_length):
+def generate_embeddings(model, data_loader, n_samples, embedding_length, device):
 
     model.eval()
     try:
@@ -17,6 +17,7 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length):
     start_id = 0
     for _, data in enumerate(data_loader):
 
+        data = data.to(device)
         n_samples_batch = data.y.shape[0]
         batch_embeddings = model(data.x.float(), data.edge_index, data.batch)
         embeddings[start_id: start_id + n_samples_batch] = batch_embeddings
