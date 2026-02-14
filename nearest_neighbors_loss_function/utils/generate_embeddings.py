@@ -16,14 +16,6 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length):
 
     start_id = 0
     for _, data in enumerate(data_loader):
-        
-        if _ <= 1:
-            print(8*"-")
-            print(f"Generating embeddings x and y elements")
-            print(data.x.float())
-            print(data.x.float().shape)
-            print(data.y.T)
-            print(8*"-")
 
         n_samples_batch = data.y.shape[0]
         batch_embeddings = model(data.x.float(), data.edge_index, data.batch)
