@@ -39,6 +39,7 @@ class GammaCalculator():
             self.gamma_values = torch.ones(n_samples)
             self.n_samples = n_samples
 
+        self.gamma_values = self.gamma_values.to(self.device)
 
     def get_gamma_values(self, gamma_start_id, gamma_end_id):
         return self.gamma_values[gamma_start_id: gamma_end_id]
