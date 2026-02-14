@@ -19,9 +19,9 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length):
         
         if _ == 0:
             print(8*"-")
-            print(f"Train data_id x elements")
+            print(f"Generate embeddings train data x and y elements")
             print(data.x.float())
-            print(data.y)
+            print(data.y.T)
             print(8*"-")
 
         n_samples_batch = data.y.shape[0]
