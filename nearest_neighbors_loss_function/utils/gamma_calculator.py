@@ -4,10 +4,11 @@ import torch
 
 class GammaCalculator():
 
-    def __init__(self, embedding_length, n_neighbors, batch_size, recalculation_strategy = 0):
+    def __init__(self, embedding_length, n_neighbors, batch_size, device, recalculation_strategy = 0):
         self.embedding_length = embedding_length
         self.n_neighbors = n_neighbors
         self.batch_size = batch_size
+        self.device = device
         self.gamma_values = None
         self.n_samples = None
         self.recalculation_strategy = recalculation_strategy
@@ -16,7 +17,7 @@ class GammaCalculator():
     def recalculate_gamma_values(self, model, data_loader, n_samples, batch_id):
         
         if self.recalculation_strategy == 0 and batch_id == 0:
-            X, y = generate_embeddings(model, data_loader, n_samples, self.embedding_length)
+            X, y = generate_embeddings(model, data_loader, n_samples, self.embedding_length, self.device)
             y = y.ravel()
             proba_thrash_threshold = 1 / self.n_neighbors
             gamma_values = torch.ones(n_samples)
