@@ -17,6 +17,13 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length):
     start_id = 0
     for _, data in enumerate(data_loader):
         
+        if _ == 0:
+            print(8*"-")
+            print(f"Train data_id x elements")
+            print(data.x.float())
+            print(data.y)
+            print(8*"-")
+
         n_samples_batch = data.y.shape[0]
         batch_embeddings = model(data.x.float(), data.edge_index, data.batch)
         embeddings[start_id: start_id + n_samples_batch] = batch_embeddings
