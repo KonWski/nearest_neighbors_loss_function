@@ -17,10 +17,11 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length):
     start_id = 0
     for _, data in enumerate(data_loader):
         
-        if _ == 0:
+        if _ <= 1:
             print(8*"-")
             print(f"Generating embeddings x and y elements")
             print(data.x.float())
+            print(data.x.float().shape)
             print(data.y.T)
             print(8*"-")
 
