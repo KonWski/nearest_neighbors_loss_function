@@ -19,7 +19,7 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length):
         
         if _ == 0:
             print(8*"-")
-            print(f"Generate embeddings train data x and y elements")
+            print(f"Generating embeddings x and y elements")
             print(data.x.float())
             print(data.y.T)
             print(8*"-")
