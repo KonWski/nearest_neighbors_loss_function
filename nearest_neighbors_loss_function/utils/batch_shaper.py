@@ -48,10 +48,10 @@ class BatchShaper():
                 anchor_label = anchor_labels[anchor_iter]
 
                 if anchor_label == 1:
-                    pos_pool = indices_1[indices_1 != anchor_iter]
+                    pos_pool = [id for id in indices_1 if id != anchor_iter]
                     neg_pool = indices_0
                 else:
-                    pos_pool = indices_0[indices_0 != anchor_iter]
+                    pos_pool = [id for id in indices_0 if id != anchor_iter]
                     neg_pool = indices_1
 
                 # pos -> random
