@@ -62,10 +62,11 @@ class BatchShaper():
                 distances_neg = distances[anchor_iter, neg_pool]
 
                 semi_hard_mask = (distances_neg > distances_pos) & (distances_neg < distances_pos + self.margin)
+                semi_hard_idx = semi_hard_mask.nonzero(as_tuple=True)[0].tolist()
 
                 if semi_hard_mask.any():
                     # pick first semi-hard (or random among them)
-                    valid_ids = neg_pool[semi_hard_mask.nonzero(as_tuple=True)[0]]
+                    valid_ids = [neg_pool[i] for i in semi_hard_idx]
                     neg_idx = valid_ids[torch.randint(len(valid_ids), (1,)).item()]
                 else:
                     # fallback to closest negative
