@@ -71,7 +71,7 @@ class GammaCalculator():
         sample_proba = max(sample_proba, 1e-8)
         gamma = - math.pow(1 - sample_proba, self.focal_pow) * math.log(sample_proba)
 
-        if gamma < 0:
+        if gamma < 1:
             return 1
 
         return gamma
