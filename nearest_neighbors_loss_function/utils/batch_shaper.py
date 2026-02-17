@@ -2,9 +2,9 @@ import torch
 
 class BatchShaper():
 
-    def __init__(self, training_type = "hard_batch_learning"):
+    def __init__(self, training_type = "hard_batch_learning", margin = 1.0):
         self.training_type = training_type
-
+        self.margin = margin
 
     def shape_batch(self, anchor_mfs, anchor_labels):
 
