@@ -80,3 +80,7 @@ class GammaCalculator():
     def _boosted_gamma(self, sample_proba):
         gamma = 2 - sample_proba
         return gamma
+    
+
+    def __str__(self):
+        pass
