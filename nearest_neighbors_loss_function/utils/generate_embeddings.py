@@ -19,6 +19,7 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, device)
 
         data = data.to(device)
         data.x = data.x.float()
+        data.edge_attr = data.edge_attr.float()
         n_samples_batch = data.y.shape[0]
         batch_embeddings = model(data)
         embeddings[start_id: start_id + n_samples_batch] = batch_embeddings

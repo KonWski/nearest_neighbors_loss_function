@@ -4,6 +4,7 @@ from nearest_neighbors_loss_function.utils.train import train_triplet
 from nearest_neighbors_loss_function.utils.evaluate_model import test_model
 from nearest_neighbors_loss_function.utils.datasets import get_loaders
 import torch
+import logging
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Siamese graph neural net training")
@@ -69,4 +70,5 @@ def main():
     statistics.save()
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     main()
