@@ -35,13 +35,15 @@ class GNNLayer(MessagePassing):
     def __init__(self, in_channels, out_channels):
 
         super().__init__(aggr='mean')
-        self.lin = nn.Linear(in_channels, out_channels)
+        self.node_mlp = nn.Linear(in_channels, out_channels)
         self.edge_mlp = nn.Linear(3, out_channels)
 
     def forward(self, x, edge_index, edge_attr):
         return self.propagate(edge_index, x=x, edge_attr=edge_attr)
 
     def message(self, x_j, edge_attr):
+        x_j = self.node_mlp(x_j)
+        
         if edge_attr is not None:
             edge_emb = self.edge_mlp(edge_attr)
             return x_j + edge_emb
@@ -49,4 +51,4 @@ class GNNLayer(MessagePassing):
         return x_j
 
     def update(self, aggr_out):
-        return self.lin(aggr_out)
+        return aggr_out
