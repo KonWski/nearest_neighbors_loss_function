@@ -60,7 +60,7 @@ def main():
         model_hidden_channels=args.model_hidden_channels,
         embedding_length=args.embedding_length,
         optimized_param_name=args.optimized_param_name,
-        device=args.device
+        device=device
     )
 
     statistics = test_model(statistics, best_model_dir_path, args.model_in_channels, args.model_hidden_channels, args.embedding_length, train_loader, 
