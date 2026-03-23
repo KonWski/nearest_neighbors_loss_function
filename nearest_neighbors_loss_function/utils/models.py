@@ -36,7 +36,7 @@ class GNNLayer(MessagePassing):
 
         super().__init__(aggr='mean')
         self.lin = nn.Linear(in_channels, out_channels)
-        self.edge_mlp = nn.Linear(1, out_channels)
+        self.edge_mlp = nn.Linear(3, out_channels)
 
     def forward(self, x, edge_index, edge_attr):
         return self.propagate(edge_index, x=x, edge_attr=edge_attr)
