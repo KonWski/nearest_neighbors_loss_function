@@ -1,4 +1,5 @@
 import argparse
+import nearest_neighbors_loss_function.utils.set_torch_geometrics
 from nearest_neighbors_loss_function.utils.train import train_triplet
 from nearest_neighbors_loss_function.utils.evaluate_model import test_model
 from nearest_neighbors_loss_function.utils.datasets import get_loaders
