@@ -25,6 +25,6 @@ def create_experiment_dir(path: str, experiment_hash: str):
 
 
 def create_model_dir(experiment_dir_path: str, seed: int):
-    model_dir_path = os.path.join(experiment_dir_path, seed)
+    model_dir_path = os.path.join(experiment_dir_path, str(seed))
     os.makedirs(model_dir_path)
     return model_dir_path
