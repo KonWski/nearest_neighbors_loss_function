@@ -4,12 +4,11 @@ import logging
 
 class Statistics():
 
-    def __init__(self, n_epochs, n_seeds, experiment_dir_path, experiment_hash, optimized_param):
+    def __init__(self, n_epochs, experiment_dir_path, experiment_hash, optimized_param_name):
         self.n_epochs = n_epochs
-        self.n_seeds = n_seeds
         self.experiment_dir_path = experiment_dir_path
         self.experiment_hash = experiment_hash
-        self.optimized_param = optimized_param
+        self.optimized_param = optimized_param_name
         self.report_path = os.path.join(self.experiment_dir_path, "train_report.xslx")
 
         '''

@@ -40,7 +40,7 @@ def train_triplet(
     experiment_hash = uuid4().hex
     experiment_dir_path = create_experiment_dir(save_path, experiment_hash)
     
-    statistics = Statistics()
+    statistics = Statistics(n_epochs, experiment_dir_path, experiment_hash, optimized_param_name)
 
     n_train_samples = len(train_loader)
     n_valid_samples = len(valid_loader)
