@@ -23,8 +23,8 @@ def get_loaders(batch_size, dataset_name = "ogbg-molhiv", dataset_root = 'datase
     train_dataset, valid_dataset, test_dataset = get_datasets(dataset_name, dataset_root, debug)
 
     n_batches = math.ceil(len(train_dataset) / batch_size)
-    minority_per_batch = int(n_train_minority_samples / n_batches)
     n_train_minority_samples = train_dataset.y.sum()
+    minority_per_batch = int(n_train_minority_samples / n_batches)
     balanced_sampler = BalancedSampler(train_dataset.y, n_train_minority_samples, 1, minority_per_batch, batch_size, n_batches)
 
     train_loader = DataLoader(train_dataset, batch_sampler=balanced_sampler)
