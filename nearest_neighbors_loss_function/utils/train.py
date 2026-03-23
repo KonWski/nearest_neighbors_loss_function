@@ -42,8 +42,8 @@ def train_triplet(
     
     statistics = Statistics(n_epochs, experiment_dir_path, experiment_hash, optimized_param_name)
 
-    n_train_samples = len(train_loader)
-    n_valid_samples = len(valid_loader)
+    n_train_samples = len(train_loader.dataset)
+    n_valid_samples = len(valid_loader.dataset)
 
     # iterate over all given seeds
     for id_seed, seed in enumerate(seeds):

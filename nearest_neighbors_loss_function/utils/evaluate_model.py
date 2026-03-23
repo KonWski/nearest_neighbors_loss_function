@@ -52,12 +52,12 @@ def test_model(statistics, model_path, in_channels, hidden_dim, embedding_size, 
                n_train_samples, test_loader, embedding_length, n_neighbors, device):
     
     model = load_model(model_path, in_channels, hidden_dim, embedding_size, model_name)
-    n_test_samples = len(test_loader)
+    n_test_samples = len(test_loader.dataset)
 
     test_stats = evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_samples, embedding_length, 
          n_neighbors, "test", device)
 
     statistics.upload_test_stats(test_stats) 
     statistics.log_best_model_stats()
-       
+
     return statistics
