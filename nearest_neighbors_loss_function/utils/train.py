@@ -84,7 +84,7 @@ def train_triplet(
             statistics.log_last_train_stats()
 
             if validate_stats[f"valid_{optimized_param_name}"] > max_epoch_optimized_param_value:
-                max_epoch_optimized_param_value = validate_stats[optimized_param_name]
+                max_epoch_optimized_param_value = validate_stats[f"valid_{optimized_param_name}"]
                 best_model_dir_path = model_dir_path
 
                 save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
