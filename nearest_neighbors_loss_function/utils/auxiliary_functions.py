@@ -28,3 +28,9 @@ def create_model_dir(experiment_dir_path: str, seed: int):
     model_dir_path = os.path.join(experiment_dir_path, str(seed))
     os.makedirs(model_dir_path)
     return model_dir_path
+
+
+def convert_graph_data_to_float(data):
+    data.x = data.x.float()
+    data.edge_attr = data.edge_attr.float()    
+    return data

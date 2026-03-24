@@ -1,4 +1,5 @@
 import torch
+from nearest_neighbors_loss_function.utils.auxiliary_functions import convert_graph_data_to_float
 
 def generate_embeddings(model, data_loader, n_samples, embedding_length, device):
 
@@ -18,8 +19,7 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, device)
     for _, data in enumerate(data_loader):
 
         data = data.to(device)
-        data.x = data.x.float()
-        data.edge_attr = data.edge_attr.float()
+        data = convert_graph_data_to_float(data)
         n_samples_batch = data.y.shape[0]
         batch_embeddings = model(data)
         embeddings[start_id: start_id + n_samples_batch] = batch_embeddings

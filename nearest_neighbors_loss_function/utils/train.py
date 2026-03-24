@@ -1,6 +1,7 @@
 from nearest_neighbors_loss_function.utils.models import GNNModel
 from nearest_neighbors_loss_function.utils.batch_shaper import BatchShaper
-from nearest_neighbors_loss_function.utils.auxiliary_functions import create_experiment_dir, create_model_dir, set_seed
+from nearest_neighbors_loss_function.utils.auxiliary_functions import create_experiment_dir, \
+    create_model_dir, set_seed, convert_graph_data_to_float
 from nearest_neighbors_loss_function.utils.gamma_calculator import GammaCalculator
 from nearest_neighbors_loss_function.utils.statistics import Statistics
 from nearest_neighbors_loss_function.utils.evaluate_model import evaluate_model
@@ -52,7 +53,7 @@ def train_triplet(
         batch_shaper = BatchShaper(training_type)
         gamma_calculator = GammaCalculator(embedding_length, n_neighbors, batch_size, device, gamma_function, recalculation_strategy = gamma_recalculation_strategy)
 
-        logging.info(f"Running training process for seed: {seed}. Progress: {id_seed}/{len(seeds)}")
+        logging.info(f"Running training process for seed: {seed}. Seed: {id_seed + 1}/{len(seeds)}")
         model_dir_path = create_model_dir(experiment_dir_path, seed)
         set_seed(seed)
 
@@ -65,7 +66,7 @@ def train_triplet(
 
         for epoch in range(0, n_epochs):
 
-            logging.info(f"Epoch: {epoch}")
+            logging.info(f"Epoch: {epoch + 1}/{n_epochs}")
             model_epoch_hash = uuid4().hex
 
             model, optimizer, loss_function, train_stats = train(model, train_loader, n_train_samples, optimizer, loss_function, 
@@ -114,6 +115,7 @@ def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_
         with torch.set_grad_enabled(True):
 
             optimizer.zero_grad()
+            data = convert_graph_data_to_float(data)
             anchor_mfs = model(data.x.float(), data.edge_index, data.batch)
             anchor_mf, positive_mf, negative_mf, _ = batch_shaper.shape_batch(anchor_mfs, labels)
 
