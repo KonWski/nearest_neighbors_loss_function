@@ -76,7 +76,7 @@ def train_triplet(
                                         n_neighbors, "valid", device)
 
             # early exit
-            if validate_stats["precision"] == 0.0:
+            if validate_stats["valid_precision"] == 0.0:
                 print(f"Precision 0 reached at epoch {epoch} -> next split")
                 break
 
