@@ -53,7 +53,7 @@ def train_triplet(
         batch_shaper = BatchShaper(training_type)
         gamma_calculator = GammaCalculator(embedding_length, n_neighbors, batch_size, device, gamma_function, recalculation_strategy = gamma_recalculation_strategy)
 
-        logging.info(f"Running training process for seed: {seed}. Seed: {id_seed + 1}/{len(seeds)}")
+        logging.info(f"Running training process for seed: {seed}. Progress: {id_seed + 1}/{len(seeds)}")
         model_dir_path = create_model_dir(experiment_dir_path, seed)
         set_seed(seed)
 
@@ -116,7 +116,7 @@ def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_
 
             optimizer.zero_grad()
             data = convert_graph_data_to_float(data)
-            anchor_mfs = model(data.x.float(), data.edge_index, data.batch)
+            anchor_mfs = model(data)
             anchor_mf, positive_mf, negative_mf, _ = batch_shaper.shape_batch(anchor_mfs, labels)
 
             loss = loss_function(anchor_mf, positive_mf, negative_mf)

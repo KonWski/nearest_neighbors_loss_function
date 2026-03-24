@@ -15,7 +15,6 @@ def get_datasets(dataset_name = "ogbg-molhiv", dataset_root = 'dataset/', debug=
         valid_dataset = ogbg_dataset[ogbg_dataset.get_idx_split()["valid"]]
         test_dataset = ogbg_dataset[ogbg_dataset.get_idx_split()["test"]]
 
-
     return train_dataset, valid_dataset, test_dataset
 
 def get_loaders(batch_size, dataset_name = "ogbg-molhiv", dataset_root = 'dataset/', debug=False):
