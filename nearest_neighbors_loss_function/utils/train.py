@@ -83,7 +83,7 @@ def train_triplet(
             statistics.add(train_stats, validate_stats)
             statistics.log_last_train_stats()
 
-            if validate_stats["valid_optimized_param_name"] > max_epoch_optimized_param_value:
+            if validate_stats[f"valid_{optimized_param_name}"] > max_epoch_optimized_param_value:
                 max_epoch_optimized_param_value = validate_stats[optimized_param_name]
                 best_model_dir_path = model_dir_path
 
