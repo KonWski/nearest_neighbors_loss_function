@@ -31,7 +31,7 @@ def save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash,  
     checkpoint["lambda_samples_difficultness"] = lambda_samples_difficultness
     checkpoint["save_model_dttm"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    checkpoint_path = os.path.join(model_dir_path, epoch, model_epoch_hash, ".pt")
+    checkpoint_path = os.path.join(model_dir_path, str(epoch), model_epoch_hash, ".pt")
     save(checkpoint, checkpoint_path)
     logging.info(f"Saved model to checkpoint: {checkpoint_path}")
 
