@@ -22,7 +22,9 @@ def train_triplet(
         batch_size: int, 
         gamma_recalculation_strategy: int, 
         gamma_function: str,
+        focal_pow: float,
         density_awareness: bool,
+        density_function: str,
         samples_difficultness: bool,
         lambda_samples_difficultness: float,
         n_neighbors: int, 
@@ -51,7 +53,9 @@ def train_triplet(
 
         loss_function = TripletMarginLoss(reduction="none")
         batch_shaper = BatchShaper(training_type)
-        gamma_calculator = GammaCalculator(embedding_length, n_neighbors, batch_size, device, gamma_function, recalculation_strategy = gamma_recalculation_strategy)
+        gamma_calculator = GammaCalculator(embedding_length, n_neighbors, batch_size, device, gamma_function, focal_pow,
+                                           density_awareness, density_function, samples_difficultness, 
+                                           lambda_samples_difficultness, gamma_recalculation_strategy)
 
         logging.info(f"Running training process for seed: {seed}. Progress: {id_seed + 1}/{len(seeds)}")
         model_dir_path = create_model_dir(experiment_dir_path, seed)

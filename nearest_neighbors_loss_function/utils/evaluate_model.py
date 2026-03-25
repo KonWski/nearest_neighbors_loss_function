@@ -1,8 +1,9 @@
 from sklearn.metrics import precision_score, accuracy_score, recall_score, f1_score, roc_auc_score, matthews_corrcoef
 from sklearn.neighbors import KNeighborsClassifier
 from skfp.metrics import enrichment_factor
-from nearest_neighbors_loss_function.utils.generate_embeddings import generate_embeddings
-from nearest_neighbors_loss_function.utils.checkpoints import load_model
+from .generate_embeddings import generate_embeddings
+from .checkpoints import load_model
+import torch
 
 def evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_samples, embedding_length, 
          n_neighbors, stats_prefix, device):
@@ -15,7 +16,8 @@ def evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_sam
     train_labels = train_labels.ravel()
     test_labels = test_labels.ravel()
 
-    accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc = knn_stats(train_embeddings, test_embeddings, train_labels, test_labels, n_neighbors)
+    train_distances = torch.cdist(train_embeddings, train_embeddings)
+    accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc = knn_stats(train_distances, test_embeddings, train_labels, test_labels, n_neighbors)
 
     # epoch_loss = round(running_loss / (data_id + 1), 5)
     test_stats = {f"{stats_prefix}_accuracy": accuracy, f"{stats_prefix}_precision": precision, f"{stats_prefix}_recall": recall, 
@@ -25,11 +27,17 @@ def evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_sam
     return test_stats
 
 
-def knn_stats(X_train, X_test, y_train, y_test, n_neighbors):
+def knn_stats(train_distances, X_test, y_train, y_test, n_neighbors):
+
+    # convert torch -> numpy
+    train_distances = train_distances.numpy()
+    X_test = X_test.numpy()
+    y_train = y_train.numpy()
+    y_test = y_test.numpy()
 
     # fit model
-    knn = KNeighborsClassifier(n_neighbors=n_neighbors)
-    knn.fit(X_train, y_train)
+    knn = KNeighborsClassifier(n_neighbors=n_neighbors, n_jobs=-1, metric="precomputed")
+    knn.fit(train_distances, y_train)
 
     # predictions
     y_pred = knn.predict(X_test)

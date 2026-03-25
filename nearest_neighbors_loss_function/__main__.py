@@ -1,8 +1,7 @@
 import argparse
-import nearest_neighbors_loss_function.utils.set_torch_geometrics
-from nearest_neighbors_loss_function.utils.train import train_triplet
-from nearest_neighbors_loss_function.utils.evaluate_model import test_model
-from nearest_neighbors_loss_function.utils.datasets import get_loaders
+from .utils.train import train_triplet
+from .utils.evaluate_model import test_model
+from .utils.datasets import get_loaders
 import torch
 import logging
 
@@ -15,9 +14,11 @@ def parse_args():
     parser.add_argument("--training_type", type=str, required=True)
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--gamma_recalculation_strategy", type=int, required=True)
-    parser.add_argument("--gamma_function", type=str, required=True)
+    parser.add_argument("--gamma_function", type=str, required=True, default=None)
+    parser.add_argument("--focal_pow", type=float, required=False, default=None)
 
     parser.add_argument("--density_awareness", action="store_false")
+    parser.add_argument("--density_function", type=str, required=False)
     parser.add_argument("--samples_difficultness", action="store_false")
     parser.add_argument("--lambda_samples_difficultness", type=float, default=0.0)
 
@@ -50,7 +51,9 @@ def main():
         batch_size=args.batch_size,
         gamma_recalculation_strategy=args.gamma_recalculation_strategy,
         gamma_function=args.gamma_function,
+        focal_pow=args.focal_pow,
         density_awareness=args.density_awareness,
+        density_function=args.density_function,
         samples_difficultness=args.samples_difficultness,
         lambda_samples_difficultness=args.lambda_samples_difficultness,
         n_neighbors=args.n_neighbors,

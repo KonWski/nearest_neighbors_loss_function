@@ -1,11 +1,25 @@
 from .generate_embeddings import generate_embeddings
+from .knn_adaptive import KNeigborsAdaptiveClassifier
 from sklearn.neighbors import KNeighborsClassifier
 import torch
 import math
 
 class GammaCalculator():
 
-    def __init__(self, embedding_length, n_neighbors, batch_size, device, gamma_function, focal_pow = 1, recalculation_strategy = 0):
+    def __init__(
+            self, 
+            embedding_length, 
+            n_neighbors, 
+            batch_size, 
+            device, 
+            gamma_function, 
+            focal_pow = 1, 
+            density_awareness, 
+            density_function,
+            samples_difficultness, 
+            lambda_samples_difficultness,
+            recalculation_strategy
+        ):
         self.embedding_length = embedding_length
         self.n_neighbors = n_neighbors
         self.batch_size = batch_size
@@ -15,15 +29,18 @@ class GammaCalculator():
         self.focal_pow = focal_pow
         self.n_samples = None
         self.recalculation_strategy = recalculation_strategy
-
+        self.density_awareness = density_awareness
+        self.density_function = density_function
+        self.samples_difficultness = samples_difficultness
+        self.lambda_samples_difficultness = lambda_samples_difficultness
 
     def recalculate_gamma_values(self, model, data_loader, n_samples, batch_id):
         
         if self.recalculation_strategy == 0 and batch_id == 0:
-            self._refresh_knn(model, data_loader, n_samples)
+            self._refresh_gamma_values(model, data_loader, n_samples)
 
         elif self.recalculation_strategy > 0 and batch_id % self.recalculation_strategy == 0:
-            self._refresh_knn(model, data_loader, n_samples)
+            self._refresh_gamma_values(model, data_loader, n_samples)
 
         elif self.recalculation_strategy == -1:
             self.gamma_values = torch.ones(n_samples)
@@ -32,22 +49,40 @@ class GammaCalculator():
         self.gamma_values = self.gamma_values.to(self.device)
 
 
-    def _refresh_knn(self, model, data_loader, n_samples):
+    def _refresh_gamma_values(self, model, data_loader, n_samples):
 
         X, y = generate_embeddings(model, data_loader, n_samples, self.embedding_length, self.device)
+        distances = torch.cdist(X, X)
+
+        # convert torch -> numpy
+        X = X.numpy()
+        y = y.numpy()
+        distances = distances.numpy()
+
         y = y.ravel()
         proba_thrash_threshold = 1 / self.n_neighbors
         gamma_values = torch.ones(n_samples)
 
-        knn = KNeighborsClassifier(n_neighbors=self.n_neighbors, n_jobs=-1)
-        knn.fit(X, y)
+        if self.density_awareness:
+            knn = KNeigborsAdaptiveClassifier(self.n_neighbors)
+            knn.fit(distances, y)
 
-        for sample_id, sample_label in enumerate(y):
-            if sample_label == 1:
-                sample_embedding = X[sample_id, :].reshape(1, -1)
-                sample_proba = knn.predict_proba(sample_embedding)[0][1] - proba_thrash_threshold
-                gamma = self._calculate_gamma(sample_proba)
-                gamma_values[sample_id] = gamma
+            for sample_id, sample_label in enumerate(y):
+                if sample_label == 1:
+                    sample_proba = knn.predict_proba(sample_id)
+                    gamma = self._calculate_gamma(sample_proba)
+                    gamma_values[sample_id] = gamma
+
+        else:
+            knn = KNeighborsClassifier(n_neighbors=self.n_neighbors, n_jobs=-1, metric="precomputed")
+            knn.fit(distances, y)
+
+            for sample_id, sample_label in enumerate(y):
+                if sample_label == 1:
+                    sample_embedding = X[sample_id, :].reshape(1, -1)
+                    sample_proba = knn.predict_proba(sample_embedding)[0][1] - proba_thrash_threshold
+                    gamma = self._calculate_gamma(sample_proba)
+                    gamma_values[sample_id] = gamma
 
         self.gamma_values = gamma_values
         self.n_samples = n_samples
@@ -80,7 +115,3 @@ class GammaCalculator():
     def _boosted_gamma(self, sample_proba):
         gamma = 2 - sample_proba
         return gamma
-    
-
-    def __str__(self):
-        pass

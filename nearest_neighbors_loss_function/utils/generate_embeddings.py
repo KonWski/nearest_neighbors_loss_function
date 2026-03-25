@@ -1,5 +1,5 @@
 import torch
-from nearest_neighbors_loss_function.utils.auxiliary_functions import convert_graph_data_to_float
+from .auxiliary_functions import convert_graph_data_to_float
 
 def generate_embeddings(model, data_loader, n_samples, embedding_length, device):
 
@@ -29,7 +29,7 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, device)
     if original_shuffle == True:
         data_loader.batch_sampler.shuffle = True
 
-    embeddings = embeddings.detach().numpy()
-    labels = labels.detach().numpy()
+    embeddings = embeddings.detach()
+    labels = labels.detach()
 
     return embeddings, labels
