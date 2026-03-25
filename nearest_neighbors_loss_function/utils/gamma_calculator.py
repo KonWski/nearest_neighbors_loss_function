@@ -13,7 +13,7 @@ class GammaCalculator():
             batch_size, 
             device, 
             gamma_function, 
-            focal_pow = 1, 
+            focal_pow, 
             density_awareness, 
             density_function,
             samples_difficultness, 
