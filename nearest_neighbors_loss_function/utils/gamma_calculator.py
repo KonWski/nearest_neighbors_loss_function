@@ -14,11 +14,12 @@ class GammaCalculator():
             device, 
             gamma_function, 
             focal_pow, 
+            recalculation_strategy,
+            weight_distances,
             density_awareness, 
             density_function,
             samples_difficultness, 
-            lambda_samples_difficultness,
-            recalculation_strategy
+            lambda_samples_difficultness
         ):
         self.embedding_length = embedding_length
         self.n_neighbors = n_neighbors
@@ -29,6 +30,7 @@ class GammaCalculator():
         self.focal_pow = focal_pow
         self.n_samples = None
         self.recalculation_strategy = recalculation_strategy
+        self.weight_distances = weight_distances
         self.density_awareness = density_awareness
         self.density_function = density_function
         self.samples_difficultness = samples_difficultness
@@ -88,8 +90,14 @@ class GammaCalculator():
         self.n_samples = n_samples
 
 
-    def get_gamma_values(self, gamma_start_id, gamma_end_id):
-        return self.gamma_values[gamma_start_id: gamma_end_id]
+    def get_gamma_values(self, gamma_start_id, gamma_end_id, positive_mf_distances, negative_mf_distances):
+        batch_gamma_values = self.gamma_values[gamma_start_id: gamma_end_id]
+        
+        if self.density_awareness:
+            samples_difficultness = positive_mf_distances / negative_mf_distances
+            batch_gamma_values = batch_gamma_values * (1 + self.lambda_samples_difficultness * samples_difficultness)
+
+        return batch_gamma_values
 
 
     def _calculate_gamma(self, sample_proba):

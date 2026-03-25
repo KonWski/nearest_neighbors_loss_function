@@ -15,6 +15,8 @@ def parse_args():
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--gamma_recalculation_strategy", type=int, required=True)
     parser.add_argument("--gamma_function", type=str, required=True, default=None)
+    parser.add_argument("--weight_distances", action="store_false")
+
     parser.add_argument("--focal_pow", type=float, required=False, default=None)
 
     parser.add_argument("--density_awareness", action="store_false")
@@ -51,6 +53,7 @@ def main():
         batch_size=args.batch_size,
         gamma_recalculation_strategy=args.gamma_recalculation_strategy,
         gamma_function=args.gamma_function,
+        weight_distances=args.weight_distances,
         focal_pow=args.focal_pow,
         density_awareness=args.density_awareness,
         density_function=args.density_function,

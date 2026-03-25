@@ -22,6 +22,7 @@ def train_triplet(
         batch_size: int, 
         gamma_recalculation_strategy: int, 
         gamma_function: str,
+        weight_distances: bool,
         focal_pow: float,
         density_awareness: bool,
         density_function: str,
@@ -53,9 +54,9 @@ def train_triplet(
 
         loss_function = TripletMarginLoss(reduction="none")
         batch_shaper = BatchShaper(training_type)
-        gamma_calculator = GammaCalculator(embedding_length, n_neighbors, batch_size, device, gamma_function, focal_pow,
-                                           density_awareness, density_function, samples_difficultness, 
-                                           lambda_samples_difficultness, gamma_recalculation_strategy)
+        gamma_calculator = GammaCalculator(embedding_length, n_neighbors, batch_size, device, gamma_function, focal_pow, 
+                                           gamma_recalculation_strategy, weight_distances, density_awareness, density_function,
+                                           samples_difficultness, lambda_samples_difficultness)
 
         logging.info(f"Running training process for seed: {seed}. Progress: {id_seed + 1}/{len(seeds)}")
         model_dir_path = create_model_dir(experiment_dir_path, seed)
@@ -64,7 +65,6 @@ def train_triplet(
         model = GNNModel(model_in_channels, model_hidden_channels, embedding_length).to(device)
         model = model.to(device)
         optimizer = Adam(model.parameters(), lr=lr)
-        batch_shaper = BatchShaper(training_type)
 
         max_epoch_optimized_param_value = float("-inf")
 
@@ -122,6 +122,7 @@ def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_
             data = convert_graph_data_to_float(data)
             anchor_mfs = model(data)
             anchor_mf, positive_mf, negative_mf, _ = batch_shaper.shape_batch(anchor_mfs, labels)
+            anchor_mf, positive_mf, positive_mf_distances, negative_mf, negative_mf_distances, _ = batch_shaper.shape_batch(anchor_mfs, labels)
 
             loss = loss_function(anchor_mf, positive_mf, negative_mf)
             gamma_values = gamma_calculator.get_gamma_values(gamma_start_id, gamma_end_id)

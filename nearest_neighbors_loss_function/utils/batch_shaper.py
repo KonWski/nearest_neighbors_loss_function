@@ -14,9 +14,13 @@ class BatchShaper():
         anchor_mfs_1 = anchor_mfs[indices_1,:]
         anchor_mfs_0 = anchor_mfs[indices_0,:]
         distances = torch.cdist(anchor_mfs, anchor_mfs)
+        n_anchors = anchor_mfs.shape[0]
+        embedding_size = anchor_mfs.shape[1]
 
-        positive_mfs = []
-        negative_mfs = []
+        positive_mfs = torch.zeros(n_anchors, embedding_size)
+        negative_mfs = torch.zeros(n_anchors, embedding_size)
+        positive_mfs_distances = torch.zeros(n_anchors)
+        negative_mfs_distances = torch.zeros(n_anchors)
 
         if self.training_type == "hard_batch_learning":
 
@@ -27,19 +31,21 @@ class BatchShaper():
                 if anchor_label == 0:
                     distances_pos = distances[anchor_iter, indices_0]
                     distances_neg = distances[anchor_iter, indices_1]
-
                     id_distance_pos_max = distances_pos.argmax().item()
                     id_distance_neg_min = distances_neg.argmin().item()
-                    positive_mfs.append(anchor_mfs_0[id_distance_pos_max, :])
-                    negative_mfs.append(anchor_mfs_1[id_distance_neg_min, :])
+                    positive_mfs[anchor_iter] = anchor_mfs_0[id_distance_pos_max, :]
+                    negative_mfs[anchor_iter] = anchor_mfs_1[id_distance_neg_min, :]
 
                 elif anchor_label == 1:
                     distances_pos = distances[anchor_iter, indices_1]
                     distances_neg = distances[anchor_iter, indices_0]
                     id_distance_pos_max = distances_pos.argmax().item()
                     id_distance_neg_min = distances_neg.argmin().item()
-                    positive_mfs.append(anchor_mfs_1[id_distance_pos_max, :])
-                    negative_mfs.append(anchor_mfs_0[id_distance_neg_min, :])
+                    positive_mfs[anchor_iter] = anchor_mfs_1[id_distance_pos_max, :]
+                    negative_mfs[anchor_iter] = anchor_mfs_0[id_distance_neg_min, :]
+
+                positive_mfs_distances[anchor_iter] = distances_pos[id_distance_pos_max]
+                negative_mfs_distances[anchor_iter] = distances_pos[id_distance_neg_min]
 
         elif self.training_type == "semi_hard_batch_learning":
 
@@ -72,13 +78,12 @@ class BatchShaper():
                     # fallback to closest negative
                     neg_idx = neg_pool[distances_neg.argmin().item()]
 
-                positive_mfs.append(anchor_mfs[pos_idx])
-                negative_mfs.append(anchor_mfs[neg_idx])
+                positive_mfs[anchor_iter] = anchor_mfs[pos_idx]
+                negative_mfs[anchor_iter] = anchor_mfs[neg_idx]
+                positive_mfs_distances[anchor_iter] = distances_pos[pos_idx]
+                negative_mfs_distances[anchor_iter] = distances_pos[neg_idx]
 
         else:
             raise Exception("Training type not implemented")
 
-        positive_mfs = torch.stack(positive_mfs, dim=0)
-        negative_mfs = torch.stack(negative_mfs, dim=0)
-
-        return anchor_mfs, positive_mfs, negative_mfs, anchor_labels
+        return anchor_mfs, positive_mfs, positive_mfs_distances, negative_mfs, negative_mfs_distances, anchor_labels
