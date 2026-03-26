@@ -86,7 +86,7 @@ class GammaCalculator():
 
             for sample_id, sample_label in enumerate(y):
                 if sample_label == 1:
-                    sample_distances = distances[sample_id, :]
+                    sample_distances = distances[sample_id, :].reshape(1, -1)
                     sample_proba = knn.predict_proba(sample_distances)[0][1] - proba_thrash_threshold
                     gamma = self._calculate_gamma(sample_proba)
                     gamma_values[sample_id] = gamma
