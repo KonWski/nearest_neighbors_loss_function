@@ -79,10 +79,10 @@ def train_triplet(
             validate_stats = evaluate_model(model, train_loader, n_train_samples, valid_loader, n_valid_samples, embedding_length, 
                                         n_neighbors, "valid", device)
 
-            # early exit
-            if validate_stats["valid_precision"] == 0.0:
-                print(f"Precision 0 reached at epoch {epoch} -> next split")
-                break
+            # # early exit
+            # if validate_stats["valid_precision"] == 0.0:
+            #     print(f"Precision 0 reached at epoch {epoch} -> next split")
+            #     break
 
             statistics.add(train_stats, validate_stats)
             statistics.log_last_train_stats()
