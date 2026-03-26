@@ -53,7 +53,7 @@ def train_triplet(
     for id_seed, seed in enumerate(seeds):
 
         loss_function = TripletMarginLoss(reduction="none")
-        batch_shaper = BatchShaper(training_type)
+        batch_shaper = BatchShaper(device, training_type)
         gamma_calculator = GammaCalculator(embedding_length, n_neighbors, batch_size, device, gamma_function, focal_pow, 
                                            gamma_recalculation_strategy, weight_distances, density_awareness, density_function,
                                            samples_difficultness, lambda_samples_difficultness)

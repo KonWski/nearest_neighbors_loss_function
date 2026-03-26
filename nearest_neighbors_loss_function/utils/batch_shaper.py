@@ -2,7 +2,7 @@ import torch
 
 class BatchShaper():
 
-    def __init__(self, training_type = "hard_batch_learning", margin = 1.0, device):
+    def __init__(self, device, training_type = "hard_batch_learning", margin = 1.0):
         self.training_type = training_type
         self.margin = margin
         self.device = device
