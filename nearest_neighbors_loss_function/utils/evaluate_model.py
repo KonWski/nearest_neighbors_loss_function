@@ -4,6 +4,7 @@ from skfp.metrics import enrichment_factor
 from .generate_embeddings import generate_embeddings
 from .checkpoints import load_model
 import torch
+import torch.nn.functional as F
 
 def evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_samples, embedding_length, 
          n_neighbors, stats_prefix, device):
@@ -12,12 +13,16 @@ def evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_sam
     train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_length, device)
     test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_length, device)
 
+    train_embeddings = F.normalize(train_embeddings, dim=1)
+    test_embeddings = F.normalize(test_embeddings, dim=1)
+
     # reshape to 1d
     train_labels = train_labels.ravel()
     test_labels = test_labels.ravel()
 
     train_distances = torch.cdist(train_embeddings, train_embeddings)
-    test_distances = torch.cdist(test_embeddings, train_embeddings)    
+    test_distances = torch.cdist(test_embeddings, train_embeddings)
+
     accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc = knn_stats(train_distances, test_distances, train_labels, test_labels, n_neighbors)
 
     # epoch_loss = round(running_loss / (data_id + 1), 5)
