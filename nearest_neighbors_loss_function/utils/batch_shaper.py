@@ -82,12 +82,12 @@ class BatchShaper():
                 negative_mfs[anchor_iter] = anchor_mfs[neg_idx]
 
                 print(f"positive_mfs_distances.shape: {positive_mfs_distances.shape}")
-                print(f"distances_pos.shape: {distances_pos.shape}")
+                print(f"distances_neg.shape: {distances_neg.shape}")
                 print(f"pos_idx: {pos_idx}")
                 print(f"neg_idx: {neg_idx}")
 
-                positive_mfs_distances[anchor_iter] = distances_pos[pos_idx]
-                negative_mfs_distances[anchor_iter] = distances_pos[neg_idx]
+                positive_mfs_distances[anchor_iter] = distances_pos
+                negative_mfs_distances[anchor_iter] = distances_neg[neg_idx]
 
         else:
             raise Exception("Training type not implemented")
