@@ -17,7 +17,7 @@ def evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_sam
     test_labels = test_labels.ravel()
 
     train_distances = torch.cdist(train_embeddings, train_embeddings)
-    test_distances = torch.cdist(test_embeddings, test_embeddings)    
+    test_distances = torch.cdist(test_embeddings, train_embeddings)    
     accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc = knn_stats(train_distances, test_distances, train_labels, test_labels, n_neighbors)
 
     # epoch_loss = round(running_loss / (data_id + 1), 5)
@@ -28,11 +28,11 @@ def evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_sam
     return test_stats
 
 
-def knn_stats(train_distances, test_distances, y_train, y_test, n_neighbors):
+def knn_stats(train_distances, test_train_distances, y_train, y_test, n_neighbors):
 
     # convert torch -> numpy
     train_distances = train_distances.numpy()
-    test_distances = test_distances.numpy()
+    test_train_distances = test_train_distances.numpy()
     y_train = y_train.numpy()
     y_test = y_test.numpy()
 
@@ -41,7 +41,7 @@ def knn_stats(train_distances, test_distances, y_train, y_test, n_neighbors):
     knn.fit(train_distances, y_train)
 
     # predictions
-    y_pred = knn.predict(test_distances)
+    y_pred = knn.predict(test_train_distances)
 
     # scores
     accuracy = round(accuracy_score(y_test, y_pred), 4)
