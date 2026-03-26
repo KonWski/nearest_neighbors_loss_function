@@ -76,7 +76,12 @@ class GammaCalculator():
                     gamma_values[sample_id] = gamma
 
         else:
-            knn = KNeighborsClassifier(n_neighbors=self.n_neighbors, n_jobs=-1, metric="precomputed")
+
+            if self.weight_distances:
+                knn = KNeighborsClassifier(n_neighbors=self.n_neighbors, n_jobs=-1, metric="precomputed", weights="distance")
+            else:
+                knn = KNeighborsClassifier(n_neighbors=self.n_neighbors, n_jobs=-1, metric="precomputed")
+
             knn.fit(distances, y)
 
             for sample_id, sample_label in enumerate(y):
