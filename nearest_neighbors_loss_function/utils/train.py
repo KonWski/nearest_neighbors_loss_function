@@ -121,11 +121,10 @@ def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_
             optimizer.zero_grad()
             data = convert_graph_data_to_float(data)
             anchor_mfs = model(data)
-            anchor_mf, positive_mf, negative_mf, _ = batch_shaper.shape_batch(anchor_mfs, labels)
             anchor_mf, positive_mf, positive_mf_distances, negative_mf, negative_mf_distances, _ = batch_shaper.shape_batch(anchor_mfs, labels)
 
             loss = loss_function(anchor_mf, positive_mf, negative_mf)
-            gamma_values = gamma_calculator.get_gamma_values(gamma_start_id, gamma_end_id)
+            gamma_values = gamma_calculator.get_gamma_values(gamma_start_id, gamma_end_id, positive_mf_distances, negative_mf_distances)
             loss = loss * gamma_values
             loss = loss.mean()
 
