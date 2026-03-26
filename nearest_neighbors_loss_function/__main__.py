@@ -2,6 +2,7 @@ import argparse
 from .utils.train import train_triplet
 from .utils.evaluate_model import test_model
 from .utils.datasets import get_loaders
+import nearest_neighbors_loss_function.utils.set_torch_geometrics
 import torch
 import logging
 
