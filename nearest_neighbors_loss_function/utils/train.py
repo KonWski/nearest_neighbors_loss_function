@@ -79,10 +79,10 @@ def train_triplet(
             validate_stats = evaluate_model(model, train_loader, n_train_samples, valid_loader, n_valid_samples, embedding_length, 
                                         n_neighbors, "valid", device)
 
-            # # early exit
-            # if validate_stats["valid_precision"] == 0.0:
-            #     print(f"Precision 0 reached at epoch {epoch} -> next split")
-            #     break
+            # early exit
+            if validate_stats["valid_precision"] == 0.0:
+                print(f"Precision 0 reached at epoch {epoch} -> next split")
+                break
 
             statistics.add(train_stats, validate_stats)
             statistics.log_last_train_stats()
@@ -94,6 +94,9 @@ def train_triplet(
                 save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
                            train_stats["loss"], n_neighbors, max_epoch_optimized_param_value, training_type, batch_size, 
                            gamma_recalculation_strategy, density_awareness, samples_difficultness, lambda_samples_difficultness)
+            
+            break
+        break
 
     return statistics, best_model_dir_path, n_train_samples
 

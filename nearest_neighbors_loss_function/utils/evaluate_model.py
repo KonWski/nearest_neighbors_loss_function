@@ -36,20 +36,26 @@ def knn_stats(train_distances, test_train_distances, y_train, y_test, n_neighbor
     y_train = y_train.numpy()
     y_test = y_test.numpy()
 
+    print(f"train_distances: {train_distances}")
+    print(f"test_train_distances: {test_train_distances}")
+    print(f"y_test: {y_test}")
+
     # fit model
     knn = KNeighborsClassifier(n_neighbors=n_neighbors, n_jobs=-1, metric="precomputed")
     knn.fit(train_distances, y_train)
 
     # predictions
     y_pred = knn.predict(test_train_distances)
-    print(y_pred)
 
     # scores
     accuracy = round(accuracy_score(y_test, y_pred), 4)
     precision = round(precision_score(y_test, y_pred), 4)
     recall = round(recall_score(y_test, y_pred), 4)
     f1 = round(f1_score(y_test, y_pred), 4)
+    
+    # todo potrzeba proba
     roc_auc = round(roc_auc_score(y_test, y_pred), 4)
+    
     mcc = round(matthews_corrcoef(y_test, y_pred), 4)
 
     ef01 = round(enrichment_factor(y_test, y_pred, fraction=0.01), 4)
