@@ -2,9 +2,10 @@ import torch
 
 class BatchShaper():
 
-    def __init__(self, training_type = "hard_batch_learning", margin = 1.0):
+    def __init__(self, training_type = "hard_batch_learning", margin = 1.0, device):
         self.training_type = training_type
         self.margin = margin
+        self.device = device
 
     def shape_batch(self, anchor_mfs, anchor_labels):
 
@@ -17,10 +18,10 @@ class BatchShaper():
         n_anchors = anchor_mfs.shape[0]
         embedding_size = anchor_mfs.shape[1]
 
-        positive_mfs = torch.zeros(n_anchors, embedding_size)
-        negative_mfs = torch.zeros(n_anchors, embedding_size)
-        positive_mfs_distances = torch.zeros(n_anchors)
-        negative_mfs_distances = torch.zeros(n_anchors)
+        positive_mfs = torch.zeros(n_anchors, embedding_size, device=self.device)
+        negative_mfs = torch.zeros(n_anchors, embedding_size, device=self.device)
+        positive_mfs_distances = torch.zeros(n_anchors, device=self.device)
+        negative_mfs_distances = torch.zeros(n_anchors, device=self.device)
 
         if self.training_type == "hard_batch_learning":
 
