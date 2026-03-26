@@ -42,6 +42,7 @@ def knn_stats(train_distances, test_train_distances, y_train, y_test, n_neighbor
 
     # predictions
     y_pred = knn.predict(test_train_distances)
+    print(y_pred)
 
     # scores
     accuracy = round(accuracy_score(y_test, y_pred), 4)
