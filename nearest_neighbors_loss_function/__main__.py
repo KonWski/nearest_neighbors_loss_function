@@ -16,13 +16,13 @@ def parse_args():
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--gamma_recalculation_strategy", type=int, required=True)
     parser.add_argument("--gamma_function", type=str, required=True, default=None)
-    parser.add_argument("--weight_distances", action="store_false")
+    parser.add_argument("--weight_distances", action="store_true")
 
     parser.add_argument("--focal_pow", type=float, required=False, default=None)
 
-    parser.add_argument("--density_awareness", action="store_false")
+    parser.add_argument("--density_awareness", action="store_true")
     parser.add_argument("--density_function", type=str, required=False)
-    parser.add_argument("--samples_difficultness", action="store_false")
+    parser.add_argument("--samples_difficultness", action="store_true")
     parser.add_argument("--lambda_samples_difficultness", type=float, default=0.0)
 
     parser.add_argument("--n_neighbors", type=int, required=True)
@@ -34,7 +34,7 @@ def parse_args():
     parser.add_argument("--model_in_channels", type=int, required=True)
     parser.add_argument("--embedding_length", type=int, required=True)
     parser.add_argument("--optimized_param_name", type=str, required=True)
-    parser.add_argument("--debug", action="store_false")
+    parser.add_argument("--debug", action="store_true")
 
     return parser.parse_args()
 
