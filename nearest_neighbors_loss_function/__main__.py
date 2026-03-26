@@ -39,9 +39,14 @@ def parse_args():
     return parser.parse_args()
 
 
+def log_args(args):
+    for arg, value in sorted(vars(args).items()):
+        logging.info("Argument %s: %r", arg, value)
+
 def main():
     
     args = parse_args()
+    log_args(args)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, debug=args.debug)

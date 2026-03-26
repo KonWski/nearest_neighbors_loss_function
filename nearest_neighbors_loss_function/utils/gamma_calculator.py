@@ -66,7 +66,7 @@ class GammaCalculator():
         gamma_values = torch.ones(n_samples)
 
         if self.density_awareness:
-            knn = KNeigborsAdaptiveClassifier(self.n_neighbors)
+            knn = KNeigborsAdaptiveClassifier(self.n_neighbors, self.density_function)
             knn.fit(distances, y)
 
             for sample_id, sample_label in enumerate(y):
