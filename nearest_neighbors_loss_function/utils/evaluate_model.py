@@ -36,10 +36,6 @@ def knn_stats(train_distances, test_train_distances, y_train, y_test, n_neighbor
     y_train = y_train.numpy()
     y_test = y_test.numpy()
 
-    print(f"train_distances: {train_distances}")
-    print(f"test_train_distances: {test_train_distances}")
-    print(f"y_test: {y_test}")
-
     # fit model
     knn = KNeighborsClassifier(n_neighbors=n_neighbors, n_jobs=-1, metric="precomputed")
     knn.fit(train_distances, y_train)
