@@ -82,11 +82,6 @@ class BatchShaper():
                 positive_mfs[anchor_iter] = anchor_mfs[pos_idx]
                 negative_mfs[anchor_iter] = anchor_mfs[neg_idx]
 
-                # print(f"positive_mfs_distances.shape: {positive_mfs_distances.shape}")
-                # print(f"distances_neg.shape: {distances_neg.shape}")
-                # print(f"pos_idx: {pos_idx}")
-                # print(f"neg_idx: {neg_idx}")
-
                 positive_mfs_distances[anchor_iter] = distances_pos
                 negative_mfs_distances[anchor_iter] = distances[anchor_iter, neg_idx]
 
