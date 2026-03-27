@@ -56,9 +56,12 @@ class GammaCalculator():
     def _refresh_gamma_values(self, model, data_loader, n_samples):
 
         X, y = generate_embeddings(model, data_loader, n_samples, self.embedding_length, self.device)
+        print("Generated embeddings for gamma refreshment")
         X = F.normalize(X, dim=1)
+        print("Normalized embeddings")
         distances = 2 - 2 * (X @ X.T)
         distances = distances.clamp(min=0)
+        print("Calculated distances")
 
         # convert torch -> numpy
         X = X.numpy()
@@ -74,6 +77,7 @@ class GammaCalculator():
             knn.fit(distances, y)
 
             for sample_id, sample_label in enumerate(y):
+                print(f"Sample id: {sample_id}")
                 if sample_label == 1:
                     sample_proba = knn.predict_proba(sample_id)
                     gamma = self._calculate_gamma(sample_proba)
