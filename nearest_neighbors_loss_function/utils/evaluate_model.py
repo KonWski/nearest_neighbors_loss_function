@@ -3,7 +3,6 @@ from sklearn.neighbors import KNeighborsClassifier
 from skfp.metrics import enrichment_factor
 from .generate_embeddings import generate_embeddings
 from .checkpoints import load_model
-import torch
 import torch.nn.functional as F
 
 def evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_samples, embedding_length, 
@@ -20,8 +19,8 @@ def evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_sam
     train_labels = train_labels.ravel()
     test_labels = test_labels.ravel()
 
-    train_distances = torch.cdist(train_embeddings, train_embeddings)
-    test_distances = torch.cdist(test_embeddings, train_embeddings)
+    train_distances = 2 - 2 * (train_distances @ train_distances.T)
+    test_distances = 2 - 2 * (test_embeddings @ train_distances.T)
 
     accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc = knn_stats(train_distances, test_distances, train_labels, test_labels, n_neighbors)
 

@@ -3,6 +3,7 @@ from .knn_adaptive import KNeigborsAdaptiveClassifier
 from sklearn.neighbors import KNeighborsClassifier
 import torch
 import math
+import torch.nn.functional as F
 
 class GammaCalculator():
 
@@ -54,7 +55,8 @@ class GammaCalculator():
     def _refresh_gamma_values(self, model, data_loader, n_samples):
 
         X, y = generate_embeddings(model, data_loader, n_samples, self.embedding_length, self.device)
-        distances = torch.cdist(X, X)
+        X = F.normalize(X, dim=1)
+        distances = 2 - 2 * (X @ X.T)
 
         # convert torch -> numpy
         X = X.numpy()
