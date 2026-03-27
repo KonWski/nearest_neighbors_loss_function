@@ -77,7 +77,6 @@ class GammaCalculator():
             knn.fit(distances, y)
 
             for sample_id, sample_label in enumerate(y):
-                print(f"Sample id: {sample_id}")
                 if sample_label == 1:
                     sample_proba = knn.predict_proba(sample_id)
                     gamma = self._calculate_gamma(sample_proba)
@@ -93,6 +92,7 @@ class GammaCalculator():
             knn.fit(distances, y)
 
             for sample_id, sample_label in enumerate(y):
+                print(f"Sample id: {sample_id}")
                 if sample_label == 1:
                     sample_distances = distances[sample_id, :].reshape(1, -1)
                     sample_proba = knn.predict_proba(sample_distances)[0][1] - proba_thrash_threshold
