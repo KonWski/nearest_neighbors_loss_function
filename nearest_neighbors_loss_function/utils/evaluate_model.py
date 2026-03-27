@@ -22,6 +22,9 @@ def evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_sam
     train_distances = 2 - 2 * (train_distances @ train_distances.T)
     test_distances = 2 - 2 * (test_embeddings @ train_distances.T)
 
+    train_distances = train_distances.clamp(min=0)
+    test_distances = test_distances.clamp(min=0)
+
     accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc = knn_stats(train_distances, test_distances, train_labels, test_labels, n_neighbors)
 
     # epoch_loss = round(running_loss / (data_id + 1), 5)

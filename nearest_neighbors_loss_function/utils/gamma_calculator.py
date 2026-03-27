@@ -57,6 +57,7 @@ class GammaCalculator():
         X, y = generate_embeddings(model, data_loader, n_samples, self.embedding_length, self.device)
         X = F.normalize(X, dim=1)
         distances = 2 - 2 * (X @ X.T)
+        distances = distances.clamp(min=0)
 
         # convert torch -> numpy
         X = X.numpy()
