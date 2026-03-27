@@ -41,16 +41,16 @@ class GammaCalculator():
         
         if self.recalculation_strategy == 0 and batch_id == 0:
             self._refresh_gamma_values(model, data_loader, n_samples)
+            self.gamma_values = self.gamma_values.to(self.device)
 
         elif self.recalculation_strategy > 0 and batch_id % self.recalculation_strategy == 0:
             self._refresh_gamma_values(model, data_loader, n_samples)
+            self.gamma_values = self.gamma_values.to(self.device)
 
         elif self.recalculation_strategy == -1:
             self.gamma_values = torch.ones(n_samples)
             self.n_samples = n_samples
-
-        self.gamma_values = self.gamma_values.to(self.device)
-
+            self.gamma_values = self.gamma_values.to(self.device)
 
     def _refresh_gamma_values(self, model, data_loader, n_samples):
 
