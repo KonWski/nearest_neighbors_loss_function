@@ -37,6 +37,7 @@ class GNNLayer(MessagePassing):
         super().__init__(aggr='mean')
         self.node_mlp = nn.Linear(in_channels, out_channels)
         self.edge_mlp = nn.Linear(3, out_channels)
+        self._initialize_weights()
 
     def forward(self, x, edge_index, edge_attr):
         return self.propagate(edge_index, x=x, edge_attr=edge_attr)
@@ -52,3 +53,7 @@ class GNNLayer(MessagePassing):
 
     def update(self, aggr_out):
         return aggr_out
+    
+    def _initialize_weights(self):
+        nn.init_xavier_uniform(self.node_mlp.weight)
+        nn.init_xavier_uniform(self.edge_mlp.weight)
