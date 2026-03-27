@@ -55,5 +55,5 @@ class GNNLayer(MessagePassing):
         return aggr_out
     
     def _initialize_weights(self):
-        nn.init.xavier_uniform(self.node_mlp.weight)
-        nn.init.xavier_uniform(self.edge_mlp.weight)
+        nn.init.xavier_uniform_(self.node_mlp.weight)
+        nn.init.xavier_uniform_(self.edge_mlp.weight)
