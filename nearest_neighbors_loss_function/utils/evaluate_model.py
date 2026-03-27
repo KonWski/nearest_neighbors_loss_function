@@ -19,8 +19,8 @@ def evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_sam
     train_labels = train_labels.ravel()
     test_labels = test_labels.ravel()
 
-    train_distances = 2 - 2 * (train_distances @ train_distances.T)
-    test_distances = 2 - 2 * (test_embeddings @ train_distances.T)
+    train_distances = 2 - 2 * (train_embeddings @ train_embeddings.T)
+    test_distances = 2 - 2 * (test_embeddings @ train_embeddings.T)
 
     train_distances = train_distances.clamp(min=0)
     test_distances = test_distances.clamp(min=0)
