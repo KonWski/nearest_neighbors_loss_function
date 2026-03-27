@@ -47,18 +47,15 @@ def knn_stats(train_distances, test_train_distances, y_train, y_test, n_neighbor
 
     # predictions
     y_pred = knn.predict(test_train_distances)
+    y_pred_proba = knn.predict_proba(test_train_distances)[:,1]
 
     # scores
     accuracy = round(accuracy_score(y_test, y_pred), 4)
     precision = round(precision_score(y_test, y_pred), 4)
     recall = round(recall_score(y_test, y_pred), 4)
-    f1 = round(f1_score(y_test, y_pred), 4)
-    
-    # todo potrzeba proba
-    roc_auc = round(roc_auc_score(y_test, y_pred), 4)
-    
+    f1 = round(f1_score(y_test, y_pred), 4)    
+    roc_auc = round(roc_auc_score(y_test, y_pred_proba), 4)
     mcc = round(matthews_corrcoef(y_test, y_pred), 4)
-
     ef01 = round(enrichment_factor(y_test, y_pred, fraction=0.01), 4)
     ef05 = round(enrichment_factor(y_test, y_pred, fraction=0.05), 4)
 
