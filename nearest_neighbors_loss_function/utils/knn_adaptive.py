@@ -34,7 +34,7 @@ class KNeigborsAdaptiveClassifier():
             self.probas = probas
 
         def get_n_neigbors_per_row(self, X):
-            kde = KernelDensity(kernel='gaussian', bandwidth=0.5)
+            kde = KernelDensity(kernel='gaussian', bandwidth=0.5, algorithm="ball_tree")
             kde.fit(X)
             print("kde fit")
 
