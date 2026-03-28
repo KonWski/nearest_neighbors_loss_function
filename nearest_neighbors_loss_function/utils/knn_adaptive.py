@@ -36,21 +36,21 @@ class KNeigborsAdaptiveClassifier():
         def _get_n_neigbors_per_row(self, distances):
 
             density = self._local_reachability_distance(distances)
-            avg_density = np.average(density)
+            avg_density = torch.mean(density)
             n_neigbors_per_row = self.initial_n_neighbors * (avg_density / density)
             return n_neigbors_per_row
 
         def _local_reachability_distance(self, distances):
 
-            indices = np.argsort(distances, axis=1)[:, 1: self.initial_n_neighbors+1]  # skip self
-            distances = np.take_along_axis(distances, indices, axis=1)
+            indices = torch.argsort(distances, dim=1)[:, 1:self.initial_n_neighbors+1] # skip self
+            distances = torch.gather(distances, 1, indices)
 
-            k_dist = np.sort(distances, axis=1)[:, self.initial_n_neighbors-1]
+            k_dist = torch.sort(distances, dim=1).values[:, self.initial_n_neighbors-1]
 
             k_dist_neighbors = k_dist[indices]
-            reach_dist = np.maximum(distances, k_dist_neighbors)
+            reach_dist = torch.maximum(distances, k_dist_neighbors)
 
-            lrd = 1.0 / (np.mean(reach_dist, axis=1) + 1e-10)
+            lrd = 1.0 / (torch.mean(reach_dist, dim=1) + 1e-10)
             return lrd
 
         def predict_proba(self, id):
