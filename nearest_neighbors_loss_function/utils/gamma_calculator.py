@@ -70,7 +70,8 @@ class GammaCalculator():
 
         y = y.ravel()
         proba_thrash_threshold = 1 / self.n_neighbors
-        gamma_values = torch.ones(n_samples)
+        self.gamma_values = torch.ones(n_samples)
+        self.n_samples = n_samples
 
         if self.density_awareness:
             knn = KNeigborsAdaptiveClassifier(self.n_neighbors, self.density_function)
@@ -80,7 +81,7 @@ class GammaCalculator():
                 if sample_label == 1:
                     sample_proba = knn.predict_proba(sample_id)
                     gamma = self._calculate_gamma(sample_proba)
-                    gamma_values[sample_id] = gamma
+                    self.gamma_values[sample_id] = gamma
 
         else:
 
@@ -91,16 +92,11 @@ class GammaCalculator():
 
             knn.fit(distances, y)
 
-            for sample_id, sample_label in enumerate(y):
-                print(f"Sample id: {sample_id}")
-                if sample_label == 1:
-                    sample_distances = distances[sample_id, :].reshape(1, -1)
-                    sample_proba = knn.predict_proba(sample_distances)[0][1] - proba_thrash_threshold
-                    gamma = self._calculate_gamma(sample_proba)
-                    gamma_values[sample_id] = gamma
-
-        self.gamma_values = gamma_values
-        self.n_samples = n_samples
+            mask = (y == 1)
+            distances_1 = distances[mask, :]
+            proba_1 = knn.predict_proba(distances_1)[0][1] - proba_thrash_threshold
+            gamma_1 = self._calculate_gamma(proba_1)
+            self.gamma_values[mask] = gamma_1
 
 
     def get_gamma_values(self, gamma_start_id, gamma_end_id, positive_mf_distances, negative_mf_distances):
