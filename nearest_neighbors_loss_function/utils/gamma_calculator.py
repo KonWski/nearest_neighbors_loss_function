@@ -63,11 +63,6 @@ class GammaCalculator():
         distances = distances.clamp(min=0)
         print("Calculated distances")
 
-        # convert torch -> numpy
-        X = X.numpy()
-        y = y.numpy()
-        distances = distances.numpy()
-
         y = y.ravel()
         proba_thrash_threshold = 1 / self.n_neighbors
         self.gamma_values = torch.ones(n_samples)
@@ -87,6 +82,11 @@ class GammaCalculator():
                 knn = KNeighborsClassifier(n_neighbors=self.n_neighbors, n_jobs=-1, metric="precomputed", weights="distance")
             else:
                 knn = KNeighborsClassifier(n_neighbors=self.n_neighbors, n_jobs=-1, metric="precomputed")
+
+            # convert torch -> numpy
+            X = X.numpy()
+            y = y.numpy()
+            distances = distances.numpy()
 
             knn.fit(distances, y)
             distances_1 = distances[mask, :]
