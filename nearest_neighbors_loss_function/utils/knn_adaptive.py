@@ -14,6 +14,7 @@ class KNeigborsAdaptiveClassifier():
 
             print("Got n neighbors per row")
             max_n_neigbors = n_neigbors_per_row.max()
+            print(f"max_n_neigbors: {max_n_neigbors}")
             _, idx = torch.topk(distances, k=max_n_neigbors, dim=1, largest=False)
             print("Got torch.topk")
 
