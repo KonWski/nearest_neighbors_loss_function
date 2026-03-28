@@ -45,7 +45,7 @@ class KNeigborsAdaptiveClassifier():
             indices = np.argsort(distances, axis=1)[:, 1: self.initial_n_neighbors+1]  # skip self
             distances = np.take_along_axis(distances, indices, axis=1)
 
-            k_dist = np.sort(distances, axis=1)[:, self.initial_n_neighbors]
+            k_dist = np.sort(distances, axis=1)[:, self.initial_n_neighbors-1]
 
             k_dist_neighbors = k_dist[indices]
             reach_dist = np.maximum(distances, k_dist_neighbors)
