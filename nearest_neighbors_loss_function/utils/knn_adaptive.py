@@ -1,5 +1,4 @@
 import torch
-from sklearn.neighbors import KernelDensity
 import numpy as np
 
 class KNeigborsAdaptiveClassifier():
@@ -11,7 +10,8 @@ class KNeigborsAdaptiveClassifier():
 
         def fit(self, X, distances, labels):
 
-            n_neigbors_per_row = self.get_n_neigbors_per_row(X)
+            n_neigbors_per_row = self._get_n_neigbors_per_row(X)
+
             print("Got n neighbors per row")
             max_n_neigbors = n_neigbors_per_row.max()
             _, idx = torch.topk(distances, k=max_n_neigbors, dim=1, largest=False)
@@ -33,17 +33,25 @@ class KNeigborsAdaptiveClassifier():
 
             self.probas = probas
 
-        def get_n_neigbors_per_row(self, X):
-            kde = KernelDensity(kernel='gaussian', bandwidth=0.5, algorithm="ball_tree")
-            kde.fit(X)
-            print("kde fit")
+        def _get_n_neigbors_per_row(self, distances):
 
-            log_density = kde.score_samples(X)
-            print("kde score_samples")
-
-            avg_density = np.average(log_density)
-            n_neigbors_per_row = self.initial_n_neighbors * (avg_density / log_density)
+            density = self._local_reachability_distance(distances)
+            avg_density = np.average(density)
+            n_neigbors_per_row = self.initial_n_neighbors * (avg_density / density)
             return n_neigbors_per_row
+
+        def _local_reachability_distance(self, distances):
+
+            indices = np.argsort(distances, axis=1)[:, 1: self.initial_n_neighbors+1]  # skip self
+            distances = np.take_along_axis(distances, indices, axis=1)
+
+            k_dist = np.sort(distances, axis=1)[:, self.initial_n_neighbors]
+
+            k_dist_neighbors = k_dist[indices]
+            reach_dist = np.maximum(distances, k_dist_neighbors)
+
+            lrd = 1.0 / (np.mean(reach_dist, axis=1) + 1e-10)
+            return lrd
 
         def predict_proba(self, id):
             return self.probas[id]
