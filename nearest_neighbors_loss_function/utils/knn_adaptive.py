@@ -38,7 +38,7 @@ class KNeigborsAdaptiveClassifier():
 
             density = self._local_reachability_distance(distances)
             avg_density = torch.mean(density)
-            n_neigbors_per_row = self.initial_n_neighbors * (avg_density / density)
+            n_neigbors_per_row = torch.floor(self.initial_n_neighbors * (avg_density / density))
             return n_neigbors_per_row
 
         def _local_reachability_distance(self, distances):
