@@ -8,9 +8,9 @@ class KNeigborsAdaptiveClassifier():
             self.density_function = density_function
             self.probas = None
 
-        def fit(self, X, distances, labels):
+        def fit(self, distances, labels):
 
-            n_neigbors_per_row = self._get_n_neigbors_per_row(X)
+            n_neigbors_per_row = self._get_n_neigbors_per_row(distances)
 
             print("Got n neighbors per row")
             max_n_neigbors = n_neigbors_per_row.max()
