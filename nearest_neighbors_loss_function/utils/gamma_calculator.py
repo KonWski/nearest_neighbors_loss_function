@@ -76,7 +76,7 @@ class GammaCalculator():
 
         if self.density_awareness:
             knn = KNeigborsAdaptiveClassifier(self.n_neighbors, self.density_function)
-            knn.fit(distances, y)
+            knn.fit(X, distances, y)
             proba_1 = knn.predict_proba(mask)
             gamma_1 = self._calculate_gamma(proba_1)
             self.gamma_values[mask] = gamma_1
