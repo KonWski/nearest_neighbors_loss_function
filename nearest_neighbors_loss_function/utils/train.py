@@ -68,7 +68,10 @@ def train_triplet(
         model_epoch_hash = uuid4().hex
         optimizer = Adam(model.parameters(), lr=lr)
 
+        # save auxiliary params
         max_epoch_optimized_param_value = float("-inf")
+        best_epoch = None
+        best_model_path = None
 
         for epoch in range(0, n_epochs):
 
@@ -90,14 +93,13 @@ def train_triplet(
 
             if validate_stats[f"valid_{optimized_param_name}"] > max_epoch_optimized_param_value:
                 max_epoch_optimized_param_value = validate_stats[f"valid_{optimized_param_name}"]
-                best_model_dir_path = model_dir_path
                 best_epoch = epoch
 
-                save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
+                best_model_path = save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
                            train_stats["loss"], n_neighbors, max_epoch_optimized_param_value, training_type, batch_size, 
                            gamma_recalculation_strategy, density_awareness, samples_difficultness, lambda_samples_difficultness)
 
-        best_seed_models[seed] = {"epoch": best_epoch, "model_path": best_model_dir_path}
+        best_seed_models[seed] = {"epoch": best_epoch, "model_path": best_model_path}
 
     return statistics, best_seed_models, n_train_samples
 

@@ -35,6 +35,8 @@ def save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash,  
     save(checkpoint, checkpoint_path)
     logging.info(f"Saved model to checkpoint: {checkpoint_path}")
 
+    return checkpoint_path
+
 
 def load_model(model_path, in_channels, hidden_dim, embedding_size):
 
