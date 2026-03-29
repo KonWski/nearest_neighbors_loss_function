@@ -73,6 +73,7 @@ def test_model(statistics, best_seed_models, in_channels, hidden_dim, embedding_
         epoch = model_data["epoch"]
 
         model = load_model(model_path, in_channels, hidden_dim, embedding_size)
+        model.to(device)
         n_test_samples = len(test_loader.dataset)
 
         test_stats = evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_samples, embedding_size, 
