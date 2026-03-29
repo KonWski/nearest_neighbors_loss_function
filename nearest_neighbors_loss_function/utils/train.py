@@ -45,6 +45,7 @@ def train_triplet(
     experiment_dir_path = create_experiment_dir(save_path, experiment_hash)
     
     statistics = Statistics(n_epochs, experiment_dir_path, experiment_hash, optimized_param_name)
+    best_seed_models = {}
 
     n_train_samples = len(train_loader.dataset)
     n_valid_samples = len(valid_loader.dataset)
@@ -74,7 +75,7 @@ def train_triplet(
             logging.info(f"Epoch: {epoch + 1}/{n_epochs}")
 
             model, optimizer, loss_function, train_stats = train(model, train_loader, n_train_samples, optimizer, loss_function, 
-                                                                 batch_shaper, gamma_calculator, epoch, model_epoch_hash, device)
+                                                                 batch_shaper, gamma_calculator, seed, epoch, model_epoch_hash, device)
 
             validate_stats = evaluate_model(model, train_loader, n_train_samples, valid_loader, n_valid_samples, embedding_length, 
                                         n_neighbors, "valid", device)
@@ -90,15 +91,18 @@ def train_triplet(
             if validate_stats[f"valid_{optimized_param_name}"] > max_epoch_optimized_param_value:
                 max_epoch_optimized_param_value = validate_stats[f"valid_{optimized_param_name}"]
                 best_model_dir_path = model_dir_path
+                best_epoch = epoch
 
                 save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
                            train_stats["loss"], n_neighbors, max_epoch_optimized_param_value, training_type, batch_size, 
                            gamma_recalculation_strategy, density_awareness, samples_difficultness, lambda_samples_difficultness)
 
-    return statistics, best_model_dir_path, n_train_samples
+        best_seed_models[seed] = {"epoch": best_epoch, "model_path": best_model_dir_path}
+
+    return statistics, best_seed_models, n_train_samples
 
 
-def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_shaper, gamma_calculator, epoch, model_epoch_hash, device):
+def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_shaper, gamma_calculator, seed, epoch, model_epoch_hash, device):
 
     model.train()
 
@@ -135,6 +139,6 @@ def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_
             gamma_start_id += n_samples
 
     epoch_loss = round(running_loss / (data_id + 1), 5)
-    train_stats = {"epoch": epoch, "loss": epoch_loss, "model_epoch_hash": model_epoch_hash}
+    train_stats = {"seed": seed, "epoch": epoch, "loss": epoch_loss, "model_epoch_hash": model_epoch_hash}
 
     return model, optimizer, loss_function, train_stats

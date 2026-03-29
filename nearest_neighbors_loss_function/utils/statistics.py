@@ -9,8 +9,7 @@ class Statistics():
         self.experiment_dir_path = experiment_dir_path
         self.experiment_hash = experiment_hash
         self.optimized_param = optimized_param_name
-        self.report_path = os.path.join(self.experiment_dir_path, "train_report.xslx")
-        print(f"self.report_path: {self.report_path}")
+        self.report_path = os.path.join(self.experiment_dir_path, "train_report.xlsx")
 
         '''
         as [{"seed": x, "state": y, "epoch": z, "loss": q, "experiment_hash": p, "model_hash": w,
@@ -26,8 +25,11 @@ class Statistics():
     def log_last_train_stats(self):
         logging.info(self.agglomerated_statistics[-1])
 
-    def upload_test_stats(self, test_stats, epoch):
-        self.agglomerated_statistics[epoch] = self.agglomerated_statistics[epoch] | test_stats
+    def upload_test_stats(self, test_stats, seed, epoch):
+        for stat_id in range(len(self.agglomerated_statistics)):
+            if self.agglomerated_statistics[stat_id]["seed"] == seed and self.agglomerated_statistics[stat_id]["epoch"] == epoch:
+                self.agglomerated_statistics[stat_id] = self.agglomerated_statistics[stat_id] | test_stats
+                break
 
     def _get_best_model_stats(self):
         df = pd.DataFrame(self.agglomerated_statistics)

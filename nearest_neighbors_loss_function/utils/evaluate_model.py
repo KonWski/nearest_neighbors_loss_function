@@ -64,16 +64,21 @@ def knn_stats(train_distances, test_train_distances, y_train, y_test, n_neighbor
     return accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc
 
 
-def test_model(statistics, model_path, in_channels, hidden_dim, embedding_size, model_name, train_loader, 
+def test_model(statistics, best_seed_models, in_channels, hidden_dim, embedding_size, model_name, train_loader, 
                n_train_samples, test_loader, embedding_length, n_neighbors, device):
     
-    model = load_model(model_path, in_channels, hidden_dim, embedding_size, model_name)
-    n_test_samples = len(test_loader.dataset)
+    for seed, model_data in best_seed_models.items():
+        
+        model_path = model_data["model_path"]
+        epoch = model_data["epoch"]
 
-    test_stats = evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_samples, embedding_length, 
-         n_neighbors, "test", device)
+        model = load_model(model_path, in_channels, hidden_dim, embedding_size, model_name)
+        n_test_samples = len(test_loader.dataset)
 
-    statistics.upload_test_stats(test_stats) 
-    statistics.log_best_model_stats()
+        test_stats = evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_samples, embedding_length, 
+            n_neighbors, "test", device)
+
+        statistics.upload_test_stats(test_stats, seed, epoch) 
+        statistics.log_best_model_stats()
 
     return statistics

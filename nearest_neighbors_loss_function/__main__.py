@@ -51,7 +51,7 @@ def main():
 
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, debug=args.debug)
 
-    statistics, best_model_dir_path, n_train_samples = train_triplet(
+    statistics, best_seed_models, n_train_samples = train_triplet(
         seeds=args.seeds,
         train_loader=train_loader,
         valid_loader=valid_loader,
@@ -76,7 +76,7 @@ def main():
         device=device
     )
 
-    statistics = test_model(statistics, best_model_dir_path, args.model_in_channels, args.model_hidden_channels, args.embedding_length, train_loader, 
+    statistics = test_model(statistics, best_seed_models, args.model_in_channels, args.model_hidden_channels, args.embedding_length, train_loader, 
             n_train_samples, test_loader, args.embedding_length, args.n_neighbors, device)
 
     statistics.save()
