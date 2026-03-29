@@ -58,7 +58,7 @@ class GammaCalculator():
 
         y = y.ravel()
         proba_thrash_threshold = 1 / self.n_neighbors
-        self.gamma_values = torch.ones(n_samples)
+        self.gamma_values = torch.ones(n_samples, dtype=torch.float)
         self.n_samples = n_samples
         mask = (y == 1)
 
