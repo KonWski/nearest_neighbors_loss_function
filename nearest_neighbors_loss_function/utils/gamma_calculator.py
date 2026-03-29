@@ -55,6 +55,8 @@ class GammaCalculator():
     def _refresh_gamma_values(self, model, data_loader, n_samples):
 
         X, y = generate_embeddings(model, data_loader, n_samples, self.embedding_length, self.device)
+        X = F.normalize(X, dim=1)
+        distances = torch.cdist(X,X)
 
         y = y.ravel()
         proba_thrash_threshold = 1 / self.n_neighbors
@@ -63,8 +65,6 @@ class GammaCalculator():
 
         if self.density_awareness:
             knn = KNeigborsAdaptiveClassifier(self.n_neighbors, self.density_function)
-            X = F.normalize(X, dim=1)
-            distances = torch.cdist(X,X)
             knn.fit(distances, y)
             proba_1 = knn.predict_proba(mask)
             gamma_1 = self._calculate_gamma(proba_1)
@@ -79,7 +79,6 @@ class GammaCalculator():
                 knn = KNeighborsClassifier(n_neighbors=self.n_neighbors, n_jobs=-1, metric="precomputed")
 
             # convert torch -> numpy
-            distances = torch.cdist(X,X)
             distances = distances.numpy()
             X = X.numpy()
             y = y.numpy()

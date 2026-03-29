@@ -64,6 +64,7 @@ def train_triplet(
 
         model = GNNModel(model_in_channels, model_hidden_channels, embedding_length).to(device)
         model = model.to(device)
+        model_epoch_hash = uuid4().hex
         optimizer = Adam(model.parameters(), lr=lr)
 
         max_epoch_optimized_param_value = float("-inf")
@@ -71,7 +72,6 @@ def train_triplet(
         for epoch in range(0, n_epochs):
 
             logging.info(f"Epoch: {epoch + 1}/{n_epochs}")
-            model_epoch_hash = uuid4().hex
 
             model, optimizer, loss_function, train_stats = train(model, train_loader, n_train_samples, optimizer, loss_function, 
                                                                  batch_shaper, gamma_calculator, epoch, model_epoch_hash, device)

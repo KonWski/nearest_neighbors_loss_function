@@ -10,6 +10,7 @@ class Statistics():
         self.experiment_hash = experiment_hash
         self.optimized_param = optimized_param_name
         self.report_path = os.path.join(self.experiment_dir_path, "train_report.xslx")
+        print(f"self.report_path: {self.report_path}")
 
         '''
         as [{"seed": x, "state": y, "epoch": z, "loss": q, "experiment_hash": p, "model_hash": w,
