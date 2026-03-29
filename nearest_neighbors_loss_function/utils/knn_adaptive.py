@@ -10,6 +10,7 @@ class KNeigborsAdaptiveClassifier():
   def fit(self, distances, labels):
 
       n_neigbors_per_row = self._get_n_neigbors_per_row(distances)
+      print(f"self.initial_n_neighbors: {self.initial_n_neighbors}")
 
       max_n_neigbors = int(n_neigbors_per_row.max().item())
       print(f"max_n_neigbors: {max_n_neigbors}")
