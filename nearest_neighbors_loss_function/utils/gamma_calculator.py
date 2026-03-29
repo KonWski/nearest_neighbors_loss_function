@@ -69,6 +69,7 @@ class GammaCalculator():
             X = F.normalize(X, dim=1)
             print(f"After: {X[:5]}")
             distances = torch.cdist(X,X)
+            print(f"distances: {distances}")
             knn.fit(distances, y)
             proba_1 = knn.predict_proba(mask)
             gamma_1 = self._calculate_gamma(proba_1)
