@@ -58,7 +58,6 @@ class GammaCalculator():
 
         y = y.ravel()
         proba_thrash_threshold = 1 / self.n_neighbors
-        self.gamma_values = torch.ones(n_samples, dtype=torch.float)
         self.n_samples = n_samples
         mask = (y == 1)
 
@@ -69,6 +68,7 @@ class GammaCalculator():
             knn.fit(distances, y)
             proba_1 = knn.predict_proba(mask)
             gamma_1 = self._calculate_gamma(proba_1)
+            self.gamma_values = torch.ones(n_samples, dtype=gamma_1.dtype)
             self.gamma_values[mask] = gamma_1
 
         else:
@@ -88,6 +88,7 @@ class GammaCalculator():
             distances_1 = distances[mask, :]
             proba_1 = knn.predict_proba(distances_1)[0][1] - proba_thrash_threshold
             gamma_1 = self._calculate_gamma(proba_1)
+            self.gamma_values = torch.ones(n_samples, dtype=gamma_1.dtype)
             self.gamma_values[mask] = gamma_1
 
 
