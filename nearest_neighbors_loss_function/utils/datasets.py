@@ -7,9 +7,9 @@ def get_datasets(dataset_name = "ogbg-molhiv", dataset_root = 'dataset/', debug=
     ogbg_dataset = PygGraphPropPredDataset(name = dataset_name, root = dataset_root)
 
     if debug:
-        train_dataset = ogbg_dataset[ogbg_dataset.get_idx_split()["train"][:5000]]
-        valid_dataset = ogbg_dataset[ogbg_dataset.get_idx_split()["valid"][:5000]]
-        test_dataset = ogbg_dataset[ogbg_dataset.get_idx_split()["test"][:5000]]
+        train_dataset = ogbg_dataset[ogbg_dataset.get_idx_split()["train"][:10000]]
+        valid_dataset = ogbg_dataset[ogbg_dataset.get_idx_split()["valid"][:10000]]
+        test_dataset = ogbg_dataset[ogbg_dataset.get_idx_split()["test"][:10000]]
     else:
         train_dataset = ogbg_dataset[ogbg_dataset.get_idx_split()["train"]]
         valid_dataset = ogbg_dataset[ogbg_dataset.get_idx_split()["valid"]]
