@@ -80,6 +80,5 @@ def test_model(statistics, best_seed_models, in_channels, hidden_dim, embedding_
             n_neighbors, "test", device)
 
         statistics.upload_test_stats(test_stats, seed, epoch) 
-        statistics.log_best_model_stats()
 
     return statistics
