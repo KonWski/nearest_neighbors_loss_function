@@ -64,6 +64,7 @@ class GammaCalculator():
 
         if self.density_awareness:
             knn = KNeigborsAdaptiveClassifier(self.n_neighbors, self.density_function)
+            X = F.normalize(X, dim=1)
             distances = torch.cdist(X,X)
             knn.fit(distances, y)
             proba_1 = knn.predict_proba(mask)
