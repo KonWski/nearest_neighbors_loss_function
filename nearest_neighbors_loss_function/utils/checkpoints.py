@@ -36,10 +36,10 @@ def save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash,  
     logging.info(f"Saved model to checkpoint: {checkpoint_path}")
 
 
-def load_model(model_path, in_channels, hidden_dim, embedding_size, model_name):
+def load_model(model_path, in_channels, hidden_dim, embedding_size):
 
     checkpoint = load(model_path)
-    model = GNNModel(in_channels, hidden_dim, embedding_size, model_name)
+    model = GNNModel(in_channels, hidden_dim, embedding_size)
     model.load_state_dict(checkpoint["model_state_dict"])
 
     return model

@@ -76,8 +76,9 @@ def main():
         device=device
     )
 
-    statistics = test_model(statistics, best_seed_models, args.model_in_channels, args.model_hidden_channels, args.embedding_length, train_loader, 
-            n_train_samples, test_loader, args.embedding_length, args.n_neighbors, device)
+    statistics = test_model(statistics, best_seed_models, args.model_in_channels, args.model_hidden_channels, 
+                            args.embedding_length, train_loader, n_train_samples, test_loader, 
+                            args.n_neighbors, device)
 
     statistics.save()
 
