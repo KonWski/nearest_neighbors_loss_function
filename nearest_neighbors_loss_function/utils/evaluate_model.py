@@ -4,6 +4,7 @@ from skfp.metrics import enrichment_factor
 from .generate_embeddings import generate_embeddings
 from .checkpoints import load_model
 import torch.nn.functional as F
+import torch
 
 def evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_samples, embedding_length, 
          n_neighbors, stats_prefix, device):
@@ -11,6 +12,9 @@ def evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_sam
     model.eval()
     train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_length, device)
     test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_length, device)
+
+    if torch.isnan(train_embeddings).any() or torch.isnan(test_embeddings).any():
+        return None, True
 
     train_embeddings = F.normalize(train_embeddings, dim=1)
     test_embeddings = F.normalize(test_embeddings, dim=1)
@@ -32,7 +36,7 @@ def evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_sam
                   f"{stats_prefix}_f1": f1, f"{stats_prefix}_ef01": ef01, f"{stats_prefix}_ef05": ef05, 
                   f"{stats_prefix}_roc_auc": roc_auc, f"{stats_prefix}_mcc": mcc}
 
-    return test_stats
+    return test_stats, False
 
 
 def knn_stats(train_distances, test_train_distances, y_train, y_test, n_neighbors):
