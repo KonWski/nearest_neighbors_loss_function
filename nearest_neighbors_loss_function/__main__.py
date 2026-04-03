@@ -41,7 +41,8 @@ def parse_training_args():
     parser.add_argument("--optimized_param_name", type=str, required=True)
     parser.add_argument("--debug", action="store_true")
 
-    return parser.parse_known_args()
+    args = parser.parse_known_args()[0]
+    return args
 
 
 def parse_testing_args():
@@ -58,7 +59,8 @@ def parse_testing_args():
     parser.add_argument("--embedding_length", type=int, required=True)
     parser.add_argument("--optimized_param_name", type=str, required=True)
 
-    return parser.parse_known_args()
+    args = parser.parse_known_args()[0]
+    return args
 
 
 def main():
