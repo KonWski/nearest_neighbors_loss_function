@@ -55,7 +55,7 @@ def test_workflow(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, debug=False)
-    train_loader.shuffle_data()
+    train_loader.batch_sampler.shuffle_data()
     n_train_samples = len(train_loader.dataset)
     best_seed_models = {}
 
