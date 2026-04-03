@@ -60,7 +60,10 @@ def test_workflow(args):
     n_train_samples = len(train_loader.dataset)
     best_seed_models = {}
 
+    print(f"os.listdir(args.save_path): {os.listdir(args.save_path)}")
     for seed in os.listdir(args.save_path):
+
+        print(f"seed: {seed}")
 
         # double check if its the seed dir
         try:
