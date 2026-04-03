@@ -5,7 +5,6 @@ from .evaluate_model import test_model
 import logging
 from nearest_neighbors_loss_function.utils.statistics import Statistics
 import os
-from pathlib import Path
 
 def train_workflow(args):
     
@@ -49,6 +48,7 @@ def train_workflow(args):
 
 def test_workflow(args):
 
+    log_args(args)
     experiment_hash = args.save_path.split("/")[-1]
     statistics = Statistics(args.n_epochs, args.save_path, experiment_hash, args.optimized_param_name)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
