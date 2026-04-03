@@ -1,6 +1,6 @@
 import torch.nn.functional as F
 from torch.nn import ReLU
-from torch_geometric.nn import GCNConv, Linear, init, MessagePassing, global_mean_pool, SAGEConv, GATConv
+from torch_geometric.nn import GCNConv, Linear, MessagePassing, global_mean_pool, SAGEConv, GATConv
 import torch
 
 class GNNModel(nn.Module):
