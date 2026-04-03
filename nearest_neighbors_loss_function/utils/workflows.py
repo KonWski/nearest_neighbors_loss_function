@@ -68,7 +68,7 @@ def test_workflow(args):
         except ValueError:
             continue
         
-        set_seed(seed)
+        set_seed(int(seed))
         seed_path = Path(os.path.join(args.save_path, str(seed)))
         models = list(seed_path.rglob("*.pt"))
         n_models = len(models)
