@@ -1,7 +1,6 @@
-from nearest_neighbors_loss_function.utils.models import GNNModel
 from nearest_neighbors_loss_function.utils.batch_shaper import BatchShaper
 from nearest_neighbors_loss_function.utils.auxiliary_functions import create_experiment_dir, \
-    create_model_dir, set_seed, convert_graph_data_to_float
+    create_model_dir, set_seed, convert_graph_data_to_float, get_model
 from nearest_neighbors_loss_function.utils.gamma_calculator import GammaCalculator
 from nearest_neighbors_loss_function.utils.statistics import Statistics
 from nearest_neighbors_loss_function.utils.evaluate_model import evaluate_model
@@ -32,6 +31,7 @@ def train_triplet(
         n_epochs: int, 
         save_path: str, 
         lr: float, 
+        model_name: str,
         model_in_channels: int,
         model_hidden_channels: int, 
         embedding_length: int, 
@@ -63,7 +63,7 @@ def train_triplet(
         model_dir_path = create_model_dir(experiment_dir_path, seed)
         set_seed(seed)
 
-        model = GNNModel(model_in_channels, model_hidden_channels, embedding_length).to(device)
+        model = get_model(model_name, model_in_channels, model_hidden_channels, embedding_length)
         model = model.to(device)
         model_epoch_hash = uuid4().hex
         optimizer = Adam(model.parameters(), lr=lr)

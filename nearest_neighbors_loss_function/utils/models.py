@@ -1,6 +1,6 @@
-import torch.nn as nn
-from torch_geometric.nn import MessagePassing, global_mean_pool
-
+import torch.nn.functional as F
+from torch_geometric.nn import GCNConv, ReLU, Linear, init, MessagePassing, global_mean_pool, SAGEConv, GATConv
+import torch
 
 class GNNModel(nn.Module):
 
@@ -11,8 +11,8 @@ class GNNModel(nn.Module):
         self.conv1 = GNNLayer(in_channels, hidden_dim)
         self.conv2 = GNNLayer(hidden_dim, hidden_dim)
         self.conv3 = GNNLayer(hidden_dim, hidden_dim)
-        self.relu = nn.ReLU()
-        self.linear = nn.Linear(hidden_dim, embedding_size)
+        self.relu = ReLU()
+        self.linear = Linear(hidden_dim, embedding_size)
         self.embedding_size = embedding_size
 
 
@@ -35,8 +35,8 @@ class GNNLayer(MessagePassing):
     def __init__(self, in_channels, out_channels):
 
         super().__init__(aggr='mean')
-        self.node_mlp = nn.Linear(in_channels, out_channels)
-        self.edge_mlp = nn.Linear(3, out_channels)
+        self.node_mlp = Linear(in_channels, out_channels)
+        self.edge_mlp = Linear(3, out_channels)
         self._initialize_weights()
 
     def forward(self, x, edge_index, edge_attr):
@@ -55,5 +55,71 @@ class GNNLayer(MessagePassing):
         return aggr_out
     
     def _initialize_weights(self):
-        nn.init.xavier_uniform_(self.node_mlp.weight)
-        nn.init.xavier_uniform_(self.edge_mlp.weight)
+        init.xavier_uniform_(self.node_mlp.weight)
+        init.xavier_uniform_(self.edge_mlp.weight)
+
+
+class GCN(torch.nn.Module):
+    def __init__(self, in_channels, hidden_dim, embedding_size):
+        super().__init__()
+        self.conv1 = GCNConv(in_channels, hidden_dim)
+        self.conv2 = GCNConv(hidden_dim, hidden_dim)
+        self.linear = Linear(hidden_dim, embedding_size)
+
+    def forward(self, data):
+        x, edge_index, _, batch = (
+            data.x, data.edge_index, data.edge_attr, data.batch
+        )
+
+        x = self.conv1(x, edge_index)
+        x = F.relu(x)
+        x = F.dropout(x, p=0.5, training=self.training)
+        x = self.conv2(x, edge_index)    
+        x = global_mean_pool(x, batch)
+        x = self.linear(x)
+        return x
+
+
+class GraphSAGE(torch.nn.Module):
+    def __init__(self, in_channels, hidden_dim, embedding_size):
+        super().__init__()
+        self.conv1 = SAGEConv(in_channels, hidden_dim)
+        self.conv2 = SAGEConv(hidden_dim, embedding_size)
+        self.linear = Linear(hidden_dim, embedding_size)
+
+    def forward(self, data):
+        x, edge_index, _, batch = (
+            data.x, data.edge_index, data.edge_attr, data.batch
+        )
+
+        x = self.conv1(x, edge_index)
+        x = x.relu()
+        x = F.dropout(x, p=0.5, training=self.training)
+        x = self.conv2(x, edge_index)
+        x = global_mean_pool(x, batch)
+        x = self.linear(x)
+
+        return x
+
+
+class GAT(torch.nn.Module):
+    def __init__(self, in_channels, hidden_dim, embedding_size, heads=8):
+        super().__init__()
+        self.conv1 = GATConv(in_channels, hidden_dim, heads=heads)
+        self.conv2 = GATConv(hidden_dim * heads, embedding_size, heads=1)
+        self.linear = Linear(hidden_dim, embedding_size)
+
+    def forward(self, data):
+        x, edge_index, _, batch = (
+            data.x, data.edge_index, data.edge_attr, data.batch
+        )
+
+        x = self.conv1(x, edge_index)
+        x = F.elu(x)
+        x = F.dropout(x, p=0.6, training=self.training)
+        x = self.conv2(x, edge_index)
+
+        x = global_mean_pool(x, batch)
+        x = self.linear(x)
+
+        return x

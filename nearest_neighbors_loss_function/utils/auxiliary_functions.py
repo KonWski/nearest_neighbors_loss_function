@@ -2,6 +2,7 @@ import random
 import numpy as np
 import torch
 import os
+import importlib
 
 def set_seed(seed: int):
     '''Set randomness for random, numpy, PyTorch CPU, PyTorch GPU, '''
@@ -34,3 +35,13 @@ def convert_graph_data_to_float(data):
     data.x = data.x.float()
     data.edge_attr = data.edge_attr.float()    
     return data
+
+
+def get_model(model_name, in_channels, hidden_dim, embedding_size):
+
+    module_name = "nearest_neighbors_loss_function.utils.models"
+    module = importlib.import_module(module_name)
+    cls = getattr(module, model_name)
+    model = cls(in_channels, hidden_dim, embedding_size)
+
+    return model

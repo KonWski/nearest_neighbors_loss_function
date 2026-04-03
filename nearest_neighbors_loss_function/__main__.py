@@ -1,9 +1,6 @@
 import argparse
-from .utils.train import train_triplet
-from .utils.evaluate_model import test_model
-from .utils.datasets import get_loaders
+from .utils.workflows import train_workflow, test_workflow
 import nearest_neighbors_loss_function.utils.set_torch_geometrics
-import torch
 import logging
 
 def parse_args():
@@ -12,6 +9,7 @@ def parse_args():
     parser.add_argument("--seeds", type=int, nargs="+", required=True,
                         help="List of random seeds")
 
+    parser.add_argument("--workflow", type=str, required=True)
     parser.add_argument("--training_type", type=str, required=True)
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--gamma_recalculation_strategy", type=int, required=True)
@@ -30,6 +28,7 @@ def parse_args():
     parser.add_argument("--save_path", type=str, required=True)
     parser.add_argument("--lr", type=float, required=True)
 
+    parser.add_argument("--model_name", type=str, required=True)
     parser.add_argument("--model_hidden_channels", type=int, required=True)
     parser.add_argument("--model_in_channels", type=int, required=True)
     parser.add_argument("--embedding_length", type=int, required=True)
@@ -39,48 +38,20 @@ def parse_args():
     return parser.parse_args()
 
 
-def log_args(args):
-    for arg, value in sorted(vars(args).items()):
-        logging.info("Argument %s: %r", arg, value)
-
 def main():
     
     args = parse_args()
-    log_args(args)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    workflow = args.workflow
+    
+    if workflow == "train_workflow":
+        train_workflow(args)
 
-    train_loader, valid_loader, test_loader = get_loaders(args.batch_size, debug=args.debug)
+    elif workflow == "test_workflow":
+        test_workflow(args)
 
-    statistics, best_seed_models, n_train_samples = train_triplet(
-        seeds=args.seeds,
-        train_loader=train_loader,
-        valid_loader=valid_loader,
-        training_type=args.training_type,
-        batch_size=args.batch_size,
-        gamma_recalculation_strategy=args.gamma_recalculation_strategy,
-        gamma_function=args.gamma_function,
-        weight_distances=args.weight_distances,
-        focal_pow=args.focal_pow,
-        density_awareness=args.density_awareness,
-        density_function=args.density_function,
-        samples_difficultness=args.samples_difficultness,
-        lambda_samples_difficultness=args.lambda_samples_difficultness,
-        n_neighbors=args.n_neighbors,
-        n_epochs=args.n_epochs,
-        save_path=args.save_path,
-        lr=args.lr,
-        model_in_channels=args.model_in_channels,
-        model_hidden_channels=args.model_hidden_channels,
-        embedding_length=args.embedding_length,
-        optimized_param_name=args.optimized_param_name,
-        device=device
-    )
+    else:
+        raise Exception(f"Workflow {workflow} not implmeneted")
 
-    statistics = test_model(statistics, best_seed_models, args.model_in_channels, args.model_hidden_channels, 
-                            args.embedding_length, train_loader, n_train_samples, test_loader, 
-                            args.n_neighbors, device)
-
-    statistics.save()
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)

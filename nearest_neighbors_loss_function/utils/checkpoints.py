@@ -2,7 +2,7 @@ from torch import save, load
 import logging
 from datetime import datetime
 import os
-from nearest_neighbors_loss_function.utils.models import GNNModel
+from nearest_neighbors_loss_function.utils.auxiliary_functions import get_model
 
 def save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash,  lr, model_state_dict,
                train_loss, n_neighbors, optimized_param_value, training_type, batch_size, 
@@ -38,11 +38,11 @@ def save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash,  
     return checkpoint_path
 
 
-def load_model(model_path, in_channels, hidden_dim, embedding_size):
+def load_model(model_path, model_name, in_channels, hidden_dim, embedding_size):
 
     logging.info(f"Loading model from path: {model_path}")
-    checkpoint = load(model_path)
-    model = GNNModel(in_channels, hidden_dim, embedding_size)
+    checkpoint = load(model_path, weights_only=False)
+    model = get_model(model_name, in_channels, hidden_dim, embedding_size)
     model.load_state_dict(checkpoint["model_state_dict"])
 
-    return model
+    return model, checkpoint
