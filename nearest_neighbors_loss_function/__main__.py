@@ -3,13 +3,19 @@ from .utils.workflows import train_workflow, test_workflow
 import nearest_neighbors_loss_function.utils.set_torch_geometrics
 import logging
 
-def parse_args():
+def parse_workflow_args():
+    parser = argparse.ArgumentParser(description="Workflow name parsing")    
+    parser.add_argument("--workflow", type=str, required=True)
+    args = parser.parse_args()
+    return args.workflow
+
+
+def parse_training_args():
     parser = argparse.ArgumentParser(description="Siamese graph neural net training")
 
     parser.add_argument("--seeds", type=int, nargs="+", required=True,
                         help="List of random seeds")
 
-    parser.add_argument("--workflow", type=str, required=True)
     parser.add_argument("--training_type", type=str, required=True)
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--gamma_recalculation_strategy", type=int, required=True)
@@ -38,15 +44,35 @@ def parse_args():
     return parser.parse_args()
 
 
+def parse_testing_args():
+    parser = argparse.ArgumentParser(description="Siamese graph neural net testing")
+
+    parser.add_argument("--seeds", type=int, nargs="+", required=True,
+                        help="List of random seeds")
+
+    parser.add_argument("--n_neighbors", type=int, required=True)
+    parser.add_argument("--n_epochs", type=int, required=True)
+    parser.add_argument("--save_path", type=str, required=True)
+
+    parser.add_argument("--model_name", type=str, required=True)
+    parser.add_argument("--model_hidden_channels", type=int, required=True)
+    parser.add_argument("--model_in_channels", type=int, required=True)
+    parser.add_argument("--embedding_length", type=int, required=True)
+    parser.add_argument("--optimized_param_name", type=str, required=True)
+
+    return parser.parse_args()
+
+
 def main():
     
-    args = parse_args()
-    workflow = args.workflow
+    workflow = parse_workflow_args()
     
     if workflow == "train_workflow":
+        args = parse_training_args()
         train_workflow(args)
 
     elif workflow == "test_workflow":
+        args = parse_testing_args()
         test_workflow(args)
 
     else:
