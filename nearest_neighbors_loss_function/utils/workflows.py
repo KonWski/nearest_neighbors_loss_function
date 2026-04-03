@@ -60,10 +60,7 @@ def test_workflow(args):
     n_train_samples = len(train_loader.dataset)
     best_seed_models = {}
 
-    print(f"os.listdir(args.save_path): {os.listdir(args.save_path)}")
     for seed in os.listdir(args.save_path):
-
-        print(f"seed: {seed}")
 
         # double check if its the seed dir
         try:
@@ -81,13 +78,13 @@ def test_workflow(args):
 
         best_seed_models[seed] = {"model_path": models[0]}
 
-        statistics = test_model(args.model_name, statistics, best_seed_models, args.model_in_channels, args.model_hidden_channels, 
-                                args.embedding_length, train_loader, n_train_samples, valid_loader, 
-                                args.n_neighbors, "valid", device)
+    statistics = test_model(args.model_name, statistics, best_seed_models, args.model_in_channels, args.model_hidden_channels, 
+                            args.embedding_length, train_loader, n_train_samples, valid_loader, 
+                            args.n_neighbors, "valid", device)
 
-        statistics = test_model(args.model_name, statistics, best_seed_models, args.model_in_channels, args.model_hidden_channels, 
-                                args.embedding_length, train_loader, n_train_samples, test_loader, 
-                                args.n_neighbors, "test", device)
+    statistics = test_model(args.model_name, statistics, best_seed_models, args.model_in_channels, args.model_hidden_channels, 
+                            args.embedding_length, train_loader, n_train_samples, test_loader, 
+                            args.n_neighbors, "test", device)
 
     statistics.save()
 
