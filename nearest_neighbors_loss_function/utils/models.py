@@ -1,5 +1,5 @@
 import torch.nn.functional as F
-from torch.nn import ReLU, Module
+from torch.nn import ReLU, Module, init
 from torch_geometric.nn import GCNConv, Linear, MessagePassing, global_mean_pool, SAGEConv, GATConv
 import torch
 
