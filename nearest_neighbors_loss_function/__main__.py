@@ -41,13 +41,14 @@ def parse_training_args():
     parser.add_argument("--optimized_param_name", type=str, required=True)
     parser.add_argument("--debug", action="store_true")
 
-    return parser.parse_args()
+    return parser.parse_known_args()
 
 
 def parse_testing_args():
     parser = argparse.ArgumentParser(description="Siamese graph neural net testing")
 
     parser.add_argument("--n_neighbors", type=int, required=True)
+    parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--n_epochs", type=int, required=True)
     parser.add_argument("--save_path", type=str, required=True)
 
@@ -57,7 +58,7 @@ def parse_testing_args():
     parser.add_argument("--embedding_length", type=int, required=True)
     parser.add_argument("--optimized_param_name", type=str, required=True)
 
-    return parser.parse_args()
+    return parser.parse_known_args()
 
 
 def main():
