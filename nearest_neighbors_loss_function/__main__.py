@@ -6,7 +6,7 @@ import logging
 def parse_workflow_args():
     parser = argparse.ArgumentParser(description="Workflow name parsing")    
     parser.add_argument("--workflow", type=str, required=True)
-    args = parser.parse_args()
+    args, _ = parser.parse_known_args()
     return args.workflow
 
 
