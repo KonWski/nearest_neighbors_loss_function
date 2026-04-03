@@ -71,6 +71,7 @@ def main():
 
     elif workflow == "test_workflow":
         args = parse_testing_args()
+        print(args)
         test_workflow(args)
 
     else:
