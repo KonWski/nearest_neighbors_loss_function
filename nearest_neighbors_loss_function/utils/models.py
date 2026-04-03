@@ -1,9 +1,9 @@
 import torch.nn.functional as F
-from torch.nn import ReLU
+from torch.nn import ReLU, Module
 from torch_geometric.nn import GCNConv, Linear, MessagePassing, global_mean_pool, SAGEConv, GATConv
 import torch
 
-class GNNModel(nn.Module):
+class GNNModel(Module):
 
     def __init__(self, in_channels, hidden_dim, embedding_size):
         
@@ -60,7 +60,7 @@ class GNNLayer(MessagePassing):
         init.xavier_uniform_(self.edge_mlp.weight)
 
 
-class GCN(torch.nn.Module):
+class GCN(Module):
     def __init__(self, in_channels, hidden_dim, embedding_size):
         super().__init__()
         self.conv1 = GCNConv(in_channels, hidden_dim)
@@ -81,7 +81,7 @@ class GCN(torch.nn.Module):
         return x
 
 
-class GraphSAGE(torch.nn.Module):
+class GraphSAGE(Module):
     def __init__(self, in_channels, hidden_dim, embedding_size):
         super().__init__()
         self.conv1 = SAGEConv(in_channels, hidden_dim)
@@ -103,7 +103,7 @@ class GraphSAGE(torch.nn.Module):
         return x
 
 
-class GAT(torch.nn.Module):
+class GAT(Module):
     def __init__(self, in_channels, hidden_dim, embedding_size, heads=8):
         super().__init__()
         self.conv1 = GATConv(in_channels, hidden_dim, heads=heads)
