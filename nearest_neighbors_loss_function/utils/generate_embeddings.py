@@ -12,9 +12,6 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, device)
     if original_shuffle == True:
         data_loader.batch_sampler.shuffle = False
 
-    print(f"data_loader.batch_sampler.shuffle: {data_loader.batch_sampler.shuffle}")
-    print(f"original_shuffle: {original_shuffle}")
-
     embeddings = torch.zeros([n_samples, embedding_length], dtype=float)
     labels = torch.zeros([n_samples, 1], dtype=int)
 

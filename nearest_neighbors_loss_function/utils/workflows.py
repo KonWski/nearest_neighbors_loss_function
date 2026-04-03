@@ -4,6 +4,7 @@ from .train import train_triplet
 from .evaluate_model import test_model
 import logging
 from nearest_neighbors_loss_function.utils.statistics import Statistics
+from nearest_neighbors_loss_function.utils.auxiliary_functions import set_seed
 import os
 from pathlib import Path
 
@@ -67,6 +68,7 @@ def test_workflow(args):
         except ValueError:
             continue
         
+        set_seed(seed)
         seed_path = Path(os.path.join(args.save_path, str(seed)))
         models = list(seed_path.rglob("*.pt"))
         n_models = len(models)
