@@ -47,9 +47,6 @@ def parse_training_args():
 def parse_testing_args():
     parser = argparse.ArgumentParser(description="Siamese graph neural net testing")
 
-    parser.add_argument("--seeds", type=int, nargs="+", required=True,
-                        help="List of random seeds")
-
     parser.add_argument("--n_neighbors", type=int, required=True)
     parser.add_argument("--n_epochs", type=int, required=True)
     parser.add_argument("--save_path", type=str, required=True)
