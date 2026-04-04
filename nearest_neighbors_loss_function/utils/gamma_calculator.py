@@ -84,11 +84,16 @@ class GammaCalculator():
             y = y.numpy()
 
             knn.fit(distances, y)
-            distances_1 = distances[mask, :]
-            proba_1 = knn.predict_proba(distances_1)[0][1] - proba_thrash_threshold
-            gamma_1 = self._calculate_gamma(proba_1)
+            proba = knn.predict_proba(distances)[0][1] - proba_thrash_threshold            
+            gamma = self._calculate_gamma(proba)
             self.gamma_values = torch.ones(n_samples)
-            self.gamma_values[mask] = gamma_1
+            self.gamma_values = gamma
+
+            # distances_1 = distances[mask, :]
+            # proba_1 = knn.predict_proba(distances_1)[0][1] - proba_thrash_threshold
+            # gamma_1 = self._calculate_gamma(proba_1)
+            # self.gamma_values = torch.ones(n_samples)
+            # self.gamma_values[mask] = gamma_1
 
 
     def get_gamma_values(self, gamma_start_id, gamma_end_id, positive_mf_distances, negative_mf_distances):
