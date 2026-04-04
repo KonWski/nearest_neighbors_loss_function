@@ -33,6 +33,9 @@ class BalancedSampler(BatchSampler):
         if self.shuffle:
             self.shuffle_data()
 
+        print(f"self.minority_indices[:100]: {self.minority_indices[:100]}")
+        print(f"self.majority_indices[:100]: {self.majority_indices[:100]}")
+
         min_ptr, maj_ptr = 0, 0
         batch_id = 0
 

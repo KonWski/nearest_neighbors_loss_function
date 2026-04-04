@@ -113,10 +113,11 @@ def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_
 
     # auxiliary param for selecting gamma values
     gamma_start_id = 0
-
+    print("TRAIN")
     for data_id, data in enumerate(train_loader):
 
         data = data.to(device)
+        print("recalculate_gamma_values")
         gamma_calculator.recalculate_gamma_values(model, train_loader, n_train_samples, data_id)
         labels = data.y
         n_samples = labels.shape[0]
