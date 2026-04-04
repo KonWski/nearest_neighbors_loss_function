@@ -15,13 +15,6 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, device)
     embeddings = torch.zeros([n_samples, embedding_length], dtype=float)
     labels = torch.zeros([n_samples, 1], dtype=int)
 
-    # debug
-    try:
-        print(f"original_shuffle: {original_shuffle}")
-        print(f"data_loader.batch_sampler.shuffle: {data_loader.batch_sampler.shuffle}")
-    except:
-        pass
-
     start_id = 0
     for _, data in enumerate(data_loader):
 
