@@ -79,7 +79,7 @@ def test_model(model_name, statistics, best_seed_models, in_channels, hidden_dim
         model.to(device)
         n_test_samples = len(test_loader.dataset)
 
-        test_stats = evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_samples, embedding_size, 
+        test_stats, _ = evaluate_model(model, train_loader, n_train_samples, test_loader, n_test_samples, embedding_size, 
             n_neighbors, stat_prefix, device)
 
         statistics.upload_test_stats(test_stats, seed, checkpoint["epoch"]) 
