@@ -132,9 +132,10 @@ def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_
 
             loss = loss_function(anchor_mf, positive_mf, negative_mf)
             gamma_values = gamma_calculator.get_gamma_values(gamma_start_id, gamma_end_id, positive_mf_distances, negative_mf_distances)
-            print(f"labels: {labels}")
+            print(f"loss before: {labels}")
             print(f"gamma_values: {gamma_values}")
             loss = loss * gamma_values
+            print(f"loss after: {labels}")
             loss = loss.mean()
 
             running_loss += loss.item()
