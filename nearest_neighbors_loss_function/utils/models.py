@@ -1,5 +1,5 @@
 import torch.nn.functional as F
-from torch.nn import ReLU, Module, init
+from torch.nn import ReLU, Module, init, BatchNorm1d
 from torch_geometric.nn import GCNConv, Linear, MessagePassing, global_mean_pool, SAGEConv, GATConv
 import torch
 
@@ -10,8 +10,11 @@ class GNNModel(Module):
         super().__init__()
 
         self.conv1 = GNNLayer(in_channels, hidden_dim)
+        self.batch1 = BatchNorm1d(hidden_dim)
         self.conv2 = GNNLayer(hidden_dim, hidden_dim)
+        self.batch2 = BatchNorm1d(hidden_dim)
         self.conv3 = GNNLayer(hidden_dim, hidden_dim)
+        self.batch3 = BatchNorm1d(hidden_dim)
         self.relu = ReLU()
         self.linear = Linear(hidden_dim, embedding_size)
         self.embedding_size = embedding_size
@@ -22,11 +25,20 @@ class GNNModel(Module):
             data.x, data.edge_index, data.edge_attr, data.batch
         )
 
-        x = self.relu(self.conv1(x, edge_index, edge_attr))
-        x = self.relu(self.conv2(x, edge_index, edge_attr))
-        x = self.relu(self.conv3(x, edge_index, edge_attr))
+        x = self.conv1(x, edge_index, edge_attr)
+        x = self.batch1(x)
+        x = self.relu(x)
+
+        x = self.conv2(x, edge_index, edge_attr)
+        x = self.batch2(x)
+        x = self.relu(x)
+
+        x = self.conv3(x, edge_index, edge_attr)
+        x = self.batch3(x)
+        x = self.relu(x)
+
         x = global_mean_pool(x, batch)
-        out = self.relu(self.linear(x))
+        out = self.linear(x)
 
         return out
 
@@ -85,7 +97,7 @@ class GraphSAGE(Module):
     def __init__(self, in_channels, hidden_dim, embedding_size):
         super().__init__()
         self.conv1 = SAGEConv(in_channels, hidden_dim)
-        self.conv2 = SAGEConv(hidden_dim, embedding_size)
+        self.conv2 = SAGEConv(hidden_dim, hidden_dim)
         self.linear = Linear(hidden_dim, embedding_size)
 
     def forward(self, data):
@@ -107,7 +119,7 @@ class GAT(Module):
     def __init__(self, in_channels, hidden_dim, embedding_size, heads=8):
         super().__init__()
         self.conv1 = GATConv(in_channels, hidden_dim, heads=heads)
-        self.conv2 = GATConv(hidden_dim * heads, embedding_size, heads=1)
+        self.conv2 = GATConv(hidden_dim * heads, hidden_dim, heads=1)
         self.linear = Linear(hidden_dim, embedding_size)
 
     def forward(self, data):
