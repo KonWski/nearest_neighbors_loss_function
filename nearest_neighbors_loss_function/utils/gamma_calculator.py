@@ -98,7 +98,7 @@ class GammaCalculator():
             samples_difficultness = positive_mf_distances / negative_mf_distances
             batch_gamma_values = batch_gamma_values * (1 + self.lambda_samples_difficultness * samples_difficultness)
 
-        return batch_gamma_values
+        return batch_gamma_values.detach()
 
 
     def _calculate_gamma(self, sample_proba):
