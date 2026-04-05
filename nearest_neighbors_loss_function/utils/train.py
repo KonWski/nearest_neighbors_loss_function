@@ -131,6 +131,8 @@ def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_
 
             loss = loss_function(anchor_mf, positive_mf, negative_mf)
             gamma_values = gamma_calculator.get_gamma_values(gamma_start_id, gamma_end_id, positive_mf_distances, negative_mf_distances)
+            gamma_values = gamma_values.detach()
+            gamma_values = gamma_values.view_as(loss)
             loss = loss * gamma_values
             loss = loss.mean()
 
