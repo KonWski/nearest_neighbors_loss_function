@@ -55,9 +55,11 @@ class GammaCalculator():
     def _refresh_gamma_values(self, model, data_loader, n_samples):
 
         X, y = generate_embeddings(model, data_loader, n_samples, self.embedding_length, self.device)
-        self.y = y
+        print(f"X.requires_grad: {X.requires_grad}")
+        print(f"y.requires_grad: {y.requires_grad}")
         X = F.normalize(X, dim=1)
         distances = torch.cdist(X,X)
+        print(f"distances.requires_grad: {distances.requires_grad}")
 
         y = y.ravel()
         proba_thrash_threshold = 1 / self.n_neighbors
@@ -71,6 +73,7 @@ class GammaCalculator():
             gamma_1 = self._calculate_gamma(proba_1)
             self.gamma_values = torch.ones(n_samples, dtype=gamma_1.dtype)
             self.gamma_values[mask] = gamma_1
+            print(f"self.gamma_values.requires_grad: {self.gamma_values.requires_grad}")
 
         else:
 
@@ -90,11 +93,11 @@ class GammaCalculator():
             gamma_1 = self._calculate_gamma(proba_1)
             self.gamma_values = torch.ones(n_samples)
             self.gamma_values[mask] = gamma_1
+            print(f"self.gamma_values.requires_grad: {self.gamma_values.requires_grad}")
 
 
     def get_gamma_values(self, gamma_start_id, gamma_end_id, positive_mf_distances, negative_mf_distances):
         batch_gamma_values = self.gamma_values[gamma_start_id: gamma_end_id]
-        # print(f"Gamma labels: {self.y[gamma_start_id: gamma_end_id]}")
         
         if self.density_awareness:
             samples_difficultness = positive_mf_distances / negative_mf_distances
