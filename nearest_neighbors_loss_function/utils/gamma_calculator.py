@@ -55,7 +55,7 @@ class GammaCalculator():
     def _refresh_gamma_values(self, model, data_loader, n_samples):
 
         X, y = generate_embeddings(model, data_loader, n_samples, self.embedding_length, self.device)
-        X = F.normalize(X, dim=1)
+        # X = F.normalize(X, dim=1)
         distances = torch.cdist(X,X)
 
         y = y.ravel()
