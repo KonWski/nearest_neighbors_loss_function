@@ -11,6 +11,7 @@ from torch.optim import Adam
 import logging
 import torch
 from typing import List
+from torch.nn.functional import normalize
 
 
 def train_triplet(
@@ -133,16 +134,10 @@ def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_
             gamma_values = gamma_calculator.get_gamma_values(gamma_start_id, gamma_end_id, positive_mf_distances, negative_mf_distances)
             gamma_values = gamma_values.detach()
             gamma_values = gamma_values.view_as(loss)
-            print(8*"-")
-            print(f"loss before: {loss}")
-            print(f"loss.mean() before: {loss.mean()}")
+            loss = normalize(loss)
             loss = loss * gamma_values
-            print(f"labels: {_.view(-1)}")
-            print(f"gamma_values: {gamma_values}")
-            print(f"loss after: {loss}")
+
             loss = loss.mean()
-            print(f"loss.mean() after: {loss}")
-            print(8*"-")
 
             running_loss += loss.item()
             loss.backward()
