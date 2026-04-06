@@ -134,6 +134,8 @@ def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_
             gamma_values = gamma_values.detach()
             gamma_values = gamma_values.view_as(loss)
             loss = loss * gamma_values
+            print(f"loss: {loss}")
+            print(f"loss.shape: {loss.shape}")
             loss = loss.mean()
 
             running_loss += loss.item()
