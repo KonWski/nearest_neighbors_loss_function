@@ -124,7 +124,8 @@ def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_
         gamma_end_id = gamma_start_id + n_samples
 
         with torch.set_grad_enabled(True):
-
+            
+            print(f"model.training: {model.training}")
             optimizer.zero_grad()
             data = convert_graph_data_to_float(data)
             anchor_mfs = model(data)
