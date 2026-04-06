@@ -135,12 +135,14 @@ def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_
             gamma_values = gamma_values.view_as(loss)
             print(8*"-")
             print(f"loss before: {loss}")
+            print(f"loss.mean() before: {loss.mean()}")
             loss = loss * gamma_values
             print(f"labels: {_.view(-1)}")
             print(f"gamma_values: {gamma_values}")
             print(f"loss after: {loss}")
-            print(8*"-")
             loss = loss.mean()
+            print(f"loss.mean() after: {loss}")
+            print(8*"-")
 
             running_loss += loss.item()
             loss.backward()
