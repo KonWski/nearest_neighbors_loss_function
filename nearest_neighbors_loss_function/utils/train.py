@@ -85,8 +85,11 @@ def train_triplet(
                                         n_neighbors, "valid", device)
 
             # early exit
-            if validate_stats["valid_precision"] == 0.0 or embeddings_with_nans:
-                print(f"Precision 0 reached at epoch {epoch} -> next split")
+            if embeddings_with_nans:
+                logging.info(f"Embeddings generated during model evaluation contained nans -> next split")
+                break
+            elif validate_stats["valid_precision"] == 0.0:
+                logging.info(f"Precision 0 reached at epoch {epoch} -> next split")
                 break
 
             statistics.add(train_stats, validate_stats)
