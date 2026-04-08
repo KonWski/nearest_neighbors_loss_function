@@ -42,6 +42,46 @@ class GNNModel(Module):
 
         return out
 
+class GNNResidualModel(Module):
+
+    def __init__(self, in_channels, hidden_dim, embedding_size):
+        
+        super().__init__()
+
+        self.conv1 = GNNLayer(in_channels, hidden_dim)
+        self.batch1 = BatchNorm1d(hidden_dim)
+        self.conv2 = GNNLayer(hidden_dim, hidden_dim)
+        self.batch2 = BatchNorm1d(hidden_dim)
+        self.conv3 = GNNLayer(hidden_dim, hidden_dim)
+        self.batch3 = BatchNorm1d(hidden_dim)
+        self.relu = ReLU()
+        self.linear = Linear(hidden_dim, embedding_size)
+        self.embedding_size = embedding_size
+
+
+    def forward(self, data):
+        x, edge_index, edge_attr, batch = (
+            data.x, data.edge_index, data.edge_attr, data.batch
+        )
+
+        x = self.conv1(x, edge_index, edge_attr)
+        x = self.batch1(x)
+        x = self.relu(x)
+        x_layer1_out = x.deepcopy()
+
+        x = self.conv2(x, edge_index, edge_attr)
+        x = self.batch2(x)
+        x = self.relu(x)
+
+        x = self.conv3(x, edge_index, edge_attr) + x_layer1_out
+        x = self.batch3(x)
+        x = self.relu(x)
+
+        x = global_mean_pool(x, batch)
+        out = self.linear(x)
+
+        return out
+
 
 class GNNLayer(MessagePassing):
 
