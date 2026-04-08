@@ -67,7 +67,7 @@ def train_triplet(
         model = get_model(model_name, model_in_channels, model_hidden_channels, embedding_length)
         model = model.to(device)
         model_epoch_hash = uuid4().hex
-        optimizer = Adam(model.parameters(), lr=lr)
+        optimizer = Adam(model.parameters(), lr=lr, weight_decay=1e-4)
 
         # save auxiliary params
         max_epoch_optimized_param_value = float("-inf")
