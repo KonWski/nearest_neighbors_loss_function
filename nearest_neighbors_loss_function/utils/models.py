@@ -2,6 +2,7 @@ import torch.nn.functional as F
 from torch.nn import ReLU, Module, init, BatchNorm1d
 from torch_geometric.nn import GCNConv, Linear, MessagePassing, global_mean_pool, SAGEConv, GATConv
 import torch
+import copy
 
 class GNNModel(Module):
 
@@ -67,7 +68,7 @@ class GNNResidualModel(Module):
         x = self.conv1(x, edge_index, edge_attr)
         x = self.batch1(x)
         x = self.relu(x)
-        x_layer1_out = x.deepcopy()
+        x_layer1_out = copy.deepcopy(x)
 
         x = self.conv2(x, edge_index, edge_attr)
         x = self.batch2(x)
