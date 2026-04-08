@@ -67,10 +67,9 @@ class GNNResidualModel(Module):
 
         x = self.conv1(x, edge_index, edge_attr)
         x = self.batch1(x)
-        x = self.relu(x)
-        x_layer1_out = copy.deepcopy(x)
+        x_layer1_out = self.relu(x)
 
-        x = self.conv2(x, edge_index, edge_attr)
+        x = self.conv2(x_layer1_out, edge_index, edge_attr)
         x = self.batch2(x)
         x = self.relu(x)
 
