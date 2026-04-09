@@ -56,6 +56,16 @@ class GNNResidualModel(Module):
         self.batch2 = BatchNorm1d(hidden_dim)
         self.conv3 = GNNLayer(hidden_dim, hidden_dim)
         self.batch3 = BatchNorm1d(hidden_dim)
+
+        self.conv3 = GNNLayer(hidden_dim, hidden_dim)
+        self.batch3 = BatchNorm1d(hidden_dim)
+
+        self.conv4 = GNNLayer(hidden_dim, hidden_dim)
+        self.batch4 = BatchNorm1d(hidden_dim)
+
+        self.batch5 = BatchNorm1d(hidden_dim)
+
+
         self.relu = ReLU()
         self.linear = Linear(hidden_dim, embedding_size)
         self.embedding_size = embedding_size
@@ -72,10 +82,17 @@ class GNNResidualModel(Module):
 
         x = self.conv2(x_layer1_out, edge_index, edge_attr)
         x = self.batch2(x)
-        x = self.relu(x)
+        x_layer2_out = self.relu(x) + x_layer1_out
 
-        x = self.conv3(x, edge_index, edge_attr) + x_layer1_out
+        x = self.conv3(x_layer2_out, edge_index, edge_attr)
         x = self.batch3(x)
+        x_layer3_out = self.relu(x) + x_layer2_out
+
+        x = self.conv4(x_layer3_out, edge_index, edge_attr)
+        x = self.batch4(x)
+        x_layer4_out = self.relu(x) + x_layer3_out
+
+        x = self.batch5(x_layer4_out)
         x = self.relu(x)
 
         x = global_mean_pool(x, batch)
