@@ -77,6 +77,25 @@ class GNNResidualModel(Module):
             data.x, data.edge_index, data.edge_attr, data.batch
         )
 
+        num_nodes = x.size(0)
+
+        _, _, node_mask = dropout_node(
+            edge_index,
+            p=0.05,
+            num_nodes=num_nodes,
+            training=self.training
+        )
+
+        edge_index, edge_attr = subgraph(
+            node_mask,
+            edge_index,
+            edge_attr=edge_attr,
+            relabel_nodes=True
+        )
+
+        x = x[node_mask]
+        batch = batch[node_mask]
+
         x = self.conv1(x, edge_index, edge_attr)
         x = self.batch1(x)
         x = self.relu(x)
