@@ -105,8 +105,8 @@ class GNNDropoutModel(Module):
             data.x, data.edge_index, data.edge_attr, data.batch
         )
 
-        edge_index, edge_mask = dropout_edge(edge_index, p=0.05, training=self.training)
-        edge_attr = edge_attr[edge_mask]
+        # edge_index, edge_mask = dropout_edge(edge_index, p=0.05, training=self.training)
+        # edge_attr = edge_attr[edge_mask]
 
         num_nodes = x.size(0)
 
