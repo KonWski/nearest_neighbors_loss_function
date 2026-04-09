@@ -1,5 +1,5 @@
 import torch.nn.functional as F
-from torch.nn import ReLU, Module, init, BatchNorm1d
+from torch.nn import ReLU, Module, init, BatchNorm1d, Dropout
 from torch_geometric.nn import GCNConv, Linear, MessagePassing, global_mean_pool, SAGEConv, GATConv
 import torch
 import copy
@@ -67,6 +67,7 @@ class GNNResidualModel(Module):
 
 
         self.relu = ReLU()
+        self.dropout = Dropout(p=0.2)
         self.linear = Linear(hidden_dim, embedding_size)
         self.embedding_size = embedding_size
 
@@ -78,24 +79,32 @@ class GNNResidualModel(Module):
 
         x = self.conv1(x, edge_index, edge_attr)
         x = self.batch1(x)
-        x_layer1_out = self.relu(x)
+        x = self.relu(x)
+        x_layer1_out = self.dropout(x)
 
         x = self.conv2(x_layer1_out, edge_index, edge_attr)
         x = self.batch2(x)
-        x_layer2_out = self.relu(x) + x_layer1_out
+        x = self.relu(x)
+        x = self.dropout(x)
+        x_layer2_out = x + x_layer1_out
 
         x = self.conv3(x_layer2_out, edge_index, edge_attr)
         x = self.batch3(x)
-        x_layer3_out = self.relu(x) + x_layer2_out
+        x = self.relu(x)
+        x = self.dropout(x)
+        x_layer3_out = x + x_layer2_out
 
         x = self.conv4(x_layer3_out, edge_index, edge_attr)
         x = self.batch4(x)
-        x_layer4_out = self.relu(x) + x_layer3_out
+        x = self.relu(x)
+        x = self.dropout(x)
+        x_layer4_out = x + x_layer3_out
 
         x = self.batch5(x_layer4_out)
         x = self.relu(x)
 
         x = global_mean_pool(x, batch)
+        x = self.dropout(x)
         out = self.linear(x)
 
         return out
