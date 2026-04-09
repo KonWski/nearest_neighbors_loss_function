@@ -3,7 +3,7 @@ from torch.nn import ReLU, Module, init, BatchNorm1d
 from torch_geometric.nn import GCNConv, Linear, MessagePassing, global_mean_pool, SAGEConv, GATConv
 import torch
 import copy
-from torch_geometric.utils import dropout_edge
+from torch_geometric.utils import dropout_edge, dropout_node
 
 class GNNModel(Module):
 
@@ -107,6 +107,10 @@ class GNNDropoutModel(Module):
 
         edge_index, edge_mask = dropout_edge(edge_index, p=0.05, training=self.training)
         edge_attr = edge_attr[edge_mask]
+
+        edge_index, edge_mask, node_mask = dropout_node(edge_index, p=0.05, num_nodes=1, training=self.training)
+        edge_attr = edge_attr[edge_mask]
+        x = x[node_mask]
 
         x = self.conv1(x, edge_index, edge_attr)
         x = self.batch1(x)
