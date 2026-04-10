@@ -127,11 +127,10 @@ def reg_log_stats(train_embeddings, test_embeddings, y_train, y_test):
     model = Pipeline([
         ("scaler", StandardScaler()),
         ("lr", LogisticRegression(
-            C=1.0,
+            C=0.2,
             penalty="l2",
             solver="lbfgs",
             max_iter=1000, 
-            class_weight={0: 1.0, 1: 3.0},
             n_jobs=-1
         ))
     ])
