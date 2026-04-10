@@ -29,6 +29,7 @@ def train_workflow(args):
         density_function=args.density_function,
         samples_difficultness=args.samples_difficultness,
         lambda_samples_difficultness=args.lambda_samples_difficultness,
+        evaluation_model_name=args.evaluation_model_name,
         n_neighbors=args.n_neighbors,
         n_epochs=args.n_epochs,
         save_path=args.save_path,

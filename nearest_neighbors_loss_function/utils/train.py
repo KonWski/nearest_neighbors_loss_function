@@ -28,6 +28,7 @@ def train_triplet(
         density_function: str,
         samples_difficultness: bool,
         lambda_samples_difficultness: float,
+        evaluation_model_name: str,
         n_neighbors: int, 
         n_epochs: int, 
         save_path: str, 
@@ -81,7 +82,7 @@ def train_triplet(
             model, optimizer, loss_function, train_stats = train(model, train_loader, n_train_samples, optimizer, loss_function, 
                                                                  batch_shaper, gamma_calculator, seed, epoch, model_epoch_hash, device)
 
-            validate_stats, embeddings_with_nans = evaluate_model(model, train_loader, n_train_samples, valid_loader, n_valid_samples, embedding_length, 
+            validate_stats, embeddings_with_nans = evaluate_model(model, evaluation_model_name, train_loader, n_train_samples, valid_loader, n_valid_samples, embedding_length, 
                                         n_neighbors, "valid", device)
 
             # early exit
