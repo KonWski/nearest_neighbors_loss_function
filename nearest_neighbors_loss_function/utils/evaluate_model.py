@@ -10,6 +10,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC, LinearSVC
 from sklearn.linear_model import LogisticRegression
 from sklearn.calibration import CalibratedClassifierCV
+import logging
 
 
 def evaluate_model(model, evaluation_model_name, train_loader, n_train_samples, test_loader, n_test_samples, embedding_length, 
@@ -173,6 +174,8 @@ def test_model(model_name, evaluation_model_name, statistics, best_seed_models, 
 
         test_stats, _ = evaluate_model(model, evaluation_model_name, train_loader, n_train_samples, test_loader, n_test_samples, embedding_size, 
             n_neighbors, stat_prefix, device)
+        
+        logging.info(f"Seed: {seed}, {test_stats}")
 
         statistics.upload_test_stats(test_stats, seed, checkpoint["epoch"]) 
 
