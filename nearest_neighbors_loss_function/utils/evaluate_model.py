@@ -131,6 +131,7 @@ def reg_log_stats(train_embeddings, test_embeddings, y_train, y_test):
             penalty="l2",
             solver="lbfgs",
             max_iter=1000, 
+            class_weight="balanced",
             n_jobs=-1
         ))
     ])
