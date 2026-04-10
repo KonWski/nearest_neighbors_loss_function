@@ -55,10 +55,10 @@ def knn_stats(train_embeddings, test_embeddings, y_train, y_test, n_neighbors):
 
     # calculate distances
     train_distances = 2 - 2 * (train_embeddings @ train_embeddings.T)
-    test_distances = 2 - 2 * (test_embeddings @ train_embeddings.T)
+    test_train_distances = 2 - 2 * (test_embeddings @ train_embeddings.T)
 
     train_distances = train_distances.clamp(min=0)
-    test_distances = test_distances.clamp(min=0)
+    test_train_distances = test_train_distances.clamp(min=0)
 
     # convert torch -> numpy
     train_distances = train_distances.numpy()
