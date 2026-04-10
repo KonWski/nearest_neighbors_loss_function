@@ -82,7 +82,7 @@ def svc_stats(train_embeddings, test_embeddings, y_train, y_test):
 
     model = Pipeline([
         ("scaler", StandardScaler()),
-        ("svm", SVC(kernel="rbf", C=1.0, gamma="scale", probability=True))
+        ("svm", SVC(kernel="rbf", C=1.0, gamma="scale", probability=True, n_jobs=-1))
     ])
 
     # fit model
@@ -102,7 +102,7 @@ def linear_svc_stats(train_embeddings, test_embeddings, y_train, y_test):
 
     model = Pipeline([
         ("scaler", StandardScaler()),
-        ("svm", LinearSVC(C=1.0, max_iter=10000, probability=True))
+        ("svm", LinearSVC(C=1.0, max_iter=10000, probability=True, n_jobs=-1))
     ])
 
     # fit model
@@ -126,8 +126,8 @@ def reg_log_stats(train_embeddings, test_embeddings, y_train, y_test):
             C=1.0,
             penalty="l2",
             solver="lbfgs",
-            max_iter=1000,
-            class_weight="balanced"   # optional
+            max_iter=1000, 
+            n_jobs=-1
         ))
     ])
 
