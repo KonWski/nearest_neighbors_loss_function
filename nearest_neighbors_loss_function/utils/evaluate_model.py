@@ -9,6 +9,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVC, LinearSVC
 from sklearn.linear_model import LogisticRegression
+from sklearn.calibration import CalibratedClassifierCV
 
 
 def evaluate_model(model, evaluation_model_name, train_loader, n_train_samples, test_loader, n_test_samples, embedding_length, 
@@ -82,7 +83,7 @@ def svc_stats(train_embeddings, test_embeddings, y_train, y_test):
 
     model = Pipeline([
         ("scaler", StandardScaler()),
-        ("svm", SVC(kernel="rbf", C=1.0, gamma="scale", probability=True, n_jobs=-1))
+        ("svm", SVC(kernel="rbf", C=1.0, gamma="scale", probability=True))
     ])
 
     # fit model
@@ -100,9 +101,11 @@ def svc_stats(train_embeddings, test_embeddings, y_train, y_test):
 
 def linear_svc_stats(train_embeddings, test_embeddings, y_train, y_test):
 
+    base_model = LinearSVC(C=1.0, max_iter=10000)
+
     model = Pipeline([
         ("scaler", StandardScaler()),
-        ("svm", LinearSVC(C=1.0, max_iter=10000, probability=True, n_jobs=-1))
+        ("calibrated", CalibratedClassifierCV(base_model, method="sigmoid"))
     ])
 
     # fit model
