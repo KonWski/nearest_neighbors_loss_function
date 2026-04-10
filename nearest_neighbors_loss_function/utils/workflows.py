@@ -42,9 +42,9 @@ def train_workflow(args):
         device=device
     )
 
-    statistics = test_model(args.model_name, statistics, best_seed_models, args.model_in_channels, args.model_hidden_channels, 
-                            args.embedding_length, train_loader, n_train_samples, test_loader, 
-                            args.n_neighbors, "test", device)
+    statistics = test_model(args.model_name, args.evaluation_model_name, statistics, best_seed_models, 
+                            args.model_in_channels, args.model_hidden_channels, args.embedding_length, 
+                            train_loader, n_train_samples, test_loader, args.n_neighbors, "test", device)
 
     statistics.save()
 
