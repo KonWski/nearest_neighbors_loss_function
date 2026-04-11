@@ -163,12 +163,10 @@ def calculate_stats(y_test, y_pred, y_pred_proba):
 
 def test_model(model_name, evaluation_model_name, statistics, best_seed_models, in_channels, hidden_dim, embedding_size, train_loader, 
                n_train_samples, test_loader, n_neighbors, stat_prefix, device):
-    
-    for seed, model_data in best_seed_models.items():
-        
-        model_path = model_data["model_path"]
 
-        model, checkpoint = load_model(model_path, model_name, in_channels, hidden_dim, embedding_size)
+    for seed, epoch, model_path in zip(best_seed_models["seeds"], best_seed_models["epochs"], best_seed_models["model_path"]):
+
+        model, _ = load_model(model_path, model_name, in_channels, hidden_dim, embedding_size)
         model.to(device)
         n_test_samples = len(test_loader.dataset)
 
@@ -177,6 +175,6 @@ def test_model(model_name, evaluation_model_name, statistics, best_seed_models, 
         
         logging.info(f"Seed: {seed}, {test_stats}")
 
-        statistics.upload_test_stats(test_stats, seed, checkpoint["epoch"]) 
+        statistics.upload_test_stats(test_stats, seed, epoch)
 
     return statistics
