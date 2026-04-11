@@ -166,7 +166,7 @@ def test_model(model_name, evaluation_model_name, statistics, best_seed_models, 
 
     for seed, seed_data in best_seed_models.items():
 
-        for epoch, model_path in zip(seed_data["epochs"], seed_data["model_path"]):
+        for epoch, model_path in zip(seed_data["epoch"], seed_data["model_path"]):
 
             model, _ = load_model(model_path, model_name, in_channels, hidden_dim, embedding_size)
             model.to(device)
