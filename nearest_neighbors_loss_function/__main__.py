@@ -30,6 +30,8 @@ def parse_training_args():
     parser.add_argument("--lambda_samples_difficultness", type=float, default=0.0)
 
     parser.add_argument("--evaluation_model_name", type=str, default="knn")
+    parser.add_argument("--n_evaluation_models", type=int, default=3)
+
     parser.add_argument("--n_neighbors", type=int, required=True)
     parser.add_argument("--n_epochs", type=int, required=True)
     parser.add_argument("--save_path", type=str, required=True)
@@ -49,6 +51,7 @@ def parse_training_args():
 def parse_testing_args():
     parser = argparse.ArgumentParser(description="Siamese graph neural net testing")
 
+    parser.add_argument("--n_evaluation_models", type=int, default=3)
     parser.add_argument("--evaluation_model_name", type=str, default="knn")
     parser.add_argument("--n_neighbors", type=int, required=True)
     parser.add_argument("--batch_size", type=int, required=True)

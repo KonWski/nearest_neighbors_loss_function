@@ -11,8 +11,8 @@ from torch.optim import Adam
 import logging
 import torch
 from typing import List
-from torch.nn.functional import normalize
-
+import numpy as np
+import os
 
 def train_triplet(
         seeds: List[int], 
@@ -28,6 +28,7 @@ def train_triplet(
         density_function: str,
         samples_difficultness: bool,
         lambda_samples_difficultness: float,
+        n_evaluation_models: int,
         evaluation_model_name: str,
         n_neighbors: int, 
         n_epochs: int, 
@@ -67,16 +68,16 @@ def train_triplet(
 
         model = get_model(model_name, model_in_channels, model_hidden_channels, embedding_length)
         model = model.to(device)
-        model_epoch_hash = uuid4().hex
         optimizer = Adam(model.parameters(), lr=lr)
 
         # save auxiliary params
-        max_epoch_optimized_param_value = float("-inf")
-        best_epoch = None
-        best_model_path = None
+        best_optimized_param_values = [float("-inf")] # min works only on non empty lists
+        best_epochs = []
+        best_model_paths = []
 
         for epoch in range(0, n_epochs):
 
+            model_epoch_hash = uuid4().hex
             logging.info(f"Epoch: {epoch + 1}/{n_epochs}")
 
             model, optimizer, loss_function, train_stats = train(model, train_loader, n_train_samples, optimizer, loss_function, 
@@ -96,15 +97,31 @@ def train_triplet(
             statistics.add(train_stats, validate_stats)
             statistics.log_last_train_stats()
 
-            if validate_stats[f"valid_{optimized_param_name}"] > max_epoch_optimized_param_value:
-                max_epoch_optimized_param_value = validate_stats[f"valid_{optimized_param_name}"]
-                best_epoch = epoch
+            optimized_param_value = validate_stats[f"valid_{optimized_param_name}"]
+            n_best_models = len(best_optimized_param_values) 
+            
+            if optimized_param_value > min(best_optimized_param_values):
 
                 best_model_path = save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
-                           train_stats["loss"], n_neighbors, max_epoch_optimized_param_value, training_type, batch_size, 
-                           gamma_recalculation_strategy, density_awareness, samples_difficultness, lambda_samples_difficultness)
+                        train_stats["loss"], n_neighbors, optimized_param_value, training_type, batch_size, 
+                        gamma_recalculation_strategy, density_awareness, samples_difficultness, lambda_samples_difficultness)
 
-        best_seed_models[seed] = {"epoch": best_epoch, "model_path": best_model_path}
+                if n_best_models < n_evaluation_models:
+                    best_optimized_param_values.append(optimized_param_value)
+                    best_model_paths.append(best_model_path)
+                    best_epochs.append(epoch)
+
+                # replace worst with best model
+                elif n_best_models == n_evaluation_models:
+                    
+                    id_worst_model = np.argmin(best_optimized_param_values)
+                    os.remove(best_model_paths[id_worst_model])
+
+                    best_optimized_param_values[id_worst_model] = optimized_param_value
+                    best_model_paths[id_worst_model] = best_model_path
+                    best_epochs[id_worst_model] = epoch
+
+        best_seed_models[seed] = {"epoch": best_epochs, "model_path": best_model_paths}
 
     return statistics, best_seed_models, n_train_samples
 

@@ -29,6 +29,7 @@ def train_workflow(args):
         density_function=args.density_function,
         samples_difficultness=args.samples_difficultness,
         lambda_samples_difficultness=args.lambda_samples_difficultness,
+        n_evaluation_models=args.n_evaluation_models,
         evaluation_model_name=args.evaluation_model_name,
         n_neighbors=args.n_neighbors,
         n_epochs=args.n_epochs,
@@ -42,9 +43,21 @@ def train_workflow(args):
         device=device
     )
 
-    statistics = test_model(args.model_name, args.evaluation_model_name, statistics, best_seed_models, 
-                            args.model_in_channels, args.model_hidden_channels, args.embedding_length, 
-                            train_loader, n_train_samples, test_loader, args.n_neighbors, "test", device)
+    statistics = test_model(
+        args.model_name,
+        args.evaluation_model_name, 
+        statistics, 
+        best_seed_models, 
+        args.model_in_channels, 
+        args.model_hidden_channels, 
+        args.embedding_length, 
+        train_loader,
+        n_train_samples,
+        test_loader,
+        args.n_neighbors,
+        "test", 
+        device
+    )
 
     statistics.save()
 
@@ -79,12 +92,12 @@ def test_workflow(args):
 
         best_seed_models[seed] = {"model_path": models[0]}
 
-    statistics = test_model(args.model_name, args.evaluation_model_name, statistics, best_seed_models, args.model_in_channels, args.model_hidden_channels, 
-                            args.embedding_length, train_loader, n_train_samples, valid_loader, 
+    statistics = test_model(args.model_name, args.evaluation_model_name, statistics, best_seed_models, 
+                            args.model_in_channels, args.model_hidden_channels, args.embedding_length, train_loader, n_train_samples, valid_loader, 
                             args.n_neighbors, "valid", device)
 
-    statistics = test_model(args.model_name, args.evaluation_model_name, statistics, best_seed_models, args.model_in_channels, args.model_hidden_channels, 
-                            args.embedding_length, train_loader, n_train_samples, test_loader, 
+    statistics = test_model(args.model_name, args.evaluation_model_name, statistics, best_seed_models, 
+                            args.model_in_channels, args.model_hidden_channels, args.embedding_length, train_loader, n_train_samples, test_loader, 
                             args.n_neighbors, "test", device)
 
     statistics.save()
