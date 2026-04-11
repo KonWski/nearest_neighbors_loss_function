@@ -71,7 +71,7 @@ def train_triplet(
         optimizer = Adam(model.parameters(), lr=lr)
 
         # save auxiliary params
-        best_optimized_param_values = [float("-inf")] # min works only on non empty lists
+        best_optimized_param_values = []
         best_epochs = []
         best_model_paths = []
 
@@ -100,7 +100,7 @@ def train_triplet(
             optimized_param_value = validate_stats[f"valid_{optimized_param_name}"]
             n_best_models = len(best_optimized_param_values) 
             
-            if optimized_param_value > min(best_optimized_param_values):
+            if optimized_param_value > min(best_optimized_param_values, default=float("-inf")):
 
                 best_model_path = save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
                         train_stats["loss"], n_neighbors, optimized_param_value, training_type, batch_size, 
