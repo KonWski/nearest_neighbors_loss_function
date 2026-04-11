@@ -100,7 +100,7 @@ def train_triplet(
             optimized_param_value = validate_stats[f"valid_{optimized_param_name}"]
             n_best_models = len(best_optimized_param_values) 
             
-            if optimized_param_value > min(best_optimized_param_values, default=float("-inf")):
+            if optimized_param_value > min(best_optimized_param_values, default=float("-inf")) or n_best_models < n_evaluation_models:
 
                 best_model_path = save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
                         train_stats["loss"], n_neighbors, optimized_param_value, training_type, batch_size, 
