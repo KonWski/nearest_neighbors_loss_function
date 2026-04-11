@@ -67,7 +67,7 @@ def knn_stats(train_embeddings, test_embeddings, y_train, y_test, n_neighbors):
     y_test = y_test.numpy()
 
     # fit model
-    knn = KNeighborsClassifier(n_neighbors=n_neighbors, n_jobs=-1, metric="precomputed")
+    knn = KNeighborsClassifier(n_neighbors=n_neighbors, n_jobs=-1, metric="precomputed", weights='distance')
     knn.fit(train_distances, y_train)
 
     # predictions
