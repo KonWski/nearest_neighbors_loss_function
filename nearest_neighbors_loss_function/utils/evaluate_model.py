@@ -164,17 +164,19 @@ def calculate_stats(y_test, y_pred, y_pred_proba):
 def test_model(model_name, evaluation_model_name, statistics, best_seed_models, in_channels, hidden_dim, embedding_size, train_loader, 
                n_train_samples, test_loader, n_neighbors, stat_prefix, device):
 
-    for seed, epoch, model_path in zip(best_seed_models["seeds"], best_seed_models["epochs"], best_seed_models["model_path"]):
+    for seed, seed_data in best_seed_models.items():
 
-        model, _ = load_model(model_path, model_name, in_channels, hidden_dim, embedding_size)
-        model.to(device)
-        n_test_samples = len(test_loader.dataset)
+        for epoch, model_path in zip(seed_data["epochs"], seed_data["model_path"]):
 
-        test_stats, _ = evaluate_model(model, evaluation_model_name, train_loader, n_train_samples, test_loader, n_test_samples, embedding_size, 
-            n_neighbors, stat_prefix, device)
-        
-        logging.info(f"Seed: {seed}, {test_stats}")
+            model, _ = load_model(model_path, model_name, in_channels, hidden_dim, embedding_size)
+            model.to(device)
+            n_test_samples = len(test_loader.dataset)
 
-        statistics.upload_test_stats(test_stats, seed, epoch)
+            test_stats, _ = evaluate_model(model, evaluation_model_name, train_loader, n_train_samples, test_loader, n_test_samples, embedding_size, 
+                n_neighbors, stat_prefix, device)
+            
+            logging.info(f"Seed: {seed}, {test_stats}")
+
+            statistics.upload_test_stats(test_stats, seed, epoch)
 
     return statistics
