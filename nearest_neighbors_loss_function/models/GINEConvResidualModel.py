@@ -29,10 +29,11 @@ class GINEConvResidualModel(Module):
         )
 
         for layer_block in self.layer_blocks:
+            print("Entered layer_block")
             x_layer_block = layer_block(x, edge_index, edge_attr)
             x = x + x_layer_block
 
-        x = self.batch5(x)
+        x = self.batch(x)
         x = self.relu(x)
 
         x = global_mean_pool(x, batch)
