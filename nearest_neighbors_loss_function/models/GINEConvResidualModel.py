@@ -1,5 +1,5 @@
-from torch.nn import ModuleList, ReLU, Module, BatchNorm1d, Dropout
-from torch_geometric.nn import Linear, global_mean_pool, Sequential
+from torch.nn import ModuleList, Sequential, Linear, ReLU, Module, BatchNorm1d, Dropout
+from torch_geometric.nn import global_mean_pool
 from torch_geometric.nn.conv import GINEConv
 
 class GINEConvResidualModel(Module):
