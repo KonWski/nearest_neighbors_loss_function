@@ -31,6 +31,8 @@ class GINEConvResidualModel(Module):
         for layer_block in self.layer_blocks:
             print("Entered layer_block")
             x_layer_block = layer_block(x, edge_index, edge_attr)
+            print(f"x.shape: {x.shape}")
+            print(f"x_layer_block.shape: {x_layer_block.shape}")
             x = x + x_layer_block
 
         x = self.batch(x)
