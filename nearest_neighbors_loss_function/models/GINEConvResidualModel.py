@@ -46,15 +46,16 @@ class GINEBlock(Module):
     def __init__(self, in_channels, hidden_dim):
         super().__init__()
 
-        self.layers = Sequential(
-            GINEConv(in_channels, hidden_dim),
-            BatchNorm1d(hidden_dim),
-            ReLU(),
-            Dropout(p=0.2)
-        )
+        self.gine_conv = GINEConv(in_channels, hidden_dim)
+        self.batch_norm = BatchNorm1d(hidden_dim)
+        self.relu = ReLU()
+        self.dropout = Dropout(p=0.2)
         
     def forward(self, x, edge_index, edge_attr):
-        
-        x = self.layers(x, edge_index, edge_attr)
+
+        x = self.gine_conv(x, edge_index, edge_attr)
+        x = self.batch_norm(x)
+        x = self.relu(x)
+        x = self.dropout(x)
         
         return x
