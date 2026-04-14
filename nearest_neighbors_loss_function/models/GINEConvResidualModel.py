@@ -11,9 +11,13 @@ class GINEConvResidualModel(Module):
         self.embedding_size = embedding_size
         self.layer_blocks = ModuleList()
         
-        for i in range(n_blocks):
+        for id_block in range(n_blocks):
             
-            layer_block = GINEBlock(in_channels, hidden_dim)
+            if id_block == 0:
+                layer_block = GINEBlock(in_channels, hidden_dim)
+            else:
+                layer_block = GINEBlock(hidden_dim, hidden_dim)
+
             self.layer_blocks.append(layer_block)
 
         self.batch = BatchNorm1d(hidden_dim)
@@ -28,12 +32,13 @@ class GINEConvResidualModel(Module):
             data.x, data.edge_index, data.edge_attr, data.batch
         )
 
-        for layer_block in self.layer_blocks:
+        for id_layer, layer_block in enumerate(self.layer_blocks):
             print("Entered layer_block")
             x_layer_block = layer_block(x, edge_index, edge_attr)
             print(f"x.shape: {x.shape}")
             print(f"x_layer_block.shape: {x_layer_block.shape}")
-            x = x + x_layer_block
+            if id_layer > 0:
+                x = x + x_layer_block
 
         x = self.batch(x)
         x = self.relu(x)
