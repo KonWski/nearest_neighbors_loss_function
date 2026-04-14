@@ -39,7 +39,7 @@ def convert_graph_data_to_float(data):
 
 def get_model(model_name, in_channels, hidden_dim, embedding_size):
 
-    module_name = "nearest_neighbors_loss_function.utils.models"
+    module_name = "nearest_neighbors_loss_function.models"
     module = importlib.import_module(module_name)
     cls = getattr(module, model_name)
     model = cls(in_channels, hidden_dim, embedding_size)
