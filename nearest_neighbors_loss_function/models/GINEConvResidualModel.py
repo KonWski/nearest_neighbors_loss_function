@@ -46,7 +46,12 @@ class GINEBlock(Module):
     def __init__(self, in_channels, hidden_dim):
         super().__init__()
 
-        self.gine_conv = GINEConv(in_channels, hidden_dim)
+        self.mlp = Sequential(
+            Linear(in_channels, hidden_dim),
+            ReLU(),
+            Linear(hidden_dim, hidden_dim)
+        )
+        self.gine_conv = GINEConv(self.mlp)
         self.batch_norm = BatchNorm1d(hidden_dim)
         self.relu = ReLU()
         self.dropout = Dropout(p=0.2)
