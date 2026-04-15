@@ -16,7 +16,7 @@ class GINEConvResidualModel(Module):
         )
 
         self.layer_blocks = ModuleList()
-        for _ in n_blocks:            
+        for _ in range(n_blocks):            
             layer_block = GINEBlock(hidden_dim, hidden_dim)
             self.layer_blocks.append(layer_block)
 
