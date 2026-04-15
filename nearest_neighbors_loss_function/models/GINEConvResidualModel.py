@@ -31,6 +31,8 @@ class GINEConvResidualModel(Module):
             data.x, data.edge_index, data.edge_attr, data.batch
         )
 
+        x = self.node_encoder(x)
+
         for layer_block in self.layer_blocks:
             x_layer_block = layer_block(x, edge_index, edge_attr)
             x = x + x_layer_block
