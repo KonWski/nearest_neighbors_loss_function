@@ -4,20 +4,20 @@ from torch_geometric.nn.conv import GINEConv
 
 class GINEConvResidualModel(Module):
 
-    def __init__(self, in_channels, hidden_dim, embedding_size, n_blocks = 5):
+    def __init__(self, in_channels, hidden_dim, embedding_size, n_blocks = 4):
         
         super().__init__()
 
         self.embedding_size = embedding_size
-        self.layer_blocks = ModuleList()
-        
-        for id_block in range(n_blocks):
-            
-            if id_block == 0:
-                layer_block = GINEBlock(in_channels, hidden_dim)
-            else:
-                layer_block = GINEBlock(hidden_dim, hidden_dim)
+        self.node_encoder = Sequential(
+            Linear(in_channels, hidden_dim),
+            BatchNorm1d(hidden_dim),
+            ReLU()
+        )
 
+        self.layer_blocks = ModuleList()
+        for _ in n_blocks:            
+            layer_block = GINEBlock(hidden_dim, hidden_dim)
             self.layer_blocks.append(layer_block)
 
         self.batch = BatchNorm1d(hidden_dim)
@@ -25,20 +25,15 @@ class GINEConvResidualModel(Module):
         self.dropout = Dropout(p=0.2)
         self.linear = Linear(hidden_dim, embedding_size)
 
-
     def forward(self, data):
         
         x, edge_index, edge_attr, batch = (
             data.x, data.edge_index, data.edge_attr, data.batch
         )
 
-        for id_layer, layer_block in enumerate(self.layer_blocks):
-            print("Entered layer_block")
+        for layer_block in self.layer_blocks:
             x_layer_block = layer_block(x, edge_index, edge_attr)
-            print(f"x.shape: {x.shape}")
-            print(f"x_layer_block.shape: {x_layer_block.shape}")
-            if id_layer > 0:
-                x = x + x_layer_block
+            x = x + x_layer_block
 
         x = self.batch(x)
         x = self.relu(x)
@@ -51,11 +46,11 @@ class GINEConvResidualModel(Module):
 
 
 class GINEBlock(Module):
-    def __init__(self, in_channels, hidden_dim):
+    def __init__(self, hidden_dim):
         super().__init__()
 
         self.mlp = Sequential(
-            Linear(in_channels, hidden_dim),
+            Linear(hidden_dim, hidden_dim),
             ReLU(),
             Linear(hidden_dim, hidden_dim)
         )
