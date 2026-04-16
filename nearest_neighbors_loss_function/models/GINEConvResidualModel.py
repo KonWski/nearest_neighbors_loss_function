@@ -28,7 +28,7 @@ class GINEConvResidualModel(Module):
         self.linear = Linear(hidden_dim, embedding_size)
         self._init_weights(self.linear)
 
-    def _init_weights(m):
+    def _init_weights(self, m):
         if isinstance(m, Linear):
             init.xavier_uniform_(m.weight)
             init.zeros_(m.bias)
