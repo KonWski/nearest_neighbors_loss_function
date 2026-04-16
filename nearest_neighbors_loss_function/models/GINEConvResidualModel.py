@@ -16,6 +16,9 @@ class GINEConvResidualModel(Module):
         )
         self.node_encoder.apply(self._init_weights)
 
+        self.edge_encoder = Linear(3, hidden_dim)
+        self._init_weights(self.edge_encoder)
+
         self.layer_blocks = ModuleList()
         for _ in range(n_blocks):            
             layer_block = GINEBlock(hidden_dim)
@@ -40,6 +43,7 @@ class GINEConvResidualModel(Module):
         )
 
         x = self.node_encoder(x)
+        edge_attr = self.edge_encoder(edge_attr)
 
         for layer_block in self.layer_blocks:
             x_layer_block = layer_block(x, edge_index, edge_attr)
@@ -61,6 +65,7 @@ class GINEBlock(Module):
 
         self.mlp = Sequential(
             Linear(hidden_dim, hidden_dim),
+            BatchNorm1d(hidden_dim),
             ReLU(),
             Linear(hidden_dim, hidden_dim)
         )
