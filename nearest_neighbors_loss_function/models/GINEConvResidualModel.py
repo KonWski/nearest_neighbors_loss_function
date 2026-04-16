@@ -1,5 +1,5 @@
 from torch.nn import ModuleList, Sequential, Linear, ReLU, Module, BatchNorm1d, Dropout
-from torch_geometric.nn import global_mean_pool
+from torch_geometric.nn import global_mean_pool, init
 from torch_geometric.nn.conv import GINEConv
 
 class GINEConvResidualModel(Module):
@@ -14,16 +14,24 @@ class GINEConvResidualModel(Module):
             BatchNorm1d(hidden_dim),
             ReLU()
         )
+        self.node_encoder.apply(self._init_weights)
 
         self.layer_blocks = ModuleList()
         for _ in range(n_blocks):            
             layer_block = GINEBlock(hidden_dim)
+            layer_block.apply(self._init_weights)
             self.layer_blocks.append(layer_block)
 
         self.batch = BatchNorm1d(hidden_dim)
         self.relu = ReLU()
         self.dropout = Dropout(p=0.2)
         self.linear = Linear(hidden_dim, embedding_size)
+        self._init_weights(self.linear)
+
+    def _init_weights(m):
+        if isinstance(m, Linear):
+            init.xavier_uniform_(m.weight)
+            init.zeros_(m.bias)
 
     def forward(self, data):
         
