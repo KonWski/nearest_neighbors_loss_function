@@ -69,7 +69,7 @@ class GINEBlock(Module):
             ReLU(),
             Linear(hidden_dim, hidden_dim)
         )
-        self.gine_conv = GINEConv(self.mlp, edge_dim=3)
+        self.gine_conv = GINEConv(self.mlp, edge_dim=hidden_dim)
         self.batch_norm = BatchNorm1d(hidden_dim)
         self.relu = ReLU()
         self.dropout = Dropout(p=0.2)
