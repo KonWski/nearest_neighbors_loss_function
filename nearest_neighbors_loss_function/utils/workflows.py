@@ -13,7 +13,7 @@ def train_workflow(args):
     log_args(args)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    train_loader, valid_loader, test_loader = get_loaders(args.batch_size, debug=args.debug)
+    train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, debug=args.debug)
 
     statistics, best_seed_models, n_train_samples = train_triplet(
         seeds=args.seeds,
@@ -69,7 +69,7 @@ def test_workflow(args):
     statistics = Statistics(args.n_epochs, args.save_path, experiment_hash, args.optimized_param_name)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    train_loader, valid_loader, test_loader = get_loaders(args.batch_size, debug=False)
+    train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, debug=False)
     train_loader.batch_sampler.shuffle_data()
     n_train_samples = len(train_loader.dataset)
     best_seed_models = {}

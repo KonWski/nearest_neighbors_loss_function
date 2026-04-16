@@ -17,7 +17,7 @@ def get_datasets(dataset_name = "ogbg-molhiv", dataset_root = 'dataset/', debug=
 
     return train_dataset, valid_dataset, test_dataset
 
-def get_loaders(batch_size, dataset_name = "ogbg-molhiv", dataset_root = 'dataset/', debug=False):
+def get_loaders(batch_size, dataset_name, dataset_root = 'dataset/', debug=False):
 
     train_dataset, valid_dataset, test_dataset = get_datasets(dataset_name, dataset_root, debug)
 
