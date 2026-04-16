@@ -16,7 +16,7 @@ def parse_training_args():
     parser.add_argument("--seeds", type=int, nargs="+", required=True,
                         help="List of random seeds")
     
-    parser.add_argument("--dataset_name", type=str, , default="ogbg-molhiv")
+    parser.add_argument("--dataset_name", type=str, default="ogbg-molhiv")
     parser.add_argument("--training_type", type=str, required=True)
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--gamma_recalculation_strategy", type=int, required=True)
