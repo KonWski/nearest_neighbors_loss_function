@@ -47,7 +47,8 @@ class GINEConvResidualModel(Module):
         edge_attr = self.edge_encoder(edge_attr)
 
         for layer_block in self.layer_blocks:
-            x = layer_block(x, edge_index, edge_attr)
+            x_layer_block = layer_block(x, edge_index, edge_attr)
+            x = x + x_layer_block
 
         x = self.batch(x)
         x = self.relu(x)
@@ -76,10 +77,9 @@ class GINEBlock(Module):
         
     def forward(self, x, edge_index, edge_attr):
 
-        x_processed = self.gine_conv(x, edge_index, edge_attr)
-        x_processed = self.batch_norm(x_processed)
-        x_processed = x_processed + x
-        x_processed = self.relu(x_processed)
-        x_processed = self.dropout(x_processed)
+        x = self.gine_conv(x, edge_index, edge_attr)
+        x = self.batch_norm(x)
+        x = self.relu(x)
+        x = self.dropout(x)
         
         return x
