@@ -1,2 +1,4 @@
 from .GINEConvResidualModel import GINEConvResidualModel
 from .GNNResidualModel import GNNResidualModel
+from .GINEConvFusionResidualModel import GINEConvFusionResidualModel
+from .GINEConvJumpingKnowledgeResidualModel import GINEConvJumpingKnowledgeResidualModel
