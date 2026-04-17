@@ -55,9 +55,6 @@ class GINEConvJumpingKnowledgeResidualModel(Module):
             hidden_representations.append(global_mean_pool(x, batch))
 
         x = torch.cat(hidden_representations, dim=1)
-        x = self.batch(x)
-        x = self.relu(x)
-        x = self.dropout(x)
         out = self.linear(x)
 
         return out
