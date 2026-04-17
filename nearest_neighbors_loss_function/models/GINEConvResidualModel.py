@@ -14,10 +14,8 @@ class GINEConvResidualModel(Module):
             BatchNorm1d(hidden_dim),
             ReLU()
         )
-        self.node_encoder.apply(self._init_weights)
 
         self.edge_encoder = Linear(3, hidden_dim)
-        self._init_weights(self.edge_encoder)
 
         self.layer_blocks = ModuleList()
         for _ in range(n_blocks):            
@@ -29,11 +27,18 @@ class GINEConvResidualModel(Module):
         self.relu = ReLU()
         self.dropout = Dropout(p=0.2)
         self.linear = Linear(hidden_dim, embedding_size)
+
+        self.node_encoder.apply(self._init_weights)
+        self._init_weights(self.edge_encoder)
+        self._init_weights(self.batch)
         self._init_weights(self.linear)
 
     def _init_weights(self, m):
         if isinstance(m, Linear):
             init.xavier_uniform_(m.weight)
+            init.zeros_(m.bias)
+        elif isinstance(m, BatchNorm1d):
+            init.ones_(m.weight)
             init.zeros_(m.bias)
 
     def forward(self, data):
