@@ -30,15 +30,11 @@ class GINEConvResidualModel(Module):
 
         self.node_encoder.apply(self._init_weights)
         self._init_weights(self.edge_encoder)
-        self._init_weights(self.batch)
         self._init_weights(self.linear)
 
     def _init_weights(self, m):
         if isinstance(m, Linear):
             init.xavier_uniform_(m.weight)
-            init.zeros_(m.bias)
-        elif isinstance(m, BatchNorm1d):
-            init.ones_(m.weight)
             init.zeros_(m.bias)
 
     def forward(self, data):
