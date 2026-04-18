@@ -1,5 +1,5 @@
-from torch.nn import ModuleList, Sequential, Linear, ReLU, Module, BatchNorm1d, Dropout, init
-from torch_geometric.nn import global_mean_pool
+from torch.nn import ModuleList, Sequential, Linear, ReLU, Module, Dropout, init
+from torch_geometric.nn import global_mean_pool, GraphNorm
 from torch_geometric.nn.conv import GINEConv
 
 class GINEConvResidualModel(Module):
@@ -11,7 +11,7 @@ class GINEConvResidualModel(Module):
         self.embedding_size = embedding_size
         self.node_encoder = Sequential(
             Linear(in_channels, hidden_dim),
-            BatchNorm1d(hidden_dim),
+            GraphNorm(hidden_dim),
             ReLU()
         )
 
@@ -23,7 +23,7 @@ class GINEConvResidualModel(Module):
             layer_block.apply(self._init_weights)
             self.layer_blocks.append(layer_block)
 
-        self.batch = BatchNorm1d(hidden_dim)
+        self.batch = GraphNorm(hidden_dim)
         self.relu = ReLU()
         self.dropout = Dropout(p=0.2)
         self.linear = Linear(hidden_dim, embedding_size)
@@ -66,12 +66,12 @@ class GINEBlock(Module):
 
         self.mlp = Sequential(
             Linear(hidden_dim, hidden_dim),
-            BatchNorm1d(hidden_dim),
+            GraphNorm(hidden_dim),
             ReLU(),
             Linear(hidden_dim, hidden_dim)
         )
         self.gine_conv = GINEConv(self.mlp, edge_dim=hidden_dim)
-        self.batch_norm = BatchNorm1d(hidden_dim)
+        self.batch_norm = GraphNorm(hidden_dim)
         self.relu = ReLU()
         self.dropout = Dropout(p=0.2)
         
