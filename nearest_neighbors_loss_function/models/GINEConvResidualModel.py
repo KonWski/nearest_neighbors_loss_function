@@ -9,12 +9,13 @@ class GINEConvResidualModel(Module):
         super().__init__()
 
         self.embedding_size = embedding_size
-        self.node_encoder = Sequential(
-            Linear(in_channels, hidden_dim),
-            GraphNorm(hidden_dim),
-            ReLU()
-        )
 
+        # node encoding
+        self.node_linear = Linear(in_channels, hidden_dim)
+        self.node_norm = GraphNorm(hidden_dim)
+        self.node_relu = ReLU()
+
+        # edge encoding
         self.edge_encoder = Linear(3, hidden_dim)
 
         self.layer_blocks = ModuleList()
@@ -23,12 +24,12 @@ class GINEConvResidualModel(Module):
             layer_block.apply(self._init_weights)
             self.layer_blocks.append(layer_block)
 
-        self.batch = GraphNorm(hidden_dim)
+        self.batch_norm = GraphNorm(hidden_dim)
         self.relu = ReLU()
         self.dropout = Dropout(p=0.2)
         self.linear = Linear(hidden_dim, embedding_size)
 
-        self.node_encoder.apply(self._init_weights)
+        self._init_weights(self.node_linear)
         self._init_weights(self.edge_encoder)
         self._init_weights(self.linear)
 
@@ -43,14 +44,19 @@ class GINEConvResidualModel(Module):
             data.x, data.edge_index, data.edge_attr, data.batch
         )
 
-        x = self.node_encoder(x)
+        # node encoding
+        x = self.node_linear(x)
+        x = self.node_norm(x)
+        x = self.node_relu(x)
+
+        # edge encoding
         edge_attr = self.edge_encoder(edge_attr)
 
         for layer_block in self.layer_blocks:
-            x_layer_block = layer_block(x, edge_index, edge_attr)
+            x_layer_block = layer_block(x, edge_index, edge_attr, batch)
             x = x + x_layer_block
 
-        x = self.batch(x)
+        x = self.batch_norm(x, batch)
         x = self.relu(x)
 
         x = global_mean_pool(x, batch)
@@ -75,10 +81,10 @@ class GINEBlock(Module):
         self.relu = ReLU()
         self.dropout = Dropout(p=0.2)
         
-    def forward(self, x, edge_index, edge_attr):
+    def forward(self, x, edge_index, edge_attr, batch):
 
         x = self.gine_conv(x, edge_index, edge_attr)
-        x = self.batch_norm(x)
+        x = self.batch_norm(x, batch)
         x = self.relu(x)
         x = self.dropout(x)
         
