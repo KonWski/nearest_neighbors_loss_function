@@ -22,7 +22,7 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, device)
         data = convert_graph_data_to_float(data)
         n_samples_batch = data.y.shape[0]
         batch_embeddings = model(data)
-        embeddings[start_id: start_id + n_samples_batch] = batch_embeddings
+        embeddings[start_id: start_id + n_samples_batch] = batch_embeddings.detach().cpu()
         labels[start_id: start_id + n_samples_batch] = data.y
         start_id += n_samples_batch
 
