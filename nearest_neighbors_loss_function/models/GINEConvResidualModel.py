@@ -80,3 +80,5 @@ class GINEBlock(Module):
         x = self.batch_norm(x)
         x = self.relu(x)
         x = self.dropout(x)
+
+        return x
