@@ -46,7 +46,7 @@ class GINEConvResidualModel(Module):
 
         # node encoding
         x = self.node_linear(x)
-        x = self.node_norm(x)
+        x = self.node_norm(x, batch)
         x = self.node_relu(x)
 
         # edge encoding
@@ -72,7 +72,6 @@ class GINEBlock(Module):
 
         self.mlp = Sequential(
             Linear(hidden_dim, hidden_dim),
-            GraphNorm(hidden_dim),
             ReLU(),
             Linear(hidden_dim, hidden_dim)
         )
