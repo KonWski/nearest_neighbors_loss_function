@@ -12,7 +12,12 @@ class KNeigborsAdaptiveClassifier():
         n_neigbors_per_row = self._get_n_neigbors_per_row(distances)
 
         max_n_neigbors = int(n_neigbors_per_row.max().item())
-        _, idx = torch.topk(distances, k=max_n_neigbors, dim=1, largest=False)
+        try:
+            _, idx = torch.topk(distances, k=max_n_neigbors, dim=1, largest=False)
+        except:
+            print(f"max_n_neigbors: {max_n_neigbors}")
+            print(f"distances.shape: {distances.shape}")
+            raise Exception()
 
         mask = torch.arange(max_n_neigbors)[None, :] < n_neigbors_per_row[:, None]
         row_ids = torch.arange(distances.size(0))[:, None].expand_as(idx)
