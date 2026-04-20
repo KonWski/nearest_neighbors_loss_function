@@ -12,12 +12,7 @@ class KNeigborsAdaptiveClassifier():
         n_neigbors_per_row = self._get_n_neigbors_per_row(distances)
 
         max_n_neigbors = int(n_neigbors_per_row.max().item())
-        try:
-            _, idx = torch.topk(distances, k=max_n_neigbors, dim=1, largest=False)
-        except:
-            print(f"max_n_neigbors: {max_n_neigbors}")
-            print(f"distances.shape: {distances.shape}")
-            raise Exception()
+        _, idx = torch.topk(distances, k=max_n_neigbors, dim=1, largest=False)
 
         mask = torch.arange(max_n_neigbors)[None, :] < n_neigbors_per_row[:, None]
         row_ids = torch.arange(distances.size(0))[:, None].expand_as(idx)
@@ -38,8 +33,8 @@ class KNeigborsAdaptiveClassifier():
 
         # make sure that avg_density / density does not explode
         n_neigbors_per_row_computed = torch.floor(self.initial_n_neighbors * (avg_density / density))
-        n_neigbors_per_row_max = torch.full_like(n_neigbors_per_row_computed, self.initial_n_neighbors)
-        n_neigbors_per_row = torch.maximum(n_neigbors_per_row_computed, n_neigbors_per_row_max)
+        n_neigbors_per_row_min = torch.full_like(n_neigbors_per_row_computed, self.initial_n_neighbors)
+        n_neigbors_per_row = torch.minimum(n_neigbors_per_row_computed, n_neigbors_per_row_min)
 
         return n_neigbors_per_row
 
