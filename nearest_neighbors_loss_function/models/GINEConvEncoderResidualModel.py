@@ -36,11 +36,7 @@ class GINEConvEncoderResidualModel(Module):
             data.x, data.edge_index, data.edge_attr, data.batch
         )
 
-        try:
-            x = self.node_encoder(x)
-        except:
-            print(f"x.dtype: {x.dtype}")
-            print(x)
+        x = self.node_encoder(x)
         edge_attr = self.edge_encoder(edge_attr)
 
         for layer_block in self.layer_blocks:
