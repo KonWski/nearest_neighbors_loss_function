@@ -3,3 +3,4 @@ from .GNNResidualModel import GNNResidualModel
 from .GINEConvFusionResidualModel import GINEConvFusionResidualModel
 from .GINEConvJumpingKnowledgeResidualModel import GINEConvJumpingKnowledgeResidualModel
 from .GINEConvResidualModel import GINEConvResidualModel
+from .GINEConvEncoderResidualModel import GINEConvEncoderResidualModel
