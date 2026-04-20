@@ -3,6 +3,7 @@ import numpy as np
 import torch
 import os
 import importlib
+from nearest_neighbors_loss_function.models import GINEConvEncoderResidualModel
 
 def set_seed(seed: int):
     '''Set randomness for random, numpy, PyTorch CPU, PyTorch GPU, '''
@@ -31,9 +32,12 @@ def create_model_dir(experiment_dir_path: str, seed: int):
     return model_dir_path
 
 
-def convert_graph_data_to_float(data):
-    data.x = data.x.float()
-    data.edge_attr = data.edge_attr.float()    
+def adjust_graph_data_dtype(data, model):
+
+    if not isinstance(model, GINEConvEncoderResidualModel):
+        data.x = data.x.float()
+        data.edge_attr = data.edge_attr.float()
+
     return data
 
 
