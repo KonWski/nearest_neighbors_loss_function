@@ -1,14 +1,16 @@
 import pandas as pd
 import os
 import logging
+from statistics import mean
 
 class Statistics():
 
-    def __init__(self, n_epochs, experiment_dir_path, experiment_hash, optimized_param_name):
+    def __init__(self, n_epochs, experiment_dir_path, experiment_hash, optimized_param_name, early_stop_window_size):
         self.n_epochs = n_epochs
         self.experiment_dir_path = experiment_dir_path
         self.experiment_hash = experiment_hash
         self.optimized_param = optimized_param_name
+        self.early_stop_window_size = early_stop_window_size
         self.report_path = os.path.join(self.experiment_dir_path, "train_report.xlsx")
 
         '''
@@ -44,3 +46,24 @@ class Statistics():
         df = pd.DataFrame(self.agglomerated_statistics)
         df["experiment_hash"] = self.experiment_hash
         df.to_excel(self.report_path, index=False)
+
+    def early_stop_training(self, seed):
+
+        seed_agglomerated_statistics = [stat for stat in self.agglomerated_statistics if stat["seed"] == seed]
+        n_seed_stats = len(seed_agglomerated_statistics)
+
+        if n_seed_stats < 2 * self.early_stop_window_size:
+            return False
+
+        current_window_optimized_params = [seed_agglomerated_statistics[i][self.optimized_param] 
+                                           for i in range(n_seed_stats - self.early_stop_window_size, n_seed_stats)]
+        self.current_window_mean = mean(current_window_optimized_params)
+
+        last_window_optimized_params = [seed_agglomerated_statistics[i][self.optimized_param] 
+                                           for i in range(n_seed_stats - 2 * self.early_stop_window_size, n_seed_stats - self.early_stop_window_size)]
+        self.last_window_mean = mean(last_window_optimized_params)
+
+        if self.current_window_mean < self.last_window_mean:
+            return True
+
+        return False

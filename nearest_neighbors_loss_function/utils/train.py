@@ -120,6 +120,10 @@ def train_triplet(
                     best_optimized_param_values[id_worst_model] = optimized_param_value
                     best_model_paths[id_worst_model] = best_model_path
                     best_epochs[id_worst_model] = epoch
+            
+            if statistics.early_stop_training():
+                logging.info(f"Training stopped because of lack of improvement. Current window mean: {statistics.current_window_mean}, last window mean: {statistics.last_window_mean}")
+                break
 
         best_seed_models[seed] = {"epoch": best_epochs, "model_path": best_model_paths}
 
