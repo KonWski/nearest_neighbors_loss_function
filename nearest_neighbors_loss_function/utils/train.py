@@ -38,7 +38,8 @@ def train_triplet(
         model_in_channels: int,
         model_hidden_channels: int, 
         embedding_length: int, 
-        optimized_param_name: str, 
+        optimized_param_name: str,
+        early_stop_window_size: int,
         device
     ):
 
@@ -47,7 +48,7 @@ def train_triplet(
     experiment_hash = uuid4().hex
     experiment_dir_path = create_experiment_dir(save_path, experiment_hash)
     
-    statistics = Statistics(n_epochs, experiment_dir_path, experiment_hash, optimized_param_name)
+    statistics = Statistics(n_epochs, experiment_dir_path, experiment_hash, optimized_param_name, early_stop_window_size)
     best_seed_models = {}
 
     n_train_samples = len(train_loader.dataset)

@@ -43,6 +43,7 @@ def parse_training_args():
     parser.add_argument("--model_in_channels", type=int, required=True)
     parser.add_argument("--embedding_length", type=int, required=True)
     parser.add_argument("--optimized_param_name", type=str, required=True)
+    parser.add_argument("--early_stop_window_size", type=int, default=10)
     parser.add_argument("--debug", action="store_true")
 
     args = parser.parse_known_args()[0]
