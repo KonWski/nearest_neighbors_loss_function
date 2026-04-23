@@ -4,6 +4,7 @@ from sklearn.neighbors import KNeighborsClassifier
 import torch
 import math
 import torch.nn.functional as F
+import numpy as np
 
 class GammaCalculator():
 
@@ -74,7 +75,7 @@ class GammaCalculator():
         else:
 
             if self.weight_distances:
-                knn = KNeighborsClassifier(n_neighbors=self.n_neighbors, n_jobs=-1, metric="precomputed", weights="distance")
+                knn = KNeighborsClassifier(n_neighbors=self.n_neighbors + 1, n_jobs=-1, metric="precomputed", weights=self._ignore_top_weight)
             else:
                 knn = KNeighborsClassifier(n_neighbors=self.n_neighbors, n_jobs=-1, metric="precomputed")
 
@@ -110,6 +111,14 @@ class GammaCalculator():
         else:
             raise Exception(f"Gamma function {self.gamma_function} not implemented")
 
+    
+    def _ignore_top_weight(self, distances):
+        weights = 1 / (distances + 1e-9)
+        max_idx = np.argmax(weights, axis=1)
+        weights[np.arange(weights.shape[0]), max_idx] = 0
+
+        return weights
+    
 
     def _focal_gamma(self, sample_proba):
         sample_proba = max(sample_proba, 1e-8)
