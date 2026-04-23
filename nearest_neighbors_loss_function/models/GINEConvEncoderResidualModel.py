@@ -5,7 +5,7 @@ from ogb.graphproppred.mol_encoder import AtomEncoder, BondEncoder
 
 class GINEConvEncoderResidualModel(Module):
 
-    def __init__(self, in_channels, hidden_dim, embedding_size, dropout_p, n_blocks = 4):
+    def __init__(self, in_channels, hidden_dim, embedding_size, n_blocks = 4):
 
         super().__init__()
 
@@ -15,13 +15,13 @@ class GINEConvEncoderResidualModel(Module):
         self.layer_blocks = ModuleList()
 
         for _ in range(n_blocks):            
-            layer_block = GINEBlock(hidden_dim, dropout_p)
+            layer_block = GINEBlock(hidden_dim)
             layer_block.apply(self._init_weights)
             self.layer_blocks.append(layer_block)
 
         self.batch = BatchNorm1d(hidden_dim)
         self.relu = ReLU()
-        self.dropout = Dropout(p=dropout_p)
+        self.dropout = Dropout(p=0.2)
         self.linear = Linear(hidden_dim, embedding_size)
         self._init_weights(self.linear)
 
@@ -54,7 +54,7 @@ class GINEConvEncoderResidualModel(Module):
 
 
 class GINEBlock(Module):
-    def __init__(self, hidden_dim, dropout_p):
+    def __init__(self, hidden_dim):
         super().__init__()
 
         self.mlp = Sequential(
@@ -66,7 +66,7 @@ class GINEBlock(Module):
         self.gine_conv = GINEConv(self.mlp, edge_dim=hidden_dim)
         self.batch_norm = GraphNorm(hidden_dim)
         self.relu = ReLU()
-        self.dropout = Dropout(p=dropout_p)
+        self.dropout = Dropout(p=0.2)
 
     def forward(self, x, edge_index, edge_attr, batch):
 
