@@ -122,7 +122,7 @@ def train_triplet(
                     best_model_paths[id_worst_model] = best_model_path
                     best_epochs[id_worst_model] = epoch
             
-            if statistics.early_stop_training():
+            if statistics.early_stop_training(seed):
                 logging.info(f"Training stopped because of lack of improvement. Current window mean: {statistics.current_window_mean}, last window mean: {statistics.last_window_mean}")
                 break
 
