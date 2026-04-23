@@ -1,11 +1,11 @@
 from torch.nn import ModuleList, Sequential, Linear, ReLU, Module, BatchNorm1d, Dropout, init
-from torch_geometric.nn import global_mean_pool
+from torch_geometric.nn import global_mean_pool, GraphNorm
 from torch_geometric.nn.conv import GINEConv
 from ogb.graphproppred.mol_encoder import AtomEncoder, BondEncoder
 
 class GINEConvEncoderResidualModel(Module):
 
-    def __init__(self, in_channels, hidden_dim, embedding_size, n_blocks = 4):
+    def __init__(self, in_channels, hidden_dim, embedding_size, dropout_p, n_blocks = 4):
 
         super().__init__()
 
@@ -15,13 +15,13 @@ class GINEConvEncoderResidualModel(Module):
         self.layer_blocks = ModuleList()
 
         for _ in range(n_blocks):            
-            layer_block = GINEBlock(hidden_dim)
+            layer_block = GINEBlock(hidden_dim, dropout_p)
             layer_block.apply(self._init_weights)
             self.layer_blocks.append(layer_block)
 
         self.batch = BatchNorm1d(hidden_dim)
         self.relu = ReLU()
-        self.dropout = Dropout(p=0.2)
+        self.dropout = Dropout(p=dropout_p)
         self.linear = Linear(hidden_dim, embedding_size)
         self._init_weights(self.linear)
 
@@ -40,7 +40,7 @@ class GINEConvEncoderResidualModel(Module):
         edge_attr = self.edge_encoder(edge_attr)
 
         for layer_block in self.layer_blocks:
-            x_layer_block = layer_block(x, edge_index, edge_attr)
+            x_layer_block = layer_block(x, edge_index, edge_attr, batch)
             x = x + x_layer_block
 
         x = self.batch(x)
@@ -54,7 +54,7 @@ class GINEConvEncoderResidualModel(Module):
 
 
 class GINEBlock(Module):
-    def __init__(self, hidden_dim):
+    def __init__(self, hidden_dim, dropout_p):
         super().__init__()
 
         self.mlp = Sequential(
@@ -64,14 +64,14 @@ class GINEBlock(Module):
             Linear(hidden_dim, hidden_dim)
         )
         self.gine_conv = GINEConv(self.mlp, edge_dim=hidden_dim)
-        self.batch_norm = BatchNorm1d(hidden_dim)
+        self.batch_norm = GraphNorm(hidden_dim)
         self.relu = ReLU()
-        self.dropout = Dropout(p=0.2)
+        self.dropout = Dropout(p=dropout_p)
 
-    def forward(self, x, edge_index, edge_attr):
+    def forward(self, x, edge_index, edge_attr, batch):
 
         x = self.gine_conv(x, edge_index, edge_attr)
-        x = self.batch_norm(x)
+        x = self.batch_norm(x, batch)
         x = self.relu(x)
         x = self.dropout(x)
 
