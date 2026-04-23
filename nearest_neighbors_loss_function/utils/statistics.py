@@ -55,11 +55,11 @@ class Statistics():
         if n_seed_stats < 2 * self.early_stop_window_size:
             return False
 
-        current_window_optimized_params = [seed_agglomerated_statistics[i][self.optimized_param] 
+        current_window_optimized_params = [seed_agglomerated_statistics[i][f"valid_{self.optimized_param}"] 
                                            for i in range(n_seed_stats - self.early_stop_window_size, n_seed_stats)]
         self.current_window_mean = mean(current_window_optimized_params)
 
-        last_window_optimized_params = [seed_agglomerated_statistics[i][self.optimized_param] 
+        last_window_optimized_params = [seed_agglomerated_statistics[i][f"valid_{self.optimized_param}"] 
                                            for i in range(n_seed_stats - 2 * self.early_stop_window_size, n_seed_stats - self.early_stop_window_size)]
         self.last_window_mean = mean(last_window_optimized_params)
 
