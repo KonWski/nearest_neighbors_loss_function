@@ -47,7 +47,7 @@ class Statistics():
         df["experiment_hash"] = self.experiment_hash
         df.to_excel(self.report_path, index=False)
 
-    def early_stop_training(self, seed):
+    def early_stop_training(self, seed, alpha=0.02):
 
         seed_agglomerated_statistics = [stat for stat in self.agglomerated_statistics if stat["seed"] == seed]
         n_seed_stats = len(seed_agglomerated_statistics)
@@ -63,7 +63,7 @@ class Statistics():
                                            for i in range(n_seed_stats - 2 * self.early_stop_window_size, n_seed_stats - self.early_stop_window_size)]
         self.last_window_mean = mean(last_window_optimized_params)
 
-        if self.current_window_mean < self.last_window_mean:
+        if (1 + alpha) * self.current_window_mean < self.last_window_mean:
             return True
 
         return False
