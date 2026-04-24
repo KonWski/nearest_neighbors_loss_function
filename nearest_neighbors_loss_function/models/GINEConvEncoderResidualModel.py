@@ -2,6 +2,7 @@ from torch.nn import ModuleList, Sequential, Linear, ReLU, Module, BatchNorm1d, 
 from torch_geometric.nn import global_mean_pool, GraphNorm
 from torch_geometric.nn.conv import GINEConv
 from ogb.graphproppred.mol_encoder import AtomEncoder, BondEncoder
+from torch_geometric.nn.models import mlp
 
 class GINEConvEncoderResidualModel(Module):
 
@@ -56,11 +57,8 @@ class GINEBlock(Module):
     def __init__(self, hidden_dim):
         super().__init__()
 
-        self.mlp = Sequential(
-            Linear(hidden_dim, hidden_dim),
-            ReLU(),
-            Linear(hidden_dim, hidden_dim)
-        )
+        self.mlp = mlp(num_layers=2, in_channels=hidden_dim, hidden_channels=hidden_dim, 
+                       out_channels=hidden_dim, batch_norm=True)
         self.batch_norm = GraphNorm(hidden_dim)
         self.relu = ReLU()
         self.gine_conv = GINEConv(self.mlp, edge_dim=hidden_dim)
