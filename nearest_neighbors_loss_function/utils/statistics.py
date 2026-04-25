@@ -47,7 +47,7 @@ class Statistics():
         df["experiment_hash"] = self.experiment_hash
         df.to_excel(self.report_path, index=False)
 
-    def early_stop_training(self, seed, alpha=0.01):
+    def early_stop_training(self, seed, alpha=0.0):
 
         seed_agglomerated_statistics = [stat for stat in self.agglomerated_statistics if stat["seed"] == seed]
         n_seed_stats = len(seed_agglomerated_statistics)

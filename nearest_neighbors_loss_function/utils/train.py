@@ -98,7 +98,7 @@ def train_triplet(
             statistics.add(train_stats, validate_stats)
             statistics.log_last_train_stats()
 
-            optimized_param_value = validate_stats[f"valid_f1"]
+            optimized_param_value = validate_stats[f"valid_{optimized_param_name}"]
             n_best_models = len(best_optimized_param_values) 
             
             if optimized_param_value > min(best_optimized_param_values, default=float("-inf")) or n_best_models < n_evaluation_models:
