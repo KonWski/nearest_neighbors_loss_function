@@ -1,4 +1,4 @@
-from sklearn.metrics import precision_score, accuracy_score, recall_score, f1_score, roc_auc_score, matthews_corrcoef
+from sklearn.metrics import precision_score, accuracy_score, recall_score, f1_score, roc_auc_score, matthews_corrcoef, average_precision_score
 from sklearn.neighbors import KNeighborsClassifier
 from skfp.metrics import enrichment_factor
 from .generate_embeddings import generate_embeddings
@@ -28,20 +28,20 @@ def evaluate_model(model, evaluation_model_name, train_loader, n_train_samples, 
     test_labels = test_labels.ravel()
 
     if evaluation_model_name == "knn":
-        accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc = knn_stats(train_embeddings, test_embeddings, train_labels, test_labels, n_neighbors)
+        accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc = knn_stats(train_embeddings, test_embeddings, train_labels, test_labels, n_neighbors)
     elif evaluation_model_name == "svc":
-        accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc = svc_stats(train_embeddings, test_embeddings, train_labels, test_labels)
+        accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc = svc_stats(train_embeddings, test_embeddings, train_labels, test_labels)
     elif evaluation_model_name == "linear_svc":
-        accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc = linear_svc_stats(train_embeddings, test_embeddings, train_labels, test_labels)
+        accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc = linear_svc_stats(train_embeddings, test_embeddings, train_labels, test_labels)
     elif evaluation_model_name == "reg_log":
-        accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc = reg_log_stats(train_embeddings, test_embeddings, train_labels, test_labels)
+        accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc = reg_log_stats(train_embeddings, test_embeddings, train_labels, test_labels)
     else:
         raise Exception(f"Unimplemented evaluation method: {evaluation_model_name}")
 
     # epoch_loss = round(running_loss / (data_id + 1), 5)
     test_stats = {f"{stats_prefix}_accuracy": accuracy, f"{stats_prefix}_precision": precision, f"{stats_prefix}_recall": recall, 
                   f"{stats_prefix}_f1": f1, f"{stats_prefix}_ef01": ef01, f"{stats_prefix}_ef05": ef05, 
-                  f"{stats_prefix}_roc_auc": roc_auc, f"{stats_prefix}_mcc": mcc}
+                  f"{stats_prefix}_roc_auc": roc_auc, f"{stats_prefix}_pr_auc": pr_auc, f"{stats_prefix}_mcc": mcc}
 
     return test_stats, False
 
@@ -75,9 +75,9 @@ def knn_stats(train_embeddings, test_embeddings, y_train, y_test, n_neighbors):
     y_pred_proba = knn.predict_proba(test_train_distances)[:,1]
 
     # scores
-    accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc = calculate_stats(y_test, y_pred, y_pred_proba)
+    accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc = calculate_stats(y_test, y_pred, y_pred_proba)
 
-    return accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc
+    return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc
 
 
 def svc_stats(train_embeddings, test_embeddings, y_train, y_test):
@@ -95,9 +95,9 @@ def svc_stats(train_embeddings, test_embeddings, y_train, y_test):
     y_pred_proba = model.predict_proba(test_embeddings)[:,1]
 
     # scores
-    accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc = calculate_stats(y_test, y_pred, y_pred_proba)
+    accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc = calculate_stats(y_test, y_pred, y_pred_proba)
 
-    return accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc
+    return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc
 
 
 def linear_svc_stats(train_embeddings, test_embeddings, y_train, y_test):
@@ -117,9 +117,9 @@ def linear_svc_stats(train_embeddings, test_embeddings, y_train, y_test):
     y_pred_proba = model.predict_proba(test_embeddings)[:,1]
 
     # scores
-    accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc = calculate_stats(y_test, y_pred, y_pred_proba)
+    accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc = calculate_stats(y_test, y_pred, y_pred_proba)
 
-    return accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc
+    return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc
 
 
 def reg_log_stats(train_embeddings, test_embeddings, y_train, y_test):
@@ -143,9 +143,9 @@ def reg_log_stats(train_embeddings, test_embeddings, y_train, y_test):
     y_pred_proba = model.predict_proba(test_embeddings)[:,1]
 
     # scores
-    accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc = calculate_stats(y_test, y_pred, y_pred_proba)
+    accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc = calculate_stats(y_test, y_pred, y_pred_proba)
 
-    return accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc
+    return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc
 
 
 def calculate_stats(y_test, y_pred, y_pred_proba):
@@ -154,11 +154,12 @@ def calculate_stats(y_test, y_pred, y_pred_proba):
     recall = round(recall_score(y_test, y_pred), 4)
     f1 = round(f1_score(y_test, y_pred), 4)    
     roc_auc = round(roc_auc_score(y_test, y_pred_proba), 4)
+    pr_auc = round(average_precision_score(y_test, y_pred_proba), 4)
     mcc = round(matthews_corrcoef(y_test, y_pred), 4)
     ef01 = round(enrichment_factor(y_test, y_pred, fraction=0.01), 4)
     ef05 = round(enrichment_factor(y_test, y_pred, fraction=0.05), 4)
 
-    return accuracy, precision, recall, f1, ef01, ef05, roc_auc, mcc
+    return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc
 
 
 def test_model(model_name, evaluation_model_name, statistics, best_seed_models, in_channels, hidden_dim, embedding_size, train_loader, 

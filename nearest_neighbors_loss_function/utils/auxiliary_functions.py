@@ -4,6 +4,7 @@ import torch
 import os
 import importlib
 from nearest_neighbors_loss_function.models import GINEConvEncoderResidualModel
+from torch_geometric import seed_everything
 
 def set_seed(seed: int):
     '''Set randomness for random, numpy, PyTorch CPU, PyTorch GPU, '''
@@ -14,6 +15,7 @@ def set_seed(seed: int):
     torch.manual_seed(seed)
     torch.cuda.manual_seed(seed)
     torch.cuda.manual_seed_all(seed)
+    seed_everything(seed)
 
     # CuDNN determinism
     torch.backends.cudnn.deterministic = True
