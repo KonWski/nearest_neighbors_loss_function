@@ -22,6 +22,7 @@ def train_workflow(args):
         training_type=args.training_type,
         batch_size=args.batch_size,
         triplet_loss_margin=args.triplet_loss_margin,
+        batch_shaper_margin=args.batch_shaper_margin,
         gamma_recalculation_strategy=args.gamma_recalculation_strategy,
         gamma_function=args.gamma_function,
         weight_distances=args.weight_distances,
