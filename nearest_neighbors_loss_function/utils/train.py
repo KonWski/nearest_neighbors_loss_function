@@ -20,6 +20,7 @@ def train_triplet(
         valid_loader, 
         training_type: str, 
         batch_size: int, 
+        triplet_loss_margin: float,
         gamma_recalculation_strategy: int, 
         gamma_function: str,
         weight_distances: bool,
@@ -57,7 +58,7 @@ def train_triplet(
     # iterate over all given seeds
     for id_seed, seed in enumerate(seeds):
 
-        loss_function = TripletMarginLoss(reduction="none", margin=0.5)
+        loss_function = TripletMarginLoss(reduction="none", margin=triplet_loss_margin)
         batch_shaper = BatchShaper(device, training_type)
         gamma_calculator = GammaCalculator(embedding_length, n_neighbors, batch_size, device, gamma_function, focal_pow, 
                                            gamma_recalculation_strategy, weight_distances, density_awareness, density_function,
