@@ -2,7 +2,7 @@ from torch.nn import ModuleList, Sequential, Linear, ReLU, Module, BatchNorm1d, 
 from torch_geometric.nn import global_mean_pool
 from torch_geometric.nn.conv import GINEConv
 
-class GINEConvResidualModel(Module):
+class GINEConvResidualModelBigger(Module):
 
     def __init__(self, in_channels, hidden_dim, embedding_size, n_blocks = 6):
 
