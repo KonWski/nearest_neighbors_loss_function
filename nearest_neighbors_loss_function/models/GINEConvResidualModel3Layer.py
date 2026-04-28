@@ -3,7 +3,7 @@ from torch_geometric.nn import global_mean_pool
 from torch_geometric.nn.conv import GINEConv
 import torch.nn.functional as F
 
-class GINEConvResidualModel2Layer(Module):
+class GINEConvResidualModel3Layer(Module):
 
     def __init__(self, in_channels, hidden_dim, embedding_size, n_blocks = 3):
 
