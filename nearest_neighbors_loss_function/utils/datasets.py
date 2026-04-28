@@ -26,8 +26,7 @@ def get_loaders(batch_size, dataset_name, dataset_root = 'dataset/', debug=False
     minority_per_batch = int(n_train_minority_samples / n_batches)
     balanced_sampler = BalancedSampler(train_dataset.y, n_train_minority_samples, 1, minority_per_batch, batch_size, n_batches)
 
-    # train_loader = DataLoader(train_dataset, batch_sampler=balanced_sampler)
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    train_loader = DataLoader(train_dataset, batch_sampler=balanced_sampler)
     valid_loader = DataLoader(valid_dataset, batch_size=batch_size, shuffle=False)
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
