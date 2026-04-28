@@ -55,8 +55,7 @@ class GINEConvResidualModelBigger(Module):
 
         x = global_mean_pool(x, batch)
         x = self.dropout(x)
-        x = self.linear(x)
-        out = F.normalize(x, dim=1)
+        out = self.linear(x)
 
         return out
 

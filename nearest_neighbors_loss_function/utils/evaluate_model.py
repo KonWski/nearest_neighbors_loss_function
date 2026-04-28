@@ -49,6 +49,10 @@ def evaluate_model(model, evaluation_model_name, train_loader, n_train_samples, 
 
 def knn_stats(train_embeddings, test_embeddings, y_train, y_test, n_neighbors):
 
+    # normalize the embeddings
+    train_embeddings = F.normalize(train_embeddings, dim=1)
+    test_embeddings = F.normalize(test_embeddings, dim=1)
+
     # calculate distances
     train_distances = 2 - 2 * (train_embeddings @ train_embeddings.T)
     test_train_distances = 2 - 2 * (test_embeddings @ train_embeddings.T)
