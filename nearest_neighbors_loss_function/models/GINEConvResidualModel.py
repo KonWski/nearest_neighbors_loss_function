@@ -1,6 +1,7 @@
 from torch.nn import ModuleList, Sequential, Linear, ReLU, Module, BatchNorm1d, Dropout, init
 from torch_geometric.nn import global_mean_pool
 from torch_geometric.nn.conv import GINEConv
+import torch.nn.functional as F
 
 class GINEConvResidualModel(Module):
 
@@ -54,7 +55,8 @@ class GINEConvResidualModel(Module):
 
         x = global_mean_pool(x, batch)
         x = self.dropout(x)
-        out = self.linear(x)
+        x = self.linear(x)
+        out = F.normalize(x, dim=1)
 
         return out
 
