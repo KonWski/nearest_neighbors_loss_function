@@ -13,6 +13,7 @@ import torch
 from typing import List
 import numpy as np
 import os
+from .generate_embeddings import generate_embeddings
 
 def train_triplet(
         seeds: List[int], 
@@ -31,7 +32,6 @@ def train_triplet(
         samples_difficultness: bool,
         lambda_samples_difficultness: float,
         n_evaluation_models: int,
-        evaluation_model_name: str,
         n_neighbors: int, 
         n_epochs: int, 
         save_path: str, 
@@ -75,7 +75,7 @@ def train_triplet(
         optimizer = Adam(model.parameters(), lr=lr)
 
         # save auxiliary params
-        best_optimized_param_values = []
+        best_scores = []
         best_epochs = []
         best_model_paths = []
 
@@ -84,44 +84,51 @@ def train_triplet(
             model_epoch_hash = uuid4().hex
             logging.info(f"Epoch: {epoch + 1}/{n_epochs}")
 
-            model, optimizer, loss_function, train_stats = train(model, train_loader, n_train_samples, optimizer, loss_function, 
+            model, optimizer, loss_function, train_basic_stats = train(model, train_loader, n_train_samples, optimizer, loss_function, 
                                                                  batch_shaper, gamma_calculator, seed, epoch, model_epoch_hash, device)
 
-            validate_stats, embeddings_with_nans = evaluate_model(model, evaluation_model_name, train_loader, n_train_samples, valid_loader, n_valid_samples, embedding_length, 
-                                        n_neighbors, "valid", device)
+            train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_length, device)
+            valid_embeddings, valid_labels = generate_embeddings(model, valid_loader, n_valid_samples, embedding_length, device)
+
+            train_stats, embeddings_with_nans = evaluate_model(model, "train", train_embeddings, train_labels, train_embeddings, train_labels, n_neighbors, "train")
+            valid_stats, embeddings_with_nans = evaluate_model(model, "valid", train_embeddings, train_labels, valid_embeddings, valid_labels, n_neighbors, "valid")
 
             # early exit
             if embeddings_with_nans:
                 logging.info(f"Embeddings generated during model evaluation contained nans -> next split")
                 break
-            elif validate_stats["valid_precision"] == 0.0:
+            elif valid_stats["valid_precision"] == 0.0:
                 logging.info(f"Precision 0 reached at epoch {epoch} -> next split")
                 break
-
-            statistics.add(train_stats, validate_stats)
+            
+            train_stats = train_basic_stats | train_stats
+            statistics.add(train_stats, valid_stats)
             statistics.log_last_train_stats()
 
-            optimized_param_value = validate_stats[f"valid_{optimized_param_name}"]
-            n_best_models = len(best_optimized_param_values) 
+            valid_optimized_param_value = valid_stats[f"valid_{optimized_param_name}"]
+            train_optimized_param_value = train_stats[f"train_{optimized_param_name}"]
+            penalty = max(train_optimized_param_value - valid_optimized_param_value, 0)            
+            score = valid_optimized_param_value - 0.25 * penalty
+            n_best_models = len(best_scores) 
             
-            if optimized_param_value > min(best_optimized_param_values, default=float("-inf")) or n_best_models < n_evaluation_models:
+            if score > min(best_scores, default=float("-inf")) or n_best_models < n_evaluation_models:
 
                 best_model_path = save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
-                        train_stats["loss"], n_neighbors, optimized_param_value, training_type, batch_size, 
+                        train_stats["loss"], n_neighbors, valid_optimized_param_value, training_type, batch_size, 
                         gamma_recalculation_strategy, density_awareness, samples_difficultness, lambda_samples_difficultness)
 
                 if n_best_models < n_evaluation_models:
-                    best_optimized_param_values.append(optimized_param_value)
+                    best_scores.append(valid_optimized_param_value)
                     best_model_paths.append(best_model_path)
                     best_epochs.append(epoch)
 
                 # replace worst with best model
                 elif n_best_models == n_evaluation_models:
                     
-                    id_worst_model = np.argmin(best_optimized_param_values)
+                    id_worst_model = np.argmin(best_scores)
                     os.remove(best_model_paths[id_worst_model])
 
-                    best_optimized_param_values[id_worst_model] = optimized_param_value
+                    best_scores[id_worst_model] = valid_optimized_param_value
                     best_model_paths[id_worst_model] = best_model_path
                     best_epochs[id_worst_model] = epoch
             

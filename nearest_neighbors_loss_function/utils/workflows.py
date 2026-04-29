@@ -32,7 +32,6 @@ def train_workflow(args):
         samples_difficultness=args.samples_difficultness,
         lambda_samples_difficultness=args.lambda_samples_difficultness,
         n_evaluation_models=args.n_evaluation_models,
-        evaluation_model_name=args.evaluation_model_name,
         n_neighbors=args.n_neighbors,
         n_epochs=args.n_epochs,
         save_path=args.save_path,
@@ -48,7 +47,6 @@ def train_workflow(args):
 
     statistics = test_model(
         args.model_name,
-        args.evaluation_model_name, 
         statistics, 
         best_seed_models, 
         args.model_in_channels, 

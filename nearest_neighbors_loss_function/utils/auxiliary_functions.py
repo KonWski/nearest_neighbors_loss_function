@@ -43,6 +43,14 @@ def adjust_graph_data_dtype(data, model):
     return data
 
 
+def ignore_top_weight(distances):
+    weights = 1 / (distances + 1e-9)
+    max_idx = np.argmax(weights, axis=1)
+    weights[np.arange(weights.shape[0]), max_idx] = 0
+
+    return weights
+
+
 def get_model(model_name, in_channels, hidden_dim, model_n_blocks, embedding_size):
 
     module_name = "nearest_neighbors_loss_function.models"

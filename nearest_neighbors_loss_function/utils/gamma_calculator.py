@@ -1,5 +1,6 @@
 from .generate_embeddings import generate_embeddings
 from .knn_adaptive import KNeigborsAdaptiveClassifier
+from .auxiliary_functions import ignore_top_weight
 from sklearn.neighbors import KNeighborsClassifier
 import torch
 import math
@@ -75,7 +76,7 @@ class GammaCalculator():
         else:
 
             if self.weight_distances:
-                knn = KNeighborsClassifier(n_neighbors=self.n_neighbors + 1, n_jobs=-1, metric="precomputed", weights=self._ignore_top_weight)
+                knn = KNeighborsClassifier(n_neighbors=self.n_neighbors + 1, n_jobs=-1, metric="precomputed", weights=ignore_top_weight)
             else:
                 knn = KNeighborsClassifier(n_neighbors=self.n_neighbors, n_jobs=-1, metric="precomputed")
 
@@ -110,14 +111,6 @@ class GammaCalculator():
             return self._focal_gamma(sample_proba)
         else:
             raise Exception(f"Gamma function {self.gamma_function} not implemented")
-
-    
-    def _ignore_top_weight(self, distances):
-        weights = 1 / (distances + 1e-9)
-        max_idx = np.argmax(weights, axis=1)
-        weights[np.arange(weights.shape[0]), max_idx] = 0
-
-        return weights
     
 
     def _focal_gamma(self, sample_proba):
