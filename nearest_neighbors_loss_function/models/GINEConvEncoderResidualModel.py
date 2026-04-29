@@ -6,7 +6,7 @@ from torch_geometric.nn.models import MLP
 
 class GINEConvEncoderResidualModel(Module):
 
-    def __init__(self, in_channels, hidden_dim, embedding_size, n_blocks = 4):
+    def __init__(self, in_channels, hidden_dim, n_blocks, embedding_size):
 
         super().__init__()
 
