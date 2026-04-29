@@ -39,6 +39,7 @@ def train_workflow(args):
         model_name=args.model_name,
         model_in_channels=args.model_in_channels,
         model_hidden_channels=args.model_hidden_channels,
+        model_n_blocks=args.model_n_blocks,
         embedding_length=args.embedding_length,
         optimized_param_name=args.optimized_param_name,
         early_stop_window_size=args.early_stop_window_size,
