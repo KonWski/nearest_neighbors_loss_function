@@ -94,11 +94,11 @@ def test_workflow(args):
 
         best_seed_models[seed] = {"model_path": models[0]}
 
-    statistics = test_model(args.model_name, args.evaluation_model_name, statistics, best_seed_models, args.model_in_channels, 
+    statistics = test_model(args.model_name, statistics, best_seed_models, args.model_in_channels, 
                             args.model_hidden_channels, args.model_n_blocks,  args.embedding_length, train_loader, n_train_samples, valid_loader, 
                             args.n_neighbors, "valid", device)
 
-    statistics = test_model(args.model_name, args.evaluation_model_name, statistics, best_seed_models, args.model_in_channels, 
+    statistics = test_model(args.model_name, statistics, best_seed_models, args.model_in_channels, 
                             args.model_hidden_channels, args.model_n_blocks, args.embedding_length, train_loader, n_train_samples, test_loader, 
                             args.n_neighbors, "test", device)
 
