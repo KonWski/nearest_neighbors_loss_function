@@ -163,14 +163,14 @@ def calculate_stats(y_test, y_pred, y_pred_proba):
     return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc
 
 
-def test_model(model_name, evaluation_model_name, statistics, best_seed_models, in_channels, hidden_dim, embedding_size, train_loader, 
-               n_train_samples, test_loader, n_neighbors, stat_prefix, device):
+def test_model(model_name, evaluation_model_name, statistics, best_seed_models, in_channels, hidden_dim, n_blocks,
+                embedding_size, train_loader, n_train_samples, test_loader, n_neighbors, stat_prefix, device):
 
     for seed, seed_data in best_seed_models.items():
 
         for epoch, model_path in zip(seed_data["epoch"], seed_data["model_path"]):
 
-            model, _ = load_model(model_path, model_name, in_channels, hidden_dim, embedding_size)
+            model, _ = load_model(model_path, model_name, in_channels, hidden_dim, n_blocks, embedding_size)
             model.to(device)
             n_test_samples = len(test_loader.dataset)
 

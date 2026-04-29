@@ -65,6 +65,7 @@ def parse_testing_args():
     parser.add_argument("--model_name", type=str, required=True)
     parser.add_argument("--model_hidden_channels", type=int, required=True)
     parser.add_argument("--model_in_channels", type=int, required=True)
+    parser.add_argument("--model_n_blocks", type=int, required=True)
     parser.add_argument("--embedding_length", type=int, required=True)
     parser.add_argument("--optimized_param_name", type=str, required=True)
 

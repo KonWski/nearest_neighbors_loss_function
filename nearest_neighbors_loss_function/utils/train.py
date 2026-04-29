@@ -38,7 +38,8 @@ def train_triplet(
         lr: float, 
         model_name: str,
         model_in_channels: int,
-        model_hidden_channels: int, 
+        model_hidden_channels: int,
+        model_n_blocks: int,  
         embedding_length: int, 
         optimized_param_name: str,
         early_stop_window_size: int,
@@ -69,7 +70,7 @@ def train_triplet(
         model_dir_path = create_model_dir(experiment_dir_path, seed)
         set_seed(seed)
 
-        model = get_model(model_name, model_in_channels, model_hidden_channels, embedding_length)
+        model = get_model(model_name, model_in_channels, model_hidden_channels, model_n_blocks, embedding_length)
         model = model.to(device)
         optimizer = Adam(model.parameters(), lr=lr)
 

@@ -38,11 +38,11 @@ def save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash,  
     return checkpoint_path
 
 
-def load_model(model_path, model_name, in_channels, hidden_dim, embedding_size):
+def load_model(model_path, model_name, in_channels, hidden_dim, model_n_blocks, embedding_size):
 
     logging.info(f"Loading model from path: {model_path}")
     checkpoint = load(model_path, weights_only=False)
-    model = get_model(model_name, in_channels, hidden_dim, embedding_size)
+    model = get_model(model_name, in_channels, hidden_dim, model_n_blocks, embedding_size)
     model.load_state_dict(checkpoint["model_state_dict"])
 
     return model, checkpoint

@@ -43,11 +43,11 @@ def adjust_graph_data_dtype(data, model):
     return data
 
 
-def get_model(model_name, in_channels, hidden_dim, embedding_size):
+def get_model(model_name, in_channels, hidden_dim, model_n_blocks, embedding_size):
 
     module_name = "nearest_neighbors_loss_function.models"
     module = importlib.import_module(module_name)
     cls = getattr(module, model_name)
-    model = cls(in_channels, hidden_dim, embedding_size)
+    model = cls(in_channels, hidden_dim, model_n_blocks, embedding_size)
 
     return model
