@@ -33,6 +33,14 @@ class FocalBatchShaper():
                     anchors_r.append(anchor_mfs[indices_0[j]])
                     labels.append(1)
 
+        # majority positives (negative pairs)
+        if n_indices_0 >= 2:
+            for i in range(n_indices_0):
+                anchors_l.append(anchor_mfs[indices_0[i]])
+                anchors_r.append(anchor_mfs[indices_0[n_indices_0 - i]])
+                labels.append(1)
+
+
         # negative pairs
         for i in indices_1:
             for j in indices_0:
