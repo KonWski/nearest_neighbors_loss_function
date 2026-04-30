@@ -37,7 +37,7 @@ class FocalBatchShaper():
         if n_indices_0 >= 2:
             for i in range(n_indices_0):
                 anchors_l.append(anchor_mfs[indices_0[i]])
-                anchors_r.append(anchor_mfs[indices_0[n_indices_0 - i]])
+                anchors_r.append(anchor_mfs[indices_0[n_indices_0 - i - 1]])
                 labels.append(1)
 
 
