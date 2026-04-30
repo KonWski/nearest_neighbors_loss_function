@@ -42,6 +42,6 @@ class FocalBatchShaper():
 
         anchors_l = torch.stack(anchors_l).to(self.device)
         anchors_r = torch.stack(anchors_r).to(self.device)
-        labels = torch.tensor(labels, device=self.device)
+        labels = torch.tensor(labels, dtype=torch.float32, device=self.device)
 
         return anchors_l, anchors_r, labels
