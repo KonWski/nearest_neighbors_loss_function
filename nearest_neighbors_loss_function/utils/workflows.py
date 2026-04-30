@@ -51,7 +51,7 @@ def train_workflow(args):
 
     elif args.loss_function == "focal":
 
-        train_focal(
+        statistics, best_seed_models, n_train_samples = train_focal(
             seeds=args.seeds,
             train_loader=train_loader,
             valid_loader=valid_loader,
