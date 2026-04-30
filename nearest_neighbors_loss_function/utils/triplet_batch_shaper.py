@@ -1,6 +1,6 @@
 import torch
 
-class BatchShaper():
+class TripletBatchShaper():
 
     def __init__(self, device, training_type = "hard_batch_learning", margin = 1.0):
         self.training_type = training_type

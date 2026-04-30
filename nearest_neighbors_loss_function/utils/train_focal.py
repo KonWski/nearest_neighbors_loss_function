@@ -1,4 +1,3 @@
-from nearest_neighbors_loss_function.utils.batch_shaper import BatchShaper
 from nearest_neighbors_loss_function.utils.auxiliary_functions import create_experiment_dir, \
     create_model_dir, set_seed, adjust_graph_data_dtype, get_model
 from nearest_neighbors_loss_function.utils.gamma_calculator import GammaCalculator
@@ -6,7 +5,6 @@ from nearest_neighbors_loss_function.utils.statistics import Statistics
 from nearest_neighbors_loss_function.utils.evaluate_model import evaluate_model
 from nearest_neighbors_loss_function.utils.checkpoints import save_model
 from uuid import uuid4
-from torch.nn import TripletMarginLoss
 from torch.optim import Adam
 import logging
 import torch
@@ -14,19 +12,15 @@ from typing import List
 import numpy as np
 import os
 from .generate_embeddings import generate_embeddings
+from torchvision.ops import sigmoid_focal_loss
+from nearest_neighbors_loss_function.utils.focal_batch_shaper import FocalBatchShaper
 
-def train_triplet(
+def train_focal(
         seeds: List[int], 
         train_loader, 
         valid_loader, 
-        training_type: str, 
         batch_size: int, 
-        triplet_loss_margin: float,
-        batch_shaper_margin: float,
-        gamma_recalculation_strategy: int, 
-        gamma_function: str,
         weight_distances: bool,
-        focal_pow: float,
         density_awareness: bool,
         density_function: str,
         samples_difficultness: bool,
@@ -60,16 +54,11 @@ def train_triplet(
     # iterate over all given seeds
     for id_seed, seed in enumerate(seeds):
 
-        loss_function = TripletMarginLoss(reduction="none", margin=triplet_loss_margin)
-        batch_shaper = BatchShaper(device, training_type, batch_shaper_margin)
-        gamma_calculator = GammaCalculator(embedding_length, n_neighbors, batch_size, device, gamma_function, focal_pow, 
-                                           gamma_recalculation_strategy, weight_distances, density_awareness, density_function,
-                                           samples_difficultness, lambda_samples_difficultness)
-
         logging.info(f"Running training process for seed: {seed}. Progress: {id_seed + 1}/{len(seeds)}")
         model_dir_path = create_model_dir(experiment_dir_path, seed)
         set_seed(seed)
 
+        batch_shaper = FocalBatchShaper(device)
         model = get_model(model_name, model_in_channels, model_hidden_channels, model_n_blocks, embedding_length)
         model = model.to(device)
         optimizer = Adam(model.parameters(), lr=lr)
@@ -84,8 +73,7 @@ def train_triplet(
             model_epoch_hash = uuid4().hex
             logging.info(f"Epoch: {epoch + 1}/{n_epochs}")
 
-            model, optimizer, loss_function, train_basic_stats = train(model, train_loader, n_train_samples, optimizer, loss_function, 
-                                                                 batch_shaper, gamma_calculator, seed, epoch, model_epoch_hash, device)
+            model, optimizer, train_basic_stats = train(model, train_loader, batch_shaper, optimizer, seed, epoch, model_epoch_hash, device)
 
             train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_length, device)
             valid_embeddings, valid_labels = generate_embeddings(model, valid_loader, n_valid_samples, embedding_length, device)
@@ -114,8 +102,8 @@ def train_triplet(
             if score > min(best_scores, default=float("-inf")) or n_best_models < n_evaluation_models:
 
                 best_model_path = save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
-                        train_stats["loss"], n_neighbors, valid_optimized_param_value, training_type, batch_size, 
-                        gamma_recalculation_strategy, density_awareness, samples_difficultness, lambda_samples_difficultness)
+                        train_stats["loss"], n_neighbors, valid_optimized_param_value, "", batch_size, 
+                        "", density_awareness, samples_difficultness, lambda_samples_difficultness)
 
                 if n_best_models < n_evaluation_models:
                     best_scores.append(valid_optimized_param_value)
@@ -141,7 +129,7 @@ def train_triplet(
     return statistics, best_seed_models, n_train_samples
 
 
-def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_shaper, gamma_calculator, seed, epoch, model_epoch_hash, device):
+def train(model, train_loader, batch_shaper, optimizer, seed, epoch, model_epoch_hash, device):
 
     model.train()
 
@@ -154,10 +142,8 @@ def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_
     for data_id, data in enumerate(train_loader):
 
         data = data.to(device)
-        gamma_calculator.recalculate_gamma_values(model, train_loader, n_train_samples, data_id)
         labels = data.y
         n_samples = labels.shape[0]
-        gamma_end_id = gamma_start_id + n_samples
 
         with torch.set_grad_enabled(True):
             
@@ -165,14 +151,10 @@ def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_
             optimizer.zero_grad()
             data = adjust_graph_data_dtype(data, model)
             anchor_mfs = model(data)
-            anchor_mf, positive_mf, positive_mf_distances, negative_mf, negative_mf_distances, _ = batch_shaper.shape_batch(anchor_mfs, labels)
 
-            loss = loss_function(anchor_mf, positive_mf, negative_mf)
-            gamma_values = gamma_calculator.get_gamma_values(gamma_start_id, gamma_end_id, positive_mf_distances, negative_mf_distances)
-            gamma_values = gamma_values.detach()
-            gamma_values = gamma_values.view_as(loss)
-            loss = loss * gamma_values
-            loss = loss.mean()
+            anchors_l, anchors_r, labels = batch_shaper.shape_batch(anchor_mfs, labels)
+            logits = model.classify(anchors_l, anchors_r)
+            loss = sigmoid_focal_loss(logits, labels).mean()
 
             running_loss += loss.item()
             loss.backward()
@@ -183,4 +165,4 @@ def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_
     epoch_loss = round(running_loss / (data_id + 1), 5)
     train_stats = {"seed": seed, "epoch": epoch, "loss": epoch_loss, "model_epoch_hash": model_epoch_hash}
 
-    return model, optimizer, loss_function, train_stats
+    return model, optimizer, train_stats

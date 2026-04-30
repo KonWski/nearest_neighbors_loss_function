@@ -1,6 +1,7 @@
 import torch
 from .datasets import get_loaders
-from .train import train_triplet
+from .train_triplet import train_triplet
+from .train_focal import train_focal
 from .evaluate_model import test_model
 import logging
 from nearest_neighbors_loss_function.utils.statistics import Statistics
@@ -15,36 +16,65 @@ def train_workflow(args):
 
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, debug=args.debug)
 
-    statistics, best_seed_models, n_train_samples = train_triplet(
-        seeds=args.seeds,
-        train_loader=train_loader,
-        valid_loader=valid_loader,
-        training_type=args.training_type,
-        batch_size=args.batch_size,
-        triplet_loss_margin=args.triplet_loss_margin,
-        batch_shaper_margin=args.batch_shaper_margin,
-        gamma_recalculation_strategy=args.gamma_recalculation_strategy,
-        gamma_function=args.gamma_function,
-        weight_distances=args.weight_distances,
-        focal_pow=args.focal_pow,
-        density_awareness=args.density_awareness,
-        density_function=args.density_function,
-        samples_difficultness=args.samples_difficultness,
-        lambda_samples_difficultness=args.lambda_samples_difficultness,
-        n_evaluation_models=args.n_evaluation_models,
-        n_neighbors=args.n_neighbors,
-        n_epochs=args.n_epochs,
-        save_path=args.save_path,
-        lr=args.lr,
-        model_name=args.model_name,
-        model_in_channels=args.model_in_channels,
-        model_hidden_channels=args.model_hidden_channels,
-        model_n_blocks=args.model_n_blocks,
-        embedding_length=args.embedding_length,
-        optimized_param_name=args.optimized_param_name,
-        early_stop_window_size=args.early_stop_window_size,
-        device=device
-    )
+    if args.loss_function == "triplet":
+
+        statistics, best_seed_models, n_train_samples = train_triplet(
+            seeds=args.seeds,
+            train_loader=train_loader,
+            valid_loader=valid_loader,
+            training_type=args.training_type,
+            batch_size=args.batch_size,
+            triplet_loss_margin=args.triplet_loss_margin,
+            batch_shaper_margin=args.batch_shaper_margin,
+            gamma_recalculation_strategy=args.gamma_recalculation_strategy,
+            gamma_function=args.gamma_function,
+            weight_distances=args.weight_distances,
+            focal_pow=args.focal_pow,
+            density_awareness=args.density_awareness,
+            density_function=args.density_function,
+            samples_difficultness=args.samples_difficultness,
+            lambda_samples_difficultness=args.lambda_samples_difficultness,
+            n_evaluation_models=args.n_evaluation_models,
+            n_neighbors=args.n_neighbors,
+            n_epochs=args.n_epochs,
+            save_path=args.save_path,
+            lr=args.lr,
+            model_name=args.model_name,
+            model_in_channels=args.model_in_channels,
+            model_hidden_channels=args.model_hidden_channels,
+            model_n_blocks=args.model_n_blocks,
+            embedding_length=args.embedding_length,
+            optimized_param_name=args.optimized_param_name,
+            early_stop_window_size=args.early_stop_window_size,
+            device=device
+        )
+
+    elif args.loss_function == "focal":
+
+        train_focal(
+            seeds=args.seeds,
+            train_loader=train_loader,
+            valid_loader=valid_loader,
+            batch_size=args.batch_size,
+            weight_distances=args.weight_distances,
+            density_awareness=args.density_awareness,
+            density_function=args.density_function,
+            samples_difficultness=args.samples_difficultness,
+            lambda_samples_difficultness=args.lambda_samples_difficultness,
+            n_evaluation_models=args.n_evaluation_models,
+            n_neighbors=args.n_neighbors,
+            n_epochs=args.n_epochs,
+            save_path=args.save_path,
+            lr=args.lr,
+            model_name=args.model_name,
+            model_in_channels=args.model_in_channels,
+            model_hidden_channels=args.model_hidden_channels,
+            model_n_blocks=args.model_n_blocks,  
+            embedding_length=args.embedding_length,
+            optimized_param_name=args.optimized_param_name,
+            early_stop_window_size=args.early_stop_window_size,
+            device=device
+        )
 
     statistics = test_model(
         args.model_name,
