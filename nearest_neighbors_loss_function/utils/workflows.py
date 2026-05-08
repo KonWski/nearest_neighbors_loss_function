@@ -48,6 +48,7 @@ def train_workflow(args):
 
     statistics = test_model(
         args.model_name,
+        "knn", 
         statistics, 
         best_seed_models, 
         args.model_in_channels, 
@@ -69,7 +70,7 @@ def test_workflow(args):
 
     log_args(args)
     experiment_hash = args.save_path.split("/")[-1]
-    statistics = Statistics(args.n_epochs, args.save_path, experiment_hash, args.optimized_param_name)
+    statistics = Statistics(args.n_epochs, args.save_path, experiment_hash, args.optimized_param_name, -1, "test_report")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, debug=False)
@@ -95,11 +96,11 @@ def test_workflow(args):
 
         best_seed_models[seed] = {"model_path": models[0]}
 
-    statistics = test_model(args.model_name, statistics, best_seed_models, args.model_in_channels, 
+    statistics = test_model(args.model_name, args.evaluation_model_name, statistics, best_seed_models, args.model_in_channels, 
                             args.model_hidden_channels, args.model_n_blocks,  args.embedding_length, train_loader, n_train_samples, valid_loader, 
                             args.n_neighbors, "valid", device)
 
-    statistics = test_model(args.model_name, statistics, best_seed_models, args.model_in_channels, 
+    statistics = test_model(args.model_name, args.evaluation_model_name, statistics, best_seed_models, args.model_in_channels, 
                             args.model_hidden_channels, args.model_n_blocks, args.embedding_length, train_loader, n_train_samples, test_loader, 
                             args.n_neighbors, "test", device)
 

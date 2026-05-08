@@ -7,8 +7,9 @@ from .auxiliary_functions import ignore_top_weight
 import torch.nn.functional as F
 import torch
 import logging
+from sklearn.ensemble import RandomForestClassifier
 
-def evaluate_model(model, evaluation_mode, train_embeddings, train_labels, test_embeddings, test_labels, n_neighbors, stats_prefix):
+def evaluate_model(model, evaluation_model_name, evaluation_mode, train_embeddings, train_labels, test_embeddings, test_labels, n_neighbors, stats_prefix):
 
     model.eval()
 
@@ -19,8 +20,16 @@ def evaluate_model(model, evaluation_mode, train_embeddings, train_labels, test_
     train_labels = train_labels.ravel()
     test_labels = test_labels.ravel()
 
-    accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc = knn_stats(evaluation_mode, train_embeddings, test_embeddings, train_labels, 
-                                                                                  test_labels, n_neighbors)
+    if evaluation_model_name == "knn":
+        accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc = knn_stats(evaluation_mode, train_embeddings, test_embeddings, train_labels, 
+                                                                                    test_labels, n_neighbors)
+
+    elif evaluation_model_name == "rf":
+        accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc = rf_stats(evaluation_mode, train_embeddings, test_embeddings, train_labels, 
+                                                                                    test_labels, n_neighbors)
+
+    else:
+        raise Exception("Evaluation model not implemented")
 
     # epoch_loss = round(running_loss / (data_id + 1), 5)
     test_stats = {f"{stats_prefix}_accuracy": accuracy, f"{stats_prefix}_precision": precision, f"{stats_prefix}_recall": recall, 
@@ -83,6 +92,28 @@ def knn_stats(evaluation_mode, train_embeddings, test_embeddings, y_train, y_tes
     return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc
 
 
+def rf_stats(train_embeddings, test_embeddings, y_train, y_test):
+
+        # TODO find optimal parameters
+        rf = RandomForestClassifier(n_estimators=1, max_depth=1)
+
+        train_embeddings = train_embeddings.numpy()
+        test_embeddings = train_embeddings.numpy()
+
+        rf.fit(train_embeddings, y_train)
+
+        # predictions
+        y_train = y_train.numpy()
+        y_test = y_test.numpy()
+
+        y_pred = rf.predict(test_embeddings)
+        y_pred_proba = rf.predict_proba(test_embeddings)[:,1]
+
+        # scores
+        accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc = calculate_stats(y_test, y_pred, y_pred_proba)
+
+        return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc
+
 
 def calculate_stats(y_test, y_pred, y_pred_proba):
     accuracy = round(accuracy_score(y_test, y_pred), 4)
@@ -98,7 +129,7 @@ def calculate_stats(y_test, y_pred, y_pred_proba):
     return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc
 
 
-def test_model(model_name, statistics, best_seed_models, in_channels, hidden_dim, n_blocks,
+def test_model(model_name, evaluation_model_name, statistics, best_seed_models, in_channels, hidden_dim, n_blocks,
                 embedding_size, train_loader, n_train_samples, test_loader, n_neighbors, stat_prefix, device):
 
     for seed, seed_data in best_seed_models.items():
@@ -112,7 +143,7 @@ def test_model(model_name, statistics, best_seed_models, in_channels, hidden_dim
             train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_size, device)
             test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_size, device)
 
-            test_stats, _ = evaluate_model(model, "test", train_embeddings, train_labels, test_embeddings, test_labels, n_neighbors, stat_prefix)
+            test_stats, _ = evaluate_model(model, evaluation_model_name, "test", train_embeddings, train_labels, test_embeddings, test_labels, n_neighbors, "test")
             
             logging.info(f"Seed: {seed}, {test_stats}")
 

@@ -5,13 +5,14 @@ from statistics import mean
 
 class Statistics():
 
-    def __init__(self, n_epochs, experiment_dir_path, experiment_hash, optimized_param_name, early_stop_window_size):
+    def __init__(self, n_epochs, experiment_dir_path, experiment_hash, optimized_param_name, early_stop_window_size, report_name = "train_report"):
         self.n_epochs = n_epochs
         self.experiment_dir_path = experiment_dir_path
         self.experiment_hash = experiment_hash
         self.optimized_param = optimized_param_name
         self.early_stop_window_size = early_stop_window_size
-        self.report_path = os.path.join(self.experiment_dir_path, "train_report.xlsx")
+        self.report_name = report_name
+        self.report_path = os.path.join(self.experiment_dir_path, f"{self.report_name}.xlsx")
 
         '''
         as [{"seed": x, "state": y, "epoch": z, "loss": q, "experiment_hash": p, "model_hash": w,

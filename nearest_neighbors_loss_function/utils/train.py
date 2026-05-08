@@ -90,8 +90,8 @@ def train_triplet(
             train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_length, device)
             valid_embeddings, valid_labels = generate_embeddings(model, valid_loader, n_valid_samples, embedding_length, device)
 
-            train_stats, embeddings_with_nans = evaluate_model(model, "train", train_embeddings, train_labels, train_embeddings, train_labels, n_neighbors, "train")
-            valid_stats, embeddings_with_nans = evaluate_model(model, "valid", train_embeddings, train_labels, valid_embeddings, valid_labels, n_neighbors, "valid")
+            train_stats, embeddings_with_nans = evaluate_model(model, "knn", "train", train_embeddings, train_labels, train_embeddings, train_labels, n_neighbors, "train")
+            valid_stats, embeddings_with_nans = evaluate_model(model, "knn", "valid", train_embeddings, train_labels, valid_embeddings, valid_labels, n_neighbors, "valid")
 
             # early exit
             if embeddings_with_nans:
