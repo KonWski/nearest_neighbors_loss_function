@@ -93,7 +93,7 @@ def test_workflow(args):
         if n_models > 1:
             raise Exception(f"Directory {seed_path} contains more than 1 model")
 
-        best_seed_models[seed] = {"epoch": seed, "model_path": models[0]}
+        best_seed_models[seed] = {"epoch": seed, "model_path": str(models[0])}
 
     statistics = test_model(args.model_name, args.evaluation_model_name, statistics, best_seed_models, args.model_in_channels, 
                             args.model_hidden_channels, args.model_n_blocks,  args.embedding_length, train_loader, n_train_samples, valid_loader, 
