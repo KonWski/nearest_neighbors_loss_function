@@ -95,7 +95,7 @@ def test_workflow(args):
 
         statistics = test_model(str(models[0]), args.model_name, args.model_in_channels, args.model_hidden_channels, args.model_n_blocks, args.embedding_length, 
                                 train_loader, n_train_samples, valid_loader, n_valid_samples, test_loader, n_test_samples, 
-                                args.evaluation_model_name, args.n_neighbors, statistics, seed, device)
+                                args.evaluation_model_name, args.n_neighbors, statistics, int(seed), device)
 
     statistics.save()
 
