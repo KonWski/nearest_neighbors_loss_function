@@ -164,7 +164,7 @@ def test_model(model_path, model_name, model_in_channels, model_hidden_channels,
                evaluation_model_name, n_neighbors, statistics, seed, device):
     
     set_seed(seed)
-    model, _ = load_model(model_path, model_name, model_in_channels, model_hidden_channels, model_n_blocks, embedding_length)
+    model, checkpoint = load_model(model_path, model_name, model_in_channels, model_hidden_channels, model_n_blocks, embedding_length)
     model.to(device)
 
     train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_length, device)
@@ -175,8 +175,9 @@ def test_model(model_path, model_name, model_in_channels, model_hidden_channels,
                                     valid_labels, n_neighbors, "valid")
     test_stats, _ = evaluate_model(model, evaluation_model_name, "test", train_embeddings, train_labels, test_embeddings, 
                                     test_labels, n_neighbors, "test")
-    
-    logging.info(f"Seed: {seed}, {valid_stats}, {test_stats}")
-    statistics.add(valid_stats, test_stats)
+    basic_stats = {"running_type": model_path.split("/")[-4], "seed": [seed], "epoch": checkpoint["epoch"]}
+    logging.info(f"{basic_stats}, {valid_stats}, {test_stats}")
+
+    statistics.add(basic_stats, valid_stats | test_stats)
     
     return statistics
