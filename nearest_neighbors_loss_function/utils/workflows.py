@@ -88,6 +88,7 @@ def test_workflow(args):
         
         seed_path = Path(os.path.join(args.save_path, str(seed)))
         models = list(seed_path.rglob("*.pt"))
+        print(models)
         n_models = len(models)
 
         if n_models > 1:
