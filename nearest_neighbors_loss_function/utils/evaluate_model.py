@@ -133,26 +133,18 @@ def test_model(model_name, evaluation_model_name, statistics, best_seed_models, 
                 embedding_size, train_loader, n_train_samples, test_loader, n_neighbors, stat_prefix, device):
 
     for seed, seed_data in best_seed_models.items():
+
+        model, _ = load_model(seed_data["model_path"], model_name, in_channels, hidden_dim, n_blocks, embedding_size)
+        model.to(device)
+        n_test_samples = len(test_loader.dataset)
+
+        train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_size, device)
+        test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_size, device)
+
+        test_stats, _ = evaluate_model(model, evaluation_model_name, "test", train_embeddings, train_labels, test_embeddings, test_labels, n_neighbors, "test")
         
-        print(f"seed: {seed}")
-        print(f"seed_data: {seed_data}")
+        logging.info(f"Seed: {seed}, {test_stats}")
 
-        for epoch, model_path in zip(seed_data["epoch"], seed_data["model_path"]):
-            
-            print(f"epoch: {epoch}")
-            print(f"model_path: {model_path}")
-
-            model, _ = load_model(model_path, model_name, in_channels, hidden_dim, n_blocks, embedding_size)
-            model.to(device)
-            n_test_samples = len(test_loader.dataset)
-
-            train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_size, device)
-            test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_size, device)
-
-            test_stats, _ = evaluate_model(model, evaluation_model_name, "test", train_embeddings, train_labels, test_embeddings, test_labels, n_neighbors, "test")
-            
-            logging.info(f"Seed: {seed}, {test_stats}")
-
-            statistics.upload_test_stats(test_stats, seed, epoch)
+        statistics.upload_test_stats(test_stats, seed, seed_data["epoch"])
 
     return statistics
