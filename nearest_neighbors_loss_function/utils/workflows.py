@@ -86,7 +86,6 @@ def test_workflow(args):
         except ValueError:
             continue
         
-        set_seed(int(seed))
         seed_path = Path(os.path.join(args.save_path, str(seed)))
         models = list(seed_path.rglob("*.pt"))
         n_models = len(models)
@@ -94,7 +93,7 @@ def test_workflow(args):
         if n_models > 1:
             raise Exception(f"Directory {seed_path} contains more than 1 model")
 
-        best_seed_models[seed] = {"model_path": models[0]}
+        best_seed_models[seed] = {"epoch": seed, "model_path": models[0]}
 
     statistics = test_model(args.model_name, args.evaluation_model_name, statistics, best_seed_models, args.model_in_channels, 
                             args.model_hidden_channels, args.model_n_blocks,  args.embedding_length, train_loader, n_train_samples, valid_loader, 
