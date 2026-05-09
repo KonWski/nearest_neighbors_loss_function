@@ -8,8 +8,9 @@ import torch.nn.functional as F
 import torch
 import logging
 from sklearn.ensemble import RandomForestClassifier
+from nearest_neighbors_loss_function.utils.auxiliary_functions import set_seed
 
-def evaluate_model(model, evaluation_model_name, evaluation_mode, train_embeddings, train_labels, test_embeddings, test_labels, n_neighbors, stats_prefix):
+def evaluate_model(model, evaluation_model_name, evaluation_mode, train_embeddings, train_labels, test_embeddings, test_labels, n_neighbors, stats_prefix, seed=None):
 
     model.eval()
 
@@ -26,7 +27,7 @@ def evaluate_model(model, evaluation_model_name, evaluation_mode, train_embeddin
 
     elif evaluation_model_name == "rf":
         accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc = rf_stats(evaluation_mode, train_embeddings, test_embeddings, train_labels, 
-                                                                                    test_labels, n_neighbors)
+                                                                                    test_labels, n_neighbors, seed)
 
     else:
         raise Exception("Evaluation model not implemented")
@@ -92,10 +93,14 @@ def knn_stats(evaluation_mode, train_embeddings, test_embeddings, y_train, y_tes
     return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc
 
 
-def rf_stats(train_embeddings, test_embeddings, y_train, y_test):
+def rf_stats(train_embeddings, test_embeddings, y_train, y_test, seed):
 
         # TODO find optimal parameters
-        rf = RandomForestClassifier(n_estimators=1, max_depth=1)
+        rf = RandomForestClassifier(
+            random_state=seed,
+            n_estimators=1, 
+            max_depth=1
+            )
 
         train_embeddings = train_embeddings.numpy()
         test_embeddings = train_embeddings.numpy()
@@ -129,10 +134,12 @@ def calculate_stats(y_test, y_pred, y_pred_proba):
     return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc
 
 
-def test_model(model_name, evaluation_model_name, statistics, best_seed_models, in_channels, hidden_dim, n_blocks,
+def test_best_seed_model(model_name, evaluation_model_name, statistics, best_seed_models, in_channels, hidden_dim, n_blocks,
                 embedding_size, train_loader, n_train_samples, test_loader, n_neighbors, phase, device):
 
     for seed, seed_data in best_seed_models.items():
+
+        set_seed(seed)
 
         for epoch, model_path in zip(seed_data["epoch"], seed_data["model_path"]):
 
@@ -149,4 +156,27 @@ def test_model(model_name, evaluation_model_name, statistics, best_seed_models, 
 
             statistics.upload_test_stats(test_stats, seed, epoch)
 
+    return statistics
+
+
+def test_model(model_path, model_name, model_in_channels, model_hidden_channels, model_n_blocks, embedding_length, 
+               train_loader, n_train_samples, valid_loader, n_valid_samples, test_loader, n_test_samples, 
+               evaluation_model_name, n_neighbors, statistics, seed, device):
+    
+    set_seed(seed)
+    model, _ = load_model(model_path, model_name, model_in_channels, model_hidden_channels, model_n_blocks, embedding_length)
+    model.to(device)
+
+    train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_length, device)
+    valid_embeddings, valid_labels = generate_embeddings(model, valid_loader, n_valid_samples, embedding_length, device)        
+    test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_length, device)
+
+    valid_stats, _ = evaluate_model(model, evaluation_model_name, "valid", train_embeddings, train_labels, valid_embeddings, 
+                                    valid_labels, n_neighbors, "valid")
+    test_stats, _ = evaluate_model(model, evaluation_model_name, "test", train_embeddings, train_labels, test_embeddings, 
+                                    test_labels, n_neighbors, "test")
+    
+    logging.info(f"Seed: {seed}, {valid_stats}, {test_stats}")
+    statistics.add(valid_stats, test_stats)
+    
     return statistics

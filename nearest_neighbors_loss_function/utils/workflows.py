@@ -1,10 +1,9 @@
 import torch
 from .datasets import get_loaders
 from .train import train_triplet
-from .evaluate_model import test_model
+from .evaluate_model import test_best_seed_model, test_model
 import logging
 from nearest_neighbors_loss_function.utils.statistics import Statistics
-from nearest_neighbors_loss_function.utils.auxiliary_functions import set_seed
 import os
 from pathlib import Path
 
@@ -46,7 +45,7 @@ def train_workflow(args):
         device=device
     )
 
-    statistics = test_model(
+    statistics = test_best_seed_model(
         args.model_name,
         "knn", 
         statistics, 
@@ -76,7 +75,8 @@ def test_workflow(args):
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, debug=False)
     train_loader.batch_sampler.shuffle_data()
     n_train_samples = len(train_loader.dataset)
-    best_seed_models = {}
+    n_valid_samples = len(valid_loader.dataset)
+    n_test_samples = len(test_loader.dataset)
 
     for seed in os.listdir(args.save_path):
 
@@ -93,15 +93,9 @@ def test_workflow(args):
         if n_models > 1:
             raise Exception(f"Directory {seed_path} contains more than 1 model")
 
-        best_seed_models[seed] = {"epoch": [-1], "model_path": [str(models[0])]}
-
-    statistics = test_model(args.model_name, args.evaluation_model_name, statistics, best_seed_models, args.model_in_channels, 
-                            args.model_hidden_channels, args.model_n_blocks,  args.embedding_length, train_loader, n_train_samples, valid_loader, 
-                            args.n_neighbors, "valid", device)
-
-    statistics = test_model(args.model_name, args.evaluation_model_name, statistics, best_seed_models, args.model_in_channels, 
-                            args.model_hidden_channels, args.model_n_blocks, args.embedding_length, train_loader, n_train_samples, test_loader, 
-                            args.n_neighbors, "test", device)
+        statistics = test_model(str(models[0]), args.model_name, args.model_in_channels, args.model_hidden_channels, args.model_n_blocks, args.embedding_length, 
+                                train_loader, n_train_samples, valid_loader, n_valid_samples, test_loader, n_test_samples, 
+                                args.evaluation_model_name, args.n_neighbors, statistics, seed, device)
 
     statistics.save()
 
