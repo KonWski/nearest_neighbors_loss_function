@@ -95,11 +95,15 @@ def knn_stats(evaluation_mode, train_embeddings, test_embeddings, y_train, y_tes
 
 def rf_stats(train_embeddings, test_embeddings, y_train, y_test, seed):
 
-        # TODO find optimal parameters
         rf = RandomForestClassifier(
+            n_jobs=-1,
             random_state=seed,
-            n_estimators=1, 
-            max_depth=1
+            n_estimators=600,
+            min_samples_split=15,
+            min_samples_leaf=2,
+            criterion="entropy",
+            max_depth=None,
+            class_weight="balanced"
             )
 
         train_embeddings = train_embeddings.numpy()
