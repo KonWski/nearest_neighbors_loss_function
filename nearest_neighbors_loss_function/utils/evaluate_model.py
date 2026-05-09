@@ -130,7 +130,7 @@ def calculate_stats(y_test, y_pred, y_pred_proba):
 
 
 def test_model(model_name, evaluation_model_name, statistics, best_seed_models, in_channels, hidden_dim, n_blocks,
-                embedding_size, train_loader, n_train_samples, test_loader, n_neighbors, stat_prefix, device):
+                embedding_size, train_loader, n_train_samples, test_loader, n_neighbors, phase, device):
 
     for seed, seed_data in best_seed_models.items():
 
@@ -141,7 +141,7 @@ def test_model(model_name, evaluation_model_name, statistics, best_seed_models, 
         train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_size, device)
         test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_size, device)
 
-        test_stats, _ = evaluate_model(model, evaluation_model_name, "test", train_embeddings, train_labels, test_embeddings, test_labels, n_neighbors, "test")
+        test_stats, _ = evaluate_model(model, evaluation_model_name, phase, train_embeddings, train_labels, test_embeddings, test_labels, n_neighbors, phase)
         
         logging.info(f"Seed: {seed}, {test_stats}")
 
