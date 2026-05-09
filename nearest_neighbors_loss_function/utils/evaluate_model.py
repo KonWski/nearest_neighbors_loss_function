@@ -134,17 +134,19 @@ def test_model(model_name, evaluation_model_name, statistics, best_seed_models, 
 
     for seed, seed_data in best_seed_models.items():
 
-        model, _ = load_model(seed_data["model_path"], model_name, in_channels, hidden_dim, n_blocks, embedding_size)
-        model.to(device)
-        n_test_samples = len(test_loader.dataset)
+        for epoch, model_path in zip(seed_data["epoch"], seed_data["model_path"]):
 
-        train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_size, device)
-        test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_size, device)
+            model, _ = load_model(model_path, model_name, in_channels, hidden_dim, n_blocks, embedding_size)
+            model.to(device)
+            n_test_samples = len(test_loader.dataset)
 
-        test_stats, _ = evaluate_model(model, evaluation_model_name, phase, train_embeddings, train_labels, test_embeddings, test_labels, n_neighbors, phase)
-        
-        logging.info(f"Seed: {seed}, {test_stats}")
+            train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_size, device)
+            test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_size, device)
 
-        statistics.upload_test_stats(test_stats, seed, seed_data["epoch"])
+            test_stats, _ = evaluate_model(model, evaluation_model_name, phase, train_embeddings, train_labels, test_embeddings, test_labels, n_neighbors, phase)
+            
+            logging.info(f"Seed: {seed}, {test_stats}")
+
+            statistics.upload_test_stats(test_stats, seed, epoch)
 
     return statistics
