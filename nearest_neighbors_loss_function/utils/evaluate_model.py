@@ -103,7 +103,7 @@ def rf_stats(train_embeddings, test_embeddings, y_train, y_test, seed):
             )
 
         train_embeddings = train_embeddings.numpy()
-        test_embeddings = train_embeddings.numpy()
+        test_embeddings = test_embeddings.numpy()
 
         rf.fit(train_embeddings, y_train)
 
