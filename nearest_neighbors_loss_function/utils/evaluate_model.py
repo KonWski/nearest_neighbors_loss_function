@@ -26,8 +26,8 @@ def evaluate_model(model, evaluation_model_name, evaluation_mode, train_embeddin
                                                                                     test_labels, n_neighbors)
 
     elif evaluation_model_name == "rf":
-        accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc = rf_stats(evaluation_mode, train_embeddings, test_embeddings, train_labels, 
-                                                                                    test_labels, n_neighbors, seed)
+        accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc = rf_stats(train_embeddings, test_embeddings, train_labels, 
+                                                                                    test_labels, seed)
 
     else:
         raise Exception("Evaluation model not implemented")
