@@ -88,15 +88,13 @@ def test_workflow(args):
         
         seed_path = Path(os.path.join(args.save_path, str(seed)))
         models = list(seed_path.rglob("*.pt"))
-        print(models)
-        print(models[0])
-        print(str(models[0]))
         n_models = len(models)
 
         if n_models > 1:
             raise Exception(f"Directory {seed_path} contains more than 1 model")
 
         best_seed_models[seed] = {"epoch": seed, "model_path": str(models[0])}
+        print(best_seed_models[seed])
 
     statistics = test_model(args.model_name, args.evaluation_model_name, statistics, best_seed_models, args.model_in_channels, 
                             args.model_hidden_channels, args.model_n_blocks,  args.embedding_length, train_loader, n_train_samples, valid_loader, 
