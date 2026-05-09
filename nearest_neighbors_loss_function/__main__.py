@@ -56,6 +56,7 @@ def parse_training_args():
 def parse_testing_args():
     parser = argparse.ArgumentParser(description="Siamese graph neural net testing")
 
+    parser.add_argument("--dataset_name", type=str, default="ogbg-molhiv")
     parser.add_argument("--n_evaluation_models", type=int, default=3)
     parser.add_argument("--evaluation_model_name", type=str, default="knn")
     parser.add_argument("--n_neighbors", type=int, required=True)
