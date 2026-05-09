@@ -133,8 +133,14 @@ def test_model(model_name, evaluation_model_name, statistics, best_seed_models, 
                 embedding_size, train_loader, n_train_samples, test_loader, n_neighbors, stat_prefix, device):
 
     for seed, seed_data in best_seed_models.items():
+        
+        print(f"seed: {seed}")
+        print(f"seed_data: {seed_data}")
 
         for epoch, model_path in zip(seed_data["epoch"], seed_data["model_path"]):
+            
+            print(f"epoch: {epoch}")
+            print(f"model_path: {model_path}")
 
             model, _ = load_model(model_path, model_name, in_channels, hidden_dim, n_blocks, embedding_size)
             model.to(device)
