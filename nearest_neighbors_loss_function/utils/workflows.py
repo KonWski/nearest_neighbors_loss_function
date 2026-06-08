@@ -4,6 +4,7 @@ from .train import train_triplet
 from .evaluate_model import test_best_seed_model, test_model
 import logging
 from nearest_neighbors_loss_function.utils.statistics import Statistics
+from nearest_neighbors_loss_function.utils.evaluate_model_params import EvaluateModelParams
 import os
 from pathlib import Path
 
@@ -13,6 +14,10 @@ def train_workflow(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, debug=args.debug)
+    evaluate_model_params = EvaluateModelParams(
+        evaluation_model_name="knn",
+        knn_n_neighbors=args.knn_n_neighbors
+    )
 
     statistics, best_seed_models, n_train_samples = train_triplet(
         seeds=args.seeds,
@@ -31,7 +36,7 @@ def train_workflow(args):
         samples_difficultness=args.samples_difficultness,
         lambda_samples_difficultness=args.lambda_samples_difficultness,
         n_evaluation_models=args.n_evaluation_models,
-        n_neighbors=args.n_neighbors,
+        evaluate_model_params=evaluate_model_params,
         n_epochs=args.n_epochs,
         save_path=args.save_path,
         lr=args.lr,
@@ -47,7 +52,6 @@ def train_workflow(args):
 
     statistics = test_best_seed_model(
         args.model_name,
-        "knn", 
         statistics, 
         best_seed_models, 
         args.model_in_channels, 
@@ -57,7 +61,7 @@ def train_workflow(args):
         train_loader,
         n_train_samples,
         test_loader,
-        args.n_neighbors,
+        evaluate_model_params,
         "test", 
         device
     )

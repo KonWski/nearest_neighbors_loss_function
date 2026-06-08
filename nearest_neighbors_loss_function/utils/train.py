@@ -14,6 +14,7 @@ from typing import List
 import numpy as np
 import os
 from .generate_embeddings import generate_embeddings
+from .evaluate_model_params import EvaluateModelParams
 
 def train_triplet(
         seeds: List[int], 
@@ -32,7 +33,7 @@ def train_triplet(
         samples_difficultness: bool,
         lambda_samples_difficultness: float,
         n_evaluation_models: int,
-        n_neighbors: int, 
+        evaluate_model_params: EvaluateModelParams,
         n_epochs: int, 
         save_path: str, 
         lr: float, 
@@ -62,7 +63,7 @@ def train_triplet(
 
         loss_function = TripletMarginLoss(reduction="none", margin=triplet_loss_margin)
         batch_shaper = BatchShaper(device, training_type, batch_shaper_margin)
-        gamma_calculator = GammaCalculator(embedding_length, n_neighbors, batch_size, device, gamma_function, focal_pow, 
+        gamma_calculator = GammaCalculator(embedding_length, evaluate_model_params.knn_n_neighbors, batch_size, device, gamma_function, focal_pow, 
                                            gamma_recalculation_strategy, weight_distances, density_awareness, density_function,
                                            samples_difficultness, lambda_samples_difficultness)
 
@@ -90,8 +91,10 @@ def train_triplet(
             train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_length, device)
             valid_embeddings, valid_labels = generate_embeddings(model, valid_loader, n_valid_samples, embedding_length, device)
 
-            train_stats, embeddings_with_nans = evaluate_model(model, "knn", "train", train_embeddings, train_labels, train_embeddings, train_labels, n_neighbors, "train")
-            valid_stats, embeddings_with_nans = evaluate_model(model, "knn", "valid", train_embeddings, train_labels, valid_embeddings, valid_labels, n_neighbors, "valid")
+            train_stats, embeddings_with_nans = evaluate_model(model, "train", train_embeddings, train_labels, train_embeddings, 
+                                                               train_labels, evaluate_model_params, "train")
+            valid_stats, embeddings_with_nans = evaluate_model(model, "valid", train_embeddings, train_labels, valid_embeddings, 
+                                                               valid_labels, evaluate_model_params, "valid")
 
             # early exit
             if embeddings_with_nans:
@@ -114,7 +117,7 @@ def train_triplet(
             if score > min(best_scores, default=float("-inf")) or n_best_models < n_evaluation_models:
 
                 best_model_path = save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
-                        train_stats["loss"], n_neighbors, valid_optimized_param_value, training_type, batch_size, 
+                        train_stats["loss"], evaluate_model_params.knn_n_neighbors, valid_optimized_param_value, training_type, batch_size, 
                         gamma_recalculation_strategy, density_awareness, samples_difficultness, lambda_samples_difficultness)
 
                 if n_best_models < n_evaluation_models:

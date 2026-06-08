@@ -10,7 +10,8 @@ import logging
 from sklearn.ensemble import RandomForestClassifier
 from nearest_neighbors_loss_function.utils.auxiliary_functions import set_seed
 
-def evaluate_model(model, evaluation_model_name, evaluation_mode, train_embeddings, train_labels, test_embeddings, test_labels, n_neighbors, stats_prefix, seed=None):
+def evaluate_model(model, evaluation_mode, train_embeddings, train_labels, test_embeddings, 
+                   test_labels, evaluate_model_params, stats_prefix, seed=None):
 
     model.eval()
 
@@ -21,13 +22,13 @@ def evaluate_model(model, evaluation_model_name, evaluation_mode, train_embeddin
     train_labels = train_labels.ravel()
     test_labels = test_labels.ravel()
 
-    if evaluation_model_name == "knn":
+    if evaluate_model_params.evaluation_model_name == "knn":
         accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc = knn_stats(evaluation_mode, train_embeddings, test_embeddings, train_labels, 
-                                                                                    test_labels, n_neighbors)
+                                                                                    test_labels, evaluate_model_params)
 
-    elif evaluation_model_name == "rf":
+    elif evaluate_model_params.evaluation_model_name == "rf":
         accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc = rf_stats(train_embeddings, test_embeddings, train_labels, 
-                                                                                    test_labels, seed)
+                                                                                    test_labels, evaluate_model_params, seed)
 
     else:
         raise Exception("Evaluation model not implemented")
@@ -40,7 +41,7 @@ def evaluate_model(model, evaluation_model_name, evaluation_mode, train_embeddin
     return test_stats, False
 
 
-def knn_stats(evaluation_mode, train_embeddings, test_embeddings, y_train, y_test, n_neighbors):
+def knn_stats(evaluation_mode, train_embeddings, test_embeddings, y_train, y_test, evaluate_model_params):
 
     if evaluation_mode in ["valid", "test"]:
 
@@ -60,7 +61,7 @@ def knn_stats(evaluation_mode, train_embeddings, test_embeddings, y_train, y_tes
         test_train_distances = test_train_distances.numpy()
 
         # fit model
-        knn = KNeighborsClassifier(n_neighbors=n_neighbors, n_jobs=-1, metric="precomputed", weights='distance')
+        knn = KNeighborsClassifier(n_neighbors=evaluate_model_params.knn_n_neighbors, n_jobs=-1, metric="precomputed", weights='distance')
         knn.fit(train_distances, y_train)
 
     elif evaluation_mode == "train":
@@ -77,7 +78,7 @@ def knn_stats(evaluation_mode, train_embeddings, test_embeddings, y_train, y_tes
         test_train_distances = train_distances
 
         # fit model
-        knn = KNeighborsClassifier(n_neighbors=n_neighbors, n_jobs=-1, metric="precomputed", weights=ignore_top_weight)
+        knn = KNeighborsClassifier(n_neighbors=evaluate_model_params.knn_n_neighbors, n_jobs=-1, metric="precomputed", weights=ignore_top_weight)
         knn.fit(train_distances, y_train)
 
     # predictions
@@ -93,17 +94,17 @@ def knn_stats(evaluation_mode, train_embeddings, test_embeddings, y_train, y_tes
     return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc
 
 
-def rf_stats(train_embeddings, test_embeddings, y_train, y_test, seed):
+def rf_stats(train_embeddings, test_embeddings, y_train, y_test, evaluate_model_params, seed):
 
         rf = RandomForestClassifier(
             n_jobs=-1,
             random_state=seed,
-            n_estimators=600,
-            min_samples_split=15,
-            min_samples_leaf=2,
-            criterion="entropy",
-            max_depth=None,
-            class_weight="balanced"
+            n_estimators=evaluate_model_params.rf_n_estimators,
+            min_samples_split=evaluate_model_params.rf_min_samples_split,
+            min_samples_leaf=evaluate_model_params.rf_min_samples_leaf,
+            criterion=evaluate_model_params.rf_criterion,
+            max_depth=evaluate_model_params.rf_max_depth,
+            class_weight=evaluate_model_params.rf_class_weight
             )
 
         train_embeddings = train_embeddings.numpy()
@@ -138,8 +139,8 @@ def calculate_stats(y_test, y_pred, y_pred_proba):
     return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc
 
 
-def test_best_seed_model(model_name, evaluation_model_name, statistics, best_seed_models, in_channels, hidden_dim, n_blocks,
-                embedding_size, train_loader, n_train_samples, test_loader, n_neighbors, phase, device):
+def test_best_seed_model(model_name, statistics, best_seed_models, in_channels, hidden_dim, n_blocks,
+                embedding_size, train_loader, n_train_samples, test_loader, evaluate_model_params, phase, device):
 
     for seed, seed_data in best_seed_models.items():
 
@@ -154,7 +155,8 @@ def test_best_seed_model(model_name, evaluation_model_name, statistics, best_see
             train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_size, device)
             test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_size, device)
 
-            test_stats, _ = evaluate_model(model, evaluation_model_name, phase, train_embeddings, train_labels, test_embeddings, test_labels, n_neighbors, phase)
+            test_stats, _ = evaluate_model(model, phase, train_embeddings, train_labels, test_embeddings, 
+                                           test_labels, evaluate_model_params, phase)
             
             logging.info(f"Seed: {seed}, {test_stats}")
 
@@ -165,7 +167,7 @@ def test_best_seed_model(model_name, evaluation_model_name, statistics, best_see
 
 def test_model(model_path, model_name, model_in_channels, model_hidden_channels, model_n_blocks, embedding_length, 
                train_loader, n_train_samples, valid_loader, n_valid_samples, test_loader, n_test_samples, 
-               evaluation_model_name, n_neighbors, statistics, seed, device):
+               evaluate_model_params, statistics, seed, device):
     
     set_seed(seed)
     model, checkpoint = load_model(model_path, model_name, model_in_channels, model_hidden_channels, model_n_blocks, embedding_length)
@@ -175,10 +177,10 @@ def test_model(model_path, model_name, model_in_channels, model_hidden_channels,
     valid_embeddings, valid_labels = generate_embeddings(model, valid_loader, n_valid_samples, embedding_length, device)        
     test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_length, device)
 
-    valid_stats, _ = evaluate_model(model, evaluation_model_name, "valid", train_embeddings, train_labels, valid_embeddings, 
-                                    valid_labels, n_neighbors, "valid")
-    test_stats, _ = evaluate_model(model, evaluation_model_name, "test", train_embeddings, train_labels, test_embeddings, 
-                                    test_labels, n_neighbors, "test")
+    valid_stats, _ = evaluate_model(model, "valid", train_embeddings, train_labels, valid_embeddings, 
+                                    valid_labels, evaluate_model_params, "valid")
+    test_stats, _ = evaluate_model(model, "test", train_embeddings, train_labels, test_embeddings, 
+                                    test_labels, evaluate_model_params, "test")
     basic_stats = {"running_type": model_path.split("/")[-4], "seed": seed, "epoch": checkpoint["epoch"]}
     logging.info(f"{basic_stats}, {valid_stats}, {test_stats}")
 
