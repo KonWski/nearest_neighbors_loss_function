@@ -34,9 +34,17 @@ def parse_training_args():
     parser.add_argument("--lambda_samples_difficultness", type=float, default=0.0)
 
     parser.add_argument("--evaluation_model_name", type=str, default="knn")
+
+    parser.add_argument("--knn_n_neighbors", type=int, required=True)
+    parser.add_argument("--rf_n_estimators", type=int, default=None)
+    parser.add_argument("--rf_min_samples_split", type=int, default=None)
+    parser.add_argument("--rf_min_samples_leaf", type=int, default=None)
+    parser.add_argument("--rf_criterion", type=str, default=None)
+    parser.add_argument("--rf_max_depth", type=int, default=None)
+    parser.add_argument("--rf_class_weight", type=str, default=None)
+
     parser.add_argument("--n_evaluation_models", type=int, default=3)
 
-    parser.add_argument("--n_neighbors", type=int, required=True)
     parser.add_argument("--n_epochs", type=int, required=True)
     parser.add_argument("--save_path", type=str, required=True)
     parser.add_argument("--lr", type=float, required=True)
@@ -60,8 +68,16 @@ def parse_testing_args():
     parser.add_argument("--dataset_name", type=str, default="ogbg-molhiv")
     parser.add_argument("--task_id", type=int, default=0)
     parser.add_argument("--n_evaluation_models", type=int, default=3)
+
     parser.add_argument("--evaluation_model_name", type=str, default="knn")
-    parser.add_argument("--n_neighbors", type=int, required=True)
+    parser.add_argument("--knn_n_neighbors", type=int, required=True)
+    parser.add_argument("--rf_n_estimators", type=int, default=None)
+    parser.add_argument("--rf_min_samples_split", type=int, default=None)
+    parser.add_argument("--rf_min_samples_leaf", type=int, default=None)
+    parser.add_argument("--rf_criterion", type=str, default=None)
+    parser.add_argument("--rf_max_depth", type=int, default=None)
+    parser.add_argument("--rf_class_weight", type=str, default=None)
+
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--n_epochs", type=int, required=True)
     parser.add_argument("--save_path", type=str, required=True)
