@@ -17,6 +17,7 @@ def parse_training_args():
                         help="List of random seeds")
     
     parser.add_argument("--dataset_name", type=str, default="ogbg-molhiv")
+    parser.add_argument("--task_id", type=int, default=0)
     parser.add_argument("--training_type", type=str, required=True)
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--triplet_loss_margin", type=float, default=0.5)
@@ -57,6 +58,7 @@ def parse_testing_args():
     parser = argparse.ArgumentParser(description="Siamese graph neural net testing")
 
     parser.add_argument("--dataset_name", type=str, default="ogbg-molhiv")
+    parser.add_argument("--task_id", type=int, default=0)
     parser.add_argument("--n_evaluation_models", type=int, default=3)
     parser.add_argument("--evaluation_model_name", type=str, default="knn")
     parser.add_argument("--n_neighbors", type=int, required=True)

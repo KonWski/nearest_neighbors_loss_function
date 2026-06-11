@@ -13,7 +13,7 @@ def train_workflow(args):
     log_args(args)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, debug=args.debug)
+    train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, debug=args.debug)
     evaluate_model_params = EvaluateModelParams(
         evaluation_model_name="knn",
         knn_n_neighbors=args.knn_n_neighbors
@@ -76,7 +76,7 @@ def test_workflow(args):
     statistics = Statistics(args.n_epochs, args.save_path, experiment_hash, args.optimized_param_name, -1, "test_report")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, debug=False)
+    train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, debug=False)
     train_loader.batch_sampler.shuffle_data()
     n_train_samples = len(train_loader.dataset)
     n_valid_samples = len(valid_loader.dataset)

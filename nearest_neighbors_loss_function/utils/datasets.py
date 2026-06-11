@@ -17,9 +17,14 @@ def get_datasets(dataset_name = "ogbg-molhiv", dataset_root = 'dataset/', debug=
 
     return train_dataset, valid_dataset, test_dataset
 
-def get_loaders(batch_size, dataset_name, dataset_root = 'dataset/', debug=False):
+def get_loaders(batch_size, dataset_name, task_id, dataset_root = 'dataset/', debug=False):
 
-    train_dataset, valid_dataset, test_dataset = get_datasets(dataset_name, dataset_root, debug)
+    train_dataset, valid_dataset, test_dataset = get_datasets(dataset_name, task_id, dataset_root, debug)
+
+    # limit the data only to the specified task
+    train_dataset.y = train_dataset.y[:,task_id]
+    valid_dataset.y = valid_dataset.y[:,task_id]
+    test_dataset.y = test_dataset.y[:,task_id]
 
     n_batches = math.ceil(len(train_dataset) / batch_size)
     n_train_minority_samples = train_dataset.y.sum()
