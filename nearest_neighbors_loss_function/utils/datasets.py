@@ -19,7 +19,7 @@ def get_datasets(dataset_name = "ogbg-molhiv", dataset_root = 'dataset/', debug=
 
 def get_loaders(batch_size, dataset_name, task_id, dataset_root = 'dataset/', debug=False):
 
-    train_dataset, valid_dataset, test_dataset = get_datasets(dataset_name, task_id, dataset_root, debug)
+    train_dataset, valid_dataset, test_dataset = get_datasets(dataset_name, dataset_root, debug)
 
     # limit the data only to the specified task
     train_dataset.y = train_dataset.y[:,task_id]
