@@ -24,9 +24,9 @@ def get_loaders(batch_size, dataset_name, task_id, dataset_root = 'dataset/', de
     print(f"Before filtering train_dataset.y.shape: {train_dataset.y.shape}")
 
     # limit the data only to the specified task
-    train_dataset.y = train_dataset.y[:,task_id]
-    valid_dataset.y = valid_dataset.y[:,task_id]
-    test_dataset.y = test_dataset.y[:,task_id]
+    train_dataset.y = train_dataset.y[:,task_id].unsqueeze(1)
+    valid_dataset.y = valid_dataset.y[:,task_id].unsqueeze(1)
+    test_dataset.y = test_dataset.y[:,task_id].unsqueeze(1)
 
     print(f"After filtering train_dataset.y.shape: {train_dataset.y.shape}")
 
