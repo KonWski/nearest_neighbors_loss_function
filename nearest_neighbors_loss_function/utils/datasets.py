@@ -21,6 +21,11 @@ def get_loaders(batch_size, dataset_name, task_id, dataset_root = 'dataset/', de
     n_batches = math.ceil(len(train_dataset) / batch_size)
     n_train_minority_samples = train_dataset.y.sum()
     minority_per_batch = int(n_train_minority_samples / n_batches)
+
+    print(f"n_train_minority_samples: {n_train_minority_samples}")
+    print(f"minority_per_batch: {minority_per_batch}")
+    print(f"batch_size: {batch_size}")
+    print(f"n_batches: {n_batches}")
     balanced_sampler = BalancedSampler(train_dataset.y, n_train_minority_samples, 1, minority_per_batch, batch_size, n_batches)
 
     train_loader = DataLoader(train_dataset, batch_sampler=balanced_sampler)
