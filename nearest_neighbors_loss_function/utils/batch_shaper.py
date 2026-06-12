@@ -54,9 +54,6 @@ class BatchShaper():
 
                 anchor_label = anchor_labels[anchor_iter]
 
-                print(f"anchor_labels: {anchor_labels}")
-                print(f"anchor_label: {anchor_label}")
-
                 if anchor_label == 1:
                     pos_pool = [id for id in indices_1 if id != anchor_iter]
                     neg_pool = indices_0
