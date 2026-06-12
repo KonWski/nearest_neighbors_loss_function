@@ -50,6 +50,9 @@ def prepare_dataset(ogbg_dataset, task_id, phase, debug):
         dataset = ogbg_dataset[phase_indices]
     
     dataset.y = dataset.y[:,task_id].unsqueeze(1)
+    print(f"dataset.y: {dataset.y}")
+    print(f"dataset.y.shape: {dataset.y.shape}")
+    
     logging.info(f"{phase}_dataset, n_obs_before_filter: {n_obs_before_filter},  n_obs_after_filter: {len(dataset)}, n_minority_class: {dataset.y.sum()}")
 
     return dataset
