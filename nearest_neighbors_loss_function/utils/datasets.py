@@ -4,25 +4,19 @@ import math
 from torch_geometric.loader import DataLoader
 import torch
 import logging
-from torch.utils.data import Subset
 
-def get_datasets(dataset_name = "ogbg-molhiv", dataset_root = 'dataset/', debug=False):
+def get_datasets(dataset_name = "ogbg-molhiv", dataset_root = 'dataset/', task_id=0, debug=False):
     ogbg_dataset = PygGraphPropPredDataset(name = dataset_name, root = dataset_root)
 
-    if debug:
-        train_dataset = ogbg_dataset[ogbg_dataset.get_idx_split()["train"][:10000]]
-        valid_dataset = ogbg_dataset[ogbg_dataset.get_idx_split()["valid"][:10000]]
-        test_dataset = ogbg_dataset[ogbg_dataset.get_idx_split()["test"][:10000]]
-    else:
-        train_dataset = ogbg_dataset[ogbg_dataset.get_idx_split()["train"]]
-        valid_dataset = ogbg_dataset[ogbg_dataset.get_idx_split()["valid"]]
-        test_dataset = ogbg_dataset[ogbg_dataset.get_idx_split()["test"]]
+    train_dataset = prepare_dataset(ogbg_dataset, task_id, "train", debug)
+    valid_dataset = prepare_dataset(ogbg_dataset, task_id, "valid", debug)
+    test_dataset = prepare_dataset(ogbg_dataset, task_id, "test", debug)
 
     return train_dataset, valid_dataset, test_dataset
 
 def get_loaders(batch_size, dataset_name, task_id, dataset_root = 'dataset/', debug=False):
 
-    train_dataset, valid_dataset, test_dataset = get_datasets(dataset_name, dataset_root, debug)
+    train_dataset, valid_dataset, test_dataset = get_datasets(dataset_name, dataset_root, task_id, debug)
 
     train_dataset = prepare_dataset(train_dataset, task_id, "train")
     valid_dataset = prepare_dataset(valid_dataset, task_id, "valid")
@@ -40,17 +34,21 @@ def get_loaders(batch_size, dataset_name, task_id, dataset_root = 'dataset/', de
     return train_loader, valid_loader, test_loader
 
 
-def prepare_dataset(dataset, task_id, phase):
-    
-    # select task
-    dataset.y = dataset.y[:,task_id].unsqueeze(1)    
-    
-    # filter out nans
-    not_nan_indices = ~torch.isnan(dataset.y).any(dim=1)
-    # dataset.y = dataset.y[not_nan_indices]
-    # dataset.x = dataset.x[not_nan_indices]
-    
-    subset = Subset(dataset, not_nan_indices)
-    logging.info(f"{phase}_dataset len: {len(dataset)}, n_minority_class: {dataset.y.sum()}")
+def prepare_dataset(ogbg_dataset, task_id, phase, debug):
 
-    return subset
+    # find not nan labels
+    phase_indices = ogbg_dataset.get_idx_split()[phase]
+    n_obs_before_filter = len(phase_indices)
+    labels = ogbg_dataset[phase_indices].y[:,task_id].unsqueeze(1)
+    not_nan_indices = ~torch.isnan(labels).any(dim=1)
+    phase_indices = phase_indices[not_nan_indices]
+
+    if debug:
+        dataset = ogbg_dataset[phase_indices[:10000]]
+    else:
+        dataset = ogbg_dataset[phase_indices]
+    
+    dataset.y = dataset.y[:,task_id].unsqueeze(1)
+    logging.info(f"{phase}_dataset, n_obs_before_filter: {n_obs_before_filter},  n_obs_after_filter: {len(dataset)}, n_minority_class: {dataset.y.sum()}")
+
+    return dataset
