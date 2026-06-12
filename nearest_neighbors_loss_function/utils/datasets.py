@@ -49,7 +49,7 @@ def prepare_dataset(ogbg_dataset, task_id, phase, debug):
     else:
         dataset = ogbg_dataset[phase_indices]
     
-    # dataset.y = dataset.y[:,task_id].unsqueeze(1)
+    dataset.y = dataset.y[:,task_id].unsqueeze(1)
     # print(f"dataset.y: {dataset.y}")
     # print(f"dataset.y.shape: {dataset.y.shape}")
     
