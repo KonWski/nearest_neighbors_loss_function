@@ -36,7 +36,7 @@ def prepare_dataset(ogbg_dataset, phase, debug):
     # find not nan labels
     phase_indices = ogbg_dataset.get_idx_split()[phase]
     n_obs_before_filter = len(phase_indices)
-    labels = ogbg_dataset[phase_indices].y.unsqueeze(1)
+    labels = ogbg_dataset[phase_indices].y
     not_nan_indices = ~torch.isnan(labels).any(dim=1)
     phase_indices = phase_indices[not_nan_indices]
 
