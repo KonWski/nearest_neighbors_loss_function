@@ -7,10 +7,12 @@ import logging
 
 def get_datasets(dataset_name = "ogbg-molhiv", dataset_root = 'dataset/', task_id=0, debug=False):
     ogbg_dataset = PygGraphPropPredDataset(name = dataset_name, root = dataset_root)
+    ogbg_dataset.data.y = ogbg_dataset.data.y[:, task_id]
+    ogbg_dataset.data.y = ogbg_dataset.data.y[:, task_id]
 
-    train_dataset = prepare_dataset(ogbg_dataset, task_id, "train", debug)
-    valid_dataset = prepare_dataset(ogbg_dataset, task_id, "valid", debug)
-    test_dataset = prepare_dataset(ogbg_dataset, task_id, "test", debug)
+    train_dataset = prepare_dataset(ogbg_dataset, "train", debug)
+    valid_dataset = prepare_dataset(ogbg_dataset, "valid", debug)
+    test_dataset = prepare_dataset(ogbg_dataset, "test", debug)
 
     return train_dataset, valid_dataset, test_dataset
 
@@ -21,11 +23,6 @@ def get_loaders(batch_size, dataset_name, task_id, dataset_root = 'dataset/', de
     n_batches = math.ceil(len(train_dataset) / batch_size)
     n_train_minority_samples = int(train_dataset.y.sum())
     minority_per_batch = int(n_train_minority_samples / n_batches)
-
-    print(f"n_train_minority_samples: {n_train_minority_samples}")
-    print(f"minority_per_batch: {minority_per_batch}")
-    print(f"batch_size: {batch_size}")
-    print(f"n_batches: {n_batches}")
     balanced_sampler = BalancedSampler(train_dataset.y, n_train_minority_samples, 1, minority_per_batch, batch_size, n_batches)
 
     train_loader = DataLoader(train_dataset, batch_sampler=balanced_sampler)
@@ -35,12 +32,12 @@ def get_loaders(batch_size, dataset_name, task_id, dataset_root = 'dataset/', de
     return train_loader, valid_loader, test_loader
 
 
-def prepare_dataset(ogbg_dataset, task_id, phase, debug):
+def prepare_dataset(ogbg_dataset, phase, debug):
 
     # find not nan labels
     phase_indices = ogbg_dataset.get_idx_split()[phase]
     n_obs_before_filter = len(phase_indices)
-    labels = ogbg_dataset[phase_indices].y[:,task_id].unsqueeze(1)
+    labels = ogbg_dataset[phase_indices].y.unsqueeze(1)
     not_nan_indices = ~torch.isnan(labels).any(dim=1)
     phase_indices = phase_indices[not_nan_indices]
 
@@ -49,7 +46,7 @@ def prepare_dataset(ogbg_dataset, task_id, phase, debug):
     else:
         dataset = ogbg_dataset[phase_indices]
     
-    dataset.y = dataset.y[:,task_id].unsqueeze(1)
+    # dataset.y = dataset.y[:,task_id].unsqueeze(1)
     # print(f"dataset.y: {dataset.y}")
     # print(f"dataset.y.shape: {dataset.y.shape}")
     
