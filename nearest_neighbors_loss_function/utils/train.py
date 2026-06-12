@@ -159,7 +159,7 @@ def train(model, train_loader, n_train_samples, task_id, optimizer, loss_functio
 
         data = data.to(device)
         gamma_calculator.recalculate_gamma_values(model, train_loader, n_train_samples, data_id)
-        labels = data.y[:, task_id]
+        labels = data.y
         n_samples = labels.shape[0]
         gamma_end_id = gamma_start_id + n_samples
 
