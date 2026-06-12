@@ -8,7 +8,6 @@ import logging
 def get_datasets(dataset_name = "ogbg-molhiv", dataset_root = 'dataset/', task_id=0, debug=False):
     ogbg_dataset = PygGraphPropPredDataset(name = dataset_name, root = dataset_root)
     ogbg_dataset.data.y = ogbg_dataset.data.y[:, task_id].unsqueeze(1)
-    ogbg_dataset.y = ogbg_dataset.y[:, task_id].unsqueeze(1)
 
     train_dataset = prepare_dataset(ogbg_dataset, "train", debug)
     valid_dataset = prepare_dataset(ogbg_dataset, "valid", debug)
