@@ -32,6 +32,7 @@ def get_loaders(batch_size, dataset_name, task_id, dataset_root = 'dataset/', de
 
     n_batches = math.ceil(len(train_dataset) / batch_size)
     print(f"n_batches: {n_batches}")
+    print(train_dataset.y)
     n_train_minority_samples = train_dataset.y.sum()
     print(f"n_train_minority_samples: {n_train_minority_samples}")
     minority_per_batch = int(n_train_minority_samples / n_batches)
