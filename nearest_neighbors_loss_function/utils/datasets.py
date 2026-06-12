@@ -2,6 +2,8 @@ from ogb.graphproppred.dataset_pyg import PygGraphPropPredDataset
 from nearest_neighbors_loss_function.utils.balanced_sampler import BalancedSampler
 import math
 from torch_geometric.loader import DataLoader
+import torch
+import logging
 
 def get_datasets(dataset_name = "ogbg-molhiv", dataset_root = 'dataset/', debug=False):
     ogbg_dataset = PygGraphPropPredDataset(name = dataset_name, root = dataset_root)
@@ -21,22 +23,13 @@ def get_loaders(batch_size, dataset_name, task_id, dataset_root = 'dataset/', de
 
     train_dataset, valid_dataset, test_dataset = get_datasets(dataset_name, dataset_root, debug)
 
-    print(f"Before filtering train_dataset.y.shape: {train_dataset.y.shape}")
-
-    # limit the data only to the specified task
-    train_dataset.y = train_dataset.y[:,task_id].unsqueeze(1)
-    valid_dataset.y = valid_dataset.y[:,task_id].unsqueeze(1)
-    test_dataset.y = test_dataset.y[:,task_id].unsqueeze(1)
-
-    print(f"After filtering train_dataset.y.shape: {train_dataset.y.shape}")
+    train_dataset = prepare_dataset(train_dataset, task_id, "train")
+    valid_dataset = prepare_dataset(valid_dataset, task_id, "valid")
+    test_dataset = prepare_dataset(test_dataset, task_id, "test")
 
     n_batches = math.ceil(len(train_dataset) / batch_size)
-    print(f"n_batches: {n_batches}")
-    print(train_dataset.y)
     n_train_minority_samples = train_dataset.y.sum()
-    print(f"n_train_minority_samples: {n_train_minority_samples}")
     minority_per_batch = int(n_train_minority_samples / n_batches)
-    print(f"minority_per_batch: {minority_per_batch}")
     balanced_sampler = BalancedSampler(train_dataset.y, n_train_minority_samples, 1, minority_per_batch, batch_size, n_batches)
 
     train_loader = DataLoader(train_dataset, batch_sampler=balanced_sampler)
@@ -44,3 +37,18 @@ def get_loaders(batch_size, dataset_name, task_id, dataset_root = 'dataset/', de
     test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False)
 
     return train_loader, valid_loader, test_loader
+
+
+def prepare_dataset(dataset, task_id, phase):
+    
+    # select task
+    dataset.y = dataset.y[:,task_id].unsqueeze(1)    
+    
+    # filter out nans
+    not_nan_indices = ~torch.isnan(dataset.y).any(dim=1)
+    dataset.y = dataset.y[not_nan_indices]
+    dataset.X = dataset.X[not_nan_indices]
+    
+    logging.info(f"{phase}_dataset len: {dataset.shape[0]}, n_minority_class: {dataset.y.sum()}")
+
+    return dataset
