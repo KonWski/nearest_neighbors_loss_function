@@ -4,6 +4,7 @@ import math
 from torch_geometric.loader import DataLoader
 import torch
 import logging
+from torch.utils.data import Subset
 
 def get_datasets(dataset_name = "ogbg-molhiv", dataset_root = 'dataset/', debug=False):
     ogbg_dataset = PygGraphPropPredDataset(name = dataset_name, root = dataset_root)
@@ -46,9 +47,10 @@ def prepare_dataset(dataset, task_id, phase):
     
     # filter out nans
     not_nan_indices = ~torch.isnan(dataset.y).any(dim=1)
-    dataset.y = dataset.y[not_nan_indices]
-    dataset.X = dataset.X[not_nan_indices]
+    # dataset.y = dataset.y[not_nan_indices]
+    # dataset.x = dataset.x[not_nan_indices]
     
+    subset = Subset(dataset, not_nan_indices)
     logging.info(f"{phase}_dataset len: {dataset.shape[0]}, n_minority_class: {dataset.y.sum()}")
 
-    return dataset
+    return subset
