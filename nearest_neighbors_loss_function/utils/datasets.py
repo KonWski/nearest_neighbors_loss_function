@@ -21,14 +21,21 @@ def get_loaders(batch_size, dataset_name, task_id, dataset_root = 'dataset/', de
 
     train_dataset, valid_dataset, test_dataset = get_datasets(dataset_name, dataset_root, debug)
 
+    print(f"Before filtering train_dataset.y.shape: {train_dataset.y.shape}")
+
     # limit the data only to the specified task
     train_dataset.y = train_dataset.y[:,task_id]
     valid_dataset.y = valid_dataset.y[:,task_id]
     test_dataset.y = test_dataset.y[:,task_id]
 
+    print(f"After filtering train_dataset.y.shape: {train_dataset.y.shape}")
+
     n_batches = math.ceil(len(train_dataset) / batch_size)
+    print(f"n_batches: {n_batches}")
     n_train_minority_samples = train_dataset.y.sum()
+    print(f"n_train_minority_samples: {n_train_minority_samples}")
     minority_per_batch = int(n_train_minority_samples / n_batches)
+    print(f"minority_per_batch: {minority_per_batch}")
     balanced_sampler = BalancedSampler(train_dataset.y, n_train_minority_samples, 1, minority_per_batch, batch_size, n_batches)
 
     train_loader = DataLoader(train_dataset, batch_sampler=balanced_sampler)
