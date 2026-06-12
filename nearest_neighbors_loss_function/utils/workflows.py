@@ -25,6 +25,7 @@ def train_workflow(args):
         valid_loader=valid_loader,
         training_type=args.training_type,
         batch_size=args.batch_size,
+        task_id=args.task_id,
         triplet_loss_margin=args.triplet_loss_margin,
         batch_shaper_margin=args.batch_shaper_margin,
         gamma_recalculation_strategy=args.gamma_recalculation_strategy,

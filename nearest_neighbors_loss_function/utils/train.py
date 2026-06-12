@@ -20,7 +20,8 @@ def train_triplet(
         seeds: List[int], 
         train_loader, 
         valid_loader, 
-        training_type: str, 
+        training_type: str,
+        task_id: int,  
         batch_size: int, 
         triplet_loss_margin: float,
         batch_shaper_margin: float,
@@ -85,7 +86,7 @@ def train_triplet(
             model_epoch_hash = uuid4().hex
             logging.info(f"Epoch: {epoch + 1}/{n_epochs}")
 
-            model, optimizer, loss_function, train_basic_stats = train(model, train_loader, n_train_samples, optimizer, loss_function, 
+            model, optimizer, loss_function, train_basic_stats = train(model, train_loader, n_train_samples, task_id, optimizer, loss_function, 
                                                                  batch_shaper, gamma_calculator, seed, epoch, model_epoch_hash, device)
 
             train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_length, device)
@@ -144,7 +145,7 @@ def train_triplet(
     return statistics, best_seed_models, n_train_samples
 
 
-def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_shaper, gamma_calculator, seed, epoch, model_epoch_hash, device):
+def train(model, train_loader, n_train_samples, task_id, optimizer, loss_function, batch_shaper, gamma_calculator, seed, epoch, model_epoch_hash, device):
 
     model.train()
 
@@ -158,7 +159,7 @@ def train(model, train_loader, n_train_samples, optimizer, loss_function, batch_
 
         data = data.to(device)
         gamma_calculator.recalculate_gamma_values(model, train_loader, n_train_samples, data_id)
-        labels = data.y
+        labels = data.y[:, task_id]
         n_samples = labels.shape[0]
         gamma_end_id = gamma_start_id + n_samples
 
