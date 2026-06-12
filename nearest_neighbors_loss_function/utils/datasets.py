@@ -51,6 +51,6 @@ def prepare_dataset(dataset, task_id, phase):
     # dataset.x = dataset.x[not_nan_indices]
     
     subset = Subset(dataset, not_nan_indices)
-    logging.info(f"{phase}_dataset len: {dataset.shape[0]}, n_minority_class: {dataset.y.sum()}")
+    logging.info(f"{phase}_dataset len: {len(dataset)}, n_minority_class: {dataset.y.sum()}")
 
     return subset
