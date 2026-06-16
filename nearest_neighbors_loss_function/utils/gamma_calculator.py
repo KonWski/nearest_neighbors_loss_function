@@ -96,7 +96,7 @@ class GammaCalculator():
     def get_gamma_values(self, gamma_start_id, gamma_end_id, positive_mf_distances, negative_mf_distances):
         batch_gamma_values = self.gamma_values[gamma_start_id: gamma_end_id]
         
-        if self.density_awareness:
+        if self.samples_difficultness:
             samples_difficultness = positive_mf_distances / negative_mf_distances
             batch_gamma_values = batch_gamma_values * (1 + self.lambda_samples_difficultness * samples_difficultness)
 
