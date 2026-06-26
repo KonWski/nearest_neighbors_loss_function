@@ -83,6 +83,18 @@ def test_workflow(args):
     n_valid_samples = len(valid_loader.dataset)
     n_test_samples = len(test_loader.dataset)
 
+    evaluate_model_params = EvaluateModelParams(
+        evaluation_model_name=args.evaluation_model_name,
+        knn_n_neighbors=args.knn_n_neighbors,
+
+        rf_n_estimators=args.rf_n_estimators,
+        rf_min_samples_split=args.rf_min_samples_split,
+        rf_min_samples_leaf=args.rf_min_samples_leaf,
+        rf_criterion=args.rf_criterion,
+        rf_max_depth=args.rf_max_depth,
+        rf_class_weight=args.rf_class_weight
+    )
+
     for seed in os.listdir(args.save_path):
 
         # double check if its the seed dir
@@ -100,7 +112,7 @@ def test_workflow(args):
 
         statistics = test_model(str(models[0]), args.model_name, args.model_in_channels, args.model_hidden_channels, args.model_n_blocks, args.embedding_length, 
                                 train_loader, n_train_samples, valid_loader, n_valid_samples, test_loader, n_test_samples, 
-                                args.evaluation_model_name, args.knn_n_neighbors, statistics, int(seed), device)
+                                evaluate_model_params, statistics, int(seed), device)
 
     statistics.save()
 
