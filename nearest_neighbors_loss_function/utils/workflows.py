@@ -75,14 +75,14 @@ def test_workflow(args):
     import random
     import traceback
 
-    _orig = random.random
+    _orig = random
 
     def traced_random():
         print("random.random() called")
         traceback.print_stack(limit=10)
         return _orig()
 
-    random.random = traced_random
+    random = traced_random
 
     log_args(args)
     experiment_hash = args.save_path.split("/")[-1]
