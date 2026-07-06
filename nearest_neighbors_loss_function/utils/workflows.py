@@ -72,6 +72,18 @@ def train_workflow(args):
 
 def test_workflow(args):
 
+    import random
+    import traceback
+
+    _orig = random.random
+
+    def traced_random():
+        print("random.random() called")
+        traceback.print_stack(limit=10)
+        return _orig()
+
+    random.random = traced_random
+
     log_args(args)
     experiment_hash = args.save_path.split("/")[-1]
     statistics = Statistics(args.n_epochs, args.save_path, experiment_hash, args.optimized_param_name, -1, "test_report")
