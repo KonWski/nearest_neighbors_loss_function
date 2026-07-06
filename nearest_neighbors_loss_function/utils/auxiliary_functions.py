@@ -20,6 +20,7 @@ def set_seed(seed: int):
     # CuDNN determinism
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
+    torch.use_deterministic_algorithms(True)
 
 
 def create_experiment_dir(path: str, experiment_hash: str):
