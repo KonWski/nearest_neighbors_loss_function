@@ -77,7 +77,7 @@ def test_workflow(args):
 
     _orig = random.seed
 
-    def traced_random():
+    def traced_random(seed):
         print("random.seed() called")
         traceback.print_stack(limit=10)
         return _orig()
