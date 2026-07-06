@@ -90,7 +90,7 @@ def test_workflow(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, debug=False)
-    train_loader.batch_sampler.shuffle_data()
+    # train_loader.batch_sampler.shuffle_data()
     n_train_samples = len(train_loader.dataset)
     n_valid_samples = len(valid_loader.dataset)
     n_test_samples = len(test_loader.dataset)
