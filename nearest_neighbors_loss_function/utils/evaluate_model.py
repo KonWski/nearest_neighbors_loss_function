@@ -178,9 +178,9 @@ def test_model(model_path, model_name, model_in_channels, model_hidden_channels,
     test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_length, device)
 
     valid_stats, _ = evaluate_model(model, "valid", train_embeddings, train_labels, valid_embeddings, 
-                                    valid_labels, evaluate_model_params, "valid")
+                                    valid_labels, evaluate_model_params, "valid", seed)
     test_stats, _ = evaluate_model(model, "test", train_embeddings, train_labels, test_embeddings, 
-                                    test_labels, evaluate_model_params, "test")
+                                    test_labels, evaluate_model_params, "test", seed)
     basic_stats = {"running_type": model_path.split("/")[-4], "seed": seed, "epoch": checkpoint["epoch"]}
     logging.info(f"{basic_stats}, {valid_stats}, {test_stats}")
 
