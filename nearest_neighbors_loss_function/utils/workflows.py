@@ -72,25 +72,12 @@ def train_workflow(args):
 
 def test_workflow(args):
 
-    import random
-    import traceback
-
-    _orig = random.seed
-
-    def traced_random(seed):
-        print("random.seed() called")
-        traceback.print_stack(limit=10)
-        return _orig()
-
-    random.seed = traced_random
-
     log_args(args)
     experiment_hash = args.save_path.split("/")[-1]
     statistics = Statistics(args.n_epochs, args.save_path, experiment_hash, args.optimized_param_name, -1, "test_report")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, debug=False)
-    # train_loader.batch_sampler.shuffle_data()
     n_train_samples = len(train_loader.dataset)
     n_valid_samples = len(valid_loader.dataset)
     n_test_samples = len(test_loader.dataset)

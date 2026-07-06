@@ -170,6 +170,7 @@ def test_model(model_path, model_name, model_in_channels, model_hidden_channels,
                evaluate_model_params, statistics, seed, device):
     
     set_seed(seed)
+    train_loader.batch_sampler.shuffle_data()
     model, checkpoint = load_model(model_path, model_name, model_in_channels, model_hidden_channels, model_n_blocks, embedding_length)
     model.to(device)
 
