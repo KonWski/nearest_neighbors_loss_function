@@ -21,19 +21,11 @@ class BalancedSampler(BatchSampler):
             i for i, y in enumerate(labels) if y != minority_class
         ]
 
-        print("BEFORE SHUFFLE")
-        print(f"self.minority_indices[:5]: {self.minority_indices[:5]}")
-        print(f"self.majority_indices[:5]: {self.majority_indices[:5]}")
-
 
     def shuffle_data(self):
         random.shuffle(self.minority_indices)
         random.shuffle(self.majority_indices)
         self.extra_minority_batch_ids = set(random.sample([i for i in range(self.n_batches)], self.n_extra_minority_batches))
-
-        print("AFTER SHUFFLE")
-        print(f"self.minority_indices[:5]: {self.minority_indices[:5]}")
-        print(f"self.majority_indices[:5]: {self.majority_indices[:5]}")
 
 
     def __iter__(self):

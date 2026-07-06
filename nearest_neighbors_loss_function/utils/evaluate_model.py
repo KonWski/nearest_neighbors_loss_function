@@ -174,20 +174,9 @@ def test_model(model_path, model_name, model_in_channels, model_hidden_channels,
     model, checkpoint = load_model(model_path, model_name, model_in_channels, model_hidden_channels, model_n_blocks, embedding_length)
     model.to(device)
 
-    print("TRAIN")
     train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_length, device)
-    print(train_embeddings[:5])
-
-    print("VALID")
     valid_embeddings, valid_labels = generate_embeddings(model, valid_loader, n_valid_samples, embedding_length, device)        
-    print(valid_embeddings[:5])
-
-    print("TEST")
     test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_length, device)
-    print(test_embeddings[:5])
-
-    # end of tests
-    exit()
 
     valid_stats, _ = evaluate_model(model, "valid", train_embeddings, train_labels, valid_embeddings, 
                                     valid_labels, evaluate_model_params, "valid", seed)
