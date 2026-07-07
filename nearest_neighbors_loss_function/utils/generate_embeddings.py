@@ -20,9 +20,6 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, device)
         
         for _, data in enumerate(data_loader):
 
-            if _ == 0:
-                print(data[:5])
-
             data = data.to(device)
             data = adjust_graph_data_dtype(data, model)
             n_samples_batch = data.y.shape[0]
