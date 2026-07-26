@@ -1,5 +1,5 @@
 from nearest_neighbors_loss_function.utils.batch_shaper import BatchShaper
-from nearest_neighbors_loss_function.utils.auxiliary_functions import create_experiment_dir, \
+from nearest_neighbors_loss_function.utils.auxiliary_functions import create_hash_dir, \
     create_model_dir, set_seed, adjust_graph_data_dtype, get_model
 from nearest_neighbors_loss_function.utils.gamma_calculator import GammaCalculator
 from nearest_neighbors_loss_function.utils.statistics import Statistics
@@ -36,7 +36,7 @@ def train_triplet(
         n_evaluation_models: int,
         evaluate_model_params: EvaluateModelParams,
         n_epochs: int, 
-        save_path: str, 
+        group_experiment_save_path: str, 
         lr: float, 
         model_name: str,
         model_in_channels: int,
@@ -51,7 +51,7 @@ def train_triplet(
     logging.info(f"Initiating experiment")
 
     experiment_hash = uuid4().hex
-    experiment_dir_path = create_experiment_dir(save_path, experiment_hash)
+    experiment_dir_path = create_hash_dir(group_experiment_save_path, experiment_hash)
     
     statistics = Statistics(n_epochs, experiment_dir_path, experiment_hash, optimized_param_name, early_stop_window_size)
     best_seed_models = {}

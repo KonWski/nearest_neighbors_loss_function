@@ -5,8 +5,11 @@ from .evaluate_model import test_best_seed_model, test_model
 import logging
 from nearest_neighbors_loss_function.utils.statistics import Statistics
 from nearest_neighbors_loss_function.utils.evaluate_model_params import EvaluateModelParams
+from nearest_neighbors_loss_function.utils.train_param_holder import TrainParamHolder
+from nearest_neighbors_loss_function.utils.auxiliary_functions import create_hash_dir
 import os
 from pathlib import Path
+from uuid import uuid4
 
 def train_workflow(args):
     
@@ -14,60 +17,68 @@ def train_workflow(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, debug=args.debug)
+    
     evaluate_model_params = EvaluateModelParams(
         evaluation_model_name="knn",
         knn_n_neighbors=args.knn_n_neighbors
     )
 
-    statistics, best_seed_models, n_train_samples = train_triplet(
-        seeds=args.seeds,
-        train_loader=train_loader,
-        valid_loader=valid_loader,
-        training_type=args.training_type,
-        batch_size=args.batch_size,
-        task_id=args.task_id,
-        triplet_loss_margin=args.triplet_loss_margin,
-        batch_shaper_margin=args.batch_shaper_margin,
-        gamma_recalculation_strategy=args.gamma_recalculation_strategy,
-        gamma_function=args.gamma_function,
-        weight_distances=args.weight_distances,
-        focal_pow=args.focal_pow,
-        density_awareness=args.density_awareness,
-        density_function=args.density_function,
-        samples_difficultness=args.samples_difficultness,
-        lambda_samples_difficultness=args.lambda_samples_difficultness,
-        n_evaluation_models=args.n_evaluation_models,
-        evaluate_model_params=evaluate_model_params,
-        n_epochs=args.n_epochs,
-        save_path=args.save_path,
-        lr=args.lr,
-        model_name=args.model_name,
-        model_in_channels=args.model_in_channels,
-        model_hidden_channels=args.model_hidden_channels,
-        model_n_blocks=args.model_n_blocks,
-        embedding_length=args.embedding_length,
-        optimized_param_name=args.optimized_param_name,
-        early_stop_window_size=args.early_stop_window_size,
-        device=device
-    )
+    train_param_holder = TrainParamHolder(args)
 
-    statistics = test_best_seed_model(
-        args.model_name,
-        statistics, 
-        best_seed_models, 
-        args.model_in_channels, 
-        args.model_hidden_channels,
-        args.model_n_blocks,
-        args.embedding_length, 
-        train_loader,
-        n_train_samples,
-        test_loader,
-        evaluate_model_params,
-        "test", 
-        device
-    )
+    group_experiment_hash = uuid4().hex
+    group_experiment_save_path = create_hash_dir(args.save_path, group_experiment_hash)
 
-    statistics.save()
+    for train_params in train_param_holder:
+
+        statistics, best_seed_models, n_train_samples = train_triplet(
+            seeds=train_params.seeds,
+            train_loader=train_loader,
+            valid_loader=valid_loader,
+            training_type=train_params.training_type,
+            batch_size=train_params.batch_size,
+            task_id=train_params.task_id,
+            triplet_loss_margin=train_params.triplet_loss_margin,
+            batch_shaper_margin=train_params.batch_shaper_margin,
+            gamma_recalculation_strategy=train_params.gamma_recalculation_strategy,
+            gamma_function=train_params.gamma_function,
+            weight_distances=train_params.weight_distances,
+            focal_pow=train_params.focal_pow,
+            density_awareness=train_params.density_awareness,
+            density_function=train_params.density_function,
+            samples_difficultness=train_params.samples_difficultness,
+            lambda_samples_difficultness=train_params.lambda_samples_difficultness,
+            n_evaluation_models=train_params.n_evaluation_models,
+            evaluate_model_params=evaluate_model_params,
+            n_epochs=train_params.n_epochs,
+            group_experiment_save_path=group_experiment_save_path,
+            lr=train_params.lr,
+            model_name=train_params.model_name,
+            model_in_channels=train_params.model_in_channels,
+            model_hidden_channels=train_params.model_hidden_channels,
+            model_n_blocks=train_params.model_n_blocks,
+            embedding_length=train_params.embedding_length,
+            optimized_param_name=train_params.optimized_param_name,
+            early_stop_window_size=train_params.early_stop_window_size,
+            device=device
+        )
+
+        statistics = test_best_seed_model(
+            args.model_name,
+            statistics, 
+            best_seed_models, 
+            args.model_in_channels, 
+            args.model_hidden_channels,
+            args.model_n_blocks,
+            args.embedding_length, 
+            train_loader,
+            n_train_samples,
+            test_loader,
+            evaluate_model_params,
+            "test", 
+            device
+        )
+
+        statistics.save()
 
 
 def test_workflow(args):

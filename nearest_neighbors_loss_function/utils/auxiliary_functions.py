@@ -22,11 +22,10 @@ def set_seed(seed: int):
     torch.backends.cudnn.benchmark = False
     torch.use_deterministic_algorithms(True)
 
-
-def create_experiment_dir(path: str, experiment_hash: str):
-    experiment_dir_path = os.path.join(path, experiment_hash)
-    os.makedirs(experiment_dir_path)
-    return experiment_dir_path
+def create_hash_dir(path: str, experiment_hash: str):
+    hash_dir_path = os.path.join(path, experiment_hash)
+    os.makedirs(hash_dir_path)
+    return hash_dir_path
 
 
 def create_model_dir(experiment_dir_path: str, seed: int):

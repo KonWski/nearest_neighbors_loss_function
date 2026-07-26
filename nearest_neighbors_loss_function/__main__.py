@@ -22,7 +22,10 @@ def parse_training_args():
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--triplet_loss_margin", type=float, default=0.5)
     parser.add_argument("--batch_shaper_margin", type=float, default=0.5)
-    parser.add_argument("--gamma_recalculation_strategy", type=int, required=True)
+
+    # parser.add_argument("--gamma_recalculation_strategy", type=int, required=True)
+    parser.add_argument("--gamma_recalculation_strategy", nargs="+", type=int, required=True)
+    
     parser.add_argument("--gamma_function", type=str, required=True, default=None)
     parser.add_argument("--weight_distances", action="store_true")
 
