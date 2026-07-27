@@ -26,7 +26,9 @@ class TrainParamHolder:
                 n_combinations = n_combinations * len(argument)
 
         list_param_combinations = product([self.args[param_name] for param_name in list_params])
-        starting_combination = {param: arguments for param, arguments in self.args.items() if param not in list_params}
+        training_params = TrainModelParams().get_keys()
+        starting_combination = {param: arguments for param, arguments in self.args.items() 
+                                if param not in list_params and param not in training_params}
 
         for args_combination in list_param_combinations:
             combination = TrainModelParams()

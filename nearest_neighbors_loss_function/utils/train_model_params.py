@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 from typing import List
 
 @dataclass
@@ -28,3 +28,6 @@ class TrainModelParams:
         embedding_length: int = None
         optimized_param_name: str = None
         early_stop_window_size: int = None
+    
+        def get_keys(self):
+            return set([f.name for f in fields(self)])
