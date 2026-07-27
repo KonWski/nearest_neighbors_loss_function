@@ -29,6 +29,7 @@ class TrainParamHolder:
         training_params = TrainModelParams().get_keys()
         starting_combination = {param: arguments for param, arguments in self.args.items() 
                                 if param not in list_params and param in training_params}
+        print(f"list_params: {list_params}")
         print(f"training_params: {training_params}")
         print(f"args: {self.args}")
         print(f"starting_combination: {starting_combination}")
