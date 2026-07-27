@@ -4,10 +4,13 @@ from dataclasses import replace
 
 class TrainParamHolder:
 
-    def __iter__(self, args):
+    def __init__(self, args):
         self.args = args
         self.combinations = self._generate_combinations()
         self.start = 0
+
+    def __iter__(self):
+        return self
 
     def _generate_combinations(self):
 
