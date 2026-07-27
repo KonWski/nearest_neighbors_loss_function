@@ -5,7 +5,7 @@ from dataclasses import replace
 class TrainParamHolder:
 
     def __init__(self, args):
-        self.args = args
+        self.args = vars(args)
         self.combinations = self._generate_combinations()
         self.start = 0
 
