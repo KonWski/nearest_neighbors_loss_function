@@ -22,7 +22,7 @@ class TrainParamHolder:
         list_args = {}
 
         for param, argument in self.args.items():
-            if isinstance(argument, list):
+            if isinstance(argument, list) and param != "seeds":
                 list_args[param] = argument
                 list_params.append(param)
                 n_combinations = n_combinations * len(argument)
