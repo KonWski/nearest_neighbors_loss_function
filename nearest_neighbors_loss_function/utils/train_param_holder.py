@@ -19,13 +19,16 @@ class TrainParamHolder:
 
         # check for lists inside of the input arguments
         list_params = []
+        list_args = {}
 
         for param, argument in self.args.items():
             if isinstance(argument, list):
+                list_args[param] = argument
                 list_params.append(param)
                 n_combinations = n_combinations * len(argument)
         print(f"list_params: {list_params}")
-        list_param_combinations = product(self.args[param_name] for param_name in list_params)
+        list_param_combinations = product(*list_args.values())
+
         training_params = TrainModelParams().get_keys()
         starting_combination = {param: arguments for param, arguments in self.args.items() 
                                 if param not in list_params and param in training_params}
