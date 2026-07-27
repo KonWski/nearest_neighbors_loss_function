@@ -14,6 +14,7 @@ class TrainParamHolder:
 
     def _generate_combinations(self):
 
+        combinations = []
         n_combinations = 0
 
         # check for lists inside of the input arguments
@@ -47,7 +48,7 @@ class TrainParamHolder:
             
             # add arguments from non-list parameters
             combination = replace(combination, **starting_combination)
-            self.combinations.append(combination)
+            combinations.append(combination)
 
         self.end = n_combinations
 
