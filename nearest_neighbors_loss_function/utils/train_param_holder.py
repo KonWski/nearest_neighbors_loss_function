@@ -24,7 +24,7 @@ class TrainParamHolder:
             if isinstance(argument, list):
                 list_params.append(param)
                 n_combinations = n_combinations * len(argument)
-
+        print(f"list_params: {list_params}")
         list_param_combinations = product([self.args[param_name] for param_name in list_params])
         training_params = TrainModelParams().get_keys()
         starting_combination = {param: arguments for param, arguments in self.args.items() 
