@@ -35,10 +35,12 @@ class TrainParamHolder:
         print(f"starting_combination: {starting_combination}")
 
         for args_combination in list_param_combinations:
+            print(f"args_combination: {args_combination}")
             combination = TrainModelParams()
 
             # add arguments from list parameters
             for param_name, argument in zip(list_params, args_combination):
+                print(f"{param_name}: {argument}")
                 combination = replace(combination, **{param_name: argument})
             
             # add arguments from non-list parameters
