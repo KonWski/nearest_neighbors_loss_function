@@ -15,7 +15,7 @@ class TrainParamHolder:
     def _generate_combinations(self):
 
         combinations = []
-        n_combinations = 0
+        n_combinations = 1
 
         # check for lists inside of the input arguments
         list_params = []
