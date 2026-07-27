@@ -2,7 +2,7 @@ from itertools import product
 from .train_model_params import TrainModelParams
 from dataclasses import replace
 
-class TrainParamHolder():
+class TrainParamHolder:
 
     def __iter__(self, args):
         self.args = args
