@@ -28,9 +28,9 @@ def train_workflow(args):
     group_experiment_hash = uuid4().hex
     group_experiment_save_path = create_hash_dir(args.save_path, group_experiment_hash)
 
-    print(f"train_params: {train_params}")
-
     for train_params in train_param_holder:
+
+        print(f"train_params: {train_params}")
 
         statistics, best_seed_models, n_train_samples = train_triplet(
             seeds=train_params.seeds,
