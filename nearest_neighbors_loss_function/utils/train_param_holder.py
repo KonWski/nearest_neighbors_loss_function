@@ -36,7 +36,7 @@ class TrainParamHolder:
                 combination = replace(combination, **{param_name: argument})
             
             # add arguments from non-list parameters
-            combination = combination.replace(combination, **starting_combination)
+            combination = replace(combination, **starting_combination)
             combinations.append(combination)
 
         self.end = n_combinations
