@@ -37,12 +37,12 @@ def parse_training_args():
 
     parser.add_argument("--evaluation_model_name", type=str, default="knn")
 
-    parser.add_argument("--knn_n_neighbors", nargs="+", type=int, required=True)
-    parser.add_argument("--rf_n_estimators", nargs="+", type=int, default=None)
-    parser.add_argument("--rf_min_samples_split", nargs="+", type=int, default=None)
-    parser.add_argument("--rf_min_samples_leaf", nargs="+", type=int, default=None)
+    parser.add_argument("--knn_n_neighbors", type=int, required=True)
+    parser.add_argument("--rf_n_estimators", type=int, default=None)
+    parser.add_argument("--rf_min_samples_split", type=int, default=None)
+    parser.add_argument("--rf_min_samples_leaf", type=int, default=None)
     parser.add_argument("--rf_criterion", type=str, default=None)
-    parser.add_argument("--rf_max_depth", nargs="+", type=int, default=None)
+    parser.add_argument("--rf_max_depth", type=int, default=None)
     parser.add_argument("--rf_class_weight", type=str, default=None)
 
     parser.add_argument("--n_evaluation_models", nargs="+", type=int, default=3)
