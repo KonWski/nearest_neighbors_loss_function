@@ -29,36 +29,36 @@ def parse_training_args():
     parser.add_argument("--gamma_function", type=str, required=True, default=None)
     parser.add_argument("--weight_distances", action="store_true")
 
-    parser.add_argument("--focal_pow", type=float, required=False, default=None)
+    parser.add_argument("--focal_pow", nargs="+", type=float, required=False, default=None)
 
     parser.add_argument("--density_awareness", action="store_true")
     parser.add_argument("--density_function", type=str, required=False)
     parser.add_argument("--samples_difficultness", action="store_true")
-    parser.add_argument("--lambda_samples_difficultness", type=float, default=0.0)
+    parser.add_argument("--lambda_samples_difficultness", nargs="+", type=float, default=0.0)
 
     parser.add_argument("--evaluation_model_name", type=str, default="knn")
 
-    parser.add_argument("--knn_n_neighbors", type=int, required=True)
-    parser.add_argument("--rf_n_estimators", type=int, default=None)
-    parser.add_argument("--rf_min_samples_split", type=int, default=None)
-    parser.add_argument("--rf_min_samples_leaf", type=int, default=None)
+    parser.add_argument("--knn_n_neighbors", nargs="+", type=int, required=True)
+    parser.add_argument("--rf_n_estimators", nargs="+", type=int, default=None)
+    parser.add_argument("--rf_min_samples_split", nargs="+", type=int, default=None)
+    parser.add_argument("--rf_min_samples_leaf", nargs="+", type=int, default=None)
     parser.add_argument("--rf_criterion", type=str, default=None)
-    parser.add_argument("--rf_max_depth", type=int, default=None)
+    parser.add_argument("--rf_max_depth", nargs="+", type=int, default=None)
     parser.add_argument("--rf_class_weight", type=str, default=None)
 
-    parser.add_argument("--n_evaluation_models", type=int, default=3)
+    parser.add_argument("--n_evaluation_models", nargs="+", type=int, default=3)
 
     parser.add_argument("--n_epochs", type=int, required=True)
     parser.add_argument("--save_path", type=str, required=True)
-    parser.add_argument("--lr", type=float, required=True)
+    parser.add_argument("--lr", nargs="+", type=float, required=True)
 
     parser.add_argument("--model_name", type=str, required=True)
-    parser.add_argument("--model_hidden_channels", type=int, required=True)
-    parser.add_argument("--model_in_channels", type=int, required=True)
-    parser.add_argument("--model_n_blocks", type=int, required=True)
-    parser.add_argument("--embedding_length", type=int, required=True)
+    parser.add_argument("--model_hidden_channels", nargs="+", type=int, required=True)
+    parser.add_argument("--model_in_channels", nargs="+", type=int, required=True)
+    parser.add_argument("--model_n_blocks", nargs="+", type=int, required=True)
+    parser.add_argument("--embedding_length", nargs="+", type=int, required=True)
     parser.add_argument("--optimized_param_name", type=str, required=True)
-    parser.add_argument("--early_stop_window_size", type=int, default=10)
+    parser.add_argument("--early_stop_window_size", nargs="+", type=int, default=10)
     parser.add_argument("--debug", action="store_true")
 
     args = parser.parse_known_args()[0]
