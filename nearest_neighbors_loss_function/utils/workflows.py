@@ -65,13 +65,13 @@ def train_workflow(args):
         )
 
         statistics = test_best_seed_model(
-            args.model_name,
+            train_params.model_name,
             statistics, 
             best_seed_models, 
-            args.model_in_channels, 
-            args.model_hidden_channels,
-            args.model_n_blocks,
-            args.embedding_length, 
+            train_params.model_in_channels, 
+            train_params.model_hidden_channels,
+            train_params.model_n_blocks,
+            train_params.embedding_length, 
             train_loader,
             n_train_samples,
             test_loader,
