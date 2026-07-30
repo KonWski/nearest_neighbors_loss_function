@@ -9,7 +9,7 @@ class TrainModelParams:
         batch_size: int = None 
         triplet_loss_margin: float = None 
         batch_shaper_margin: float = None 
-        gamma_recalculation_strategy: int = None  
+        gamma_recalculation_strategy: int = None
         gamma_function: str = None 
         weight_distances: bool = None 
         focal_pow: float = None 
