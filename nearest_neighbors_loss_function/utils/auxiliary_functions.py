@@ -5,7 +5,7 @@ import os
 import importlib
 from nearest_neighbors_loss_function.models import GINEConvEncoderResidualModel
 from torch_geometric import seed_everything
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, is_dataclass
 import yaml
 from argparse import Namespace
 
@@ -67,7 +67,7 @@ def get_model(model_name, in_channels, hidden_dim, model_n_blocks, embedding_siz
 def save_conf(conf, path, hash):
     "Saves group of experiments / experiment configuration to a yaml file"
 
-    if isinstance(conf, dataclass):
+    if is_dataclass(conf):
         d_conf = asdict(conf)
     elif isinstance(conf, Namespace):
         d_conf = vars(conf)
