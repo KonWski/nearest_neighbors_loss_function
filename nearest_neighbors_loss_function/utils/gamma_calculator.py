@@ -5,7 +5,6 @@ from sklearn.neighbors import KNeighborsClassifier
 import torch
 import math
 import torch.nn.functional as F
-import numpy as np
 
 class GammaCalculator():
 

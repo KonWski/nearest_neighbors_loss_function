@@ -36,7 +36,8 @@ def train_triplet(
         n_evaluation_models: int,
         evaluate_model_params: EvaluateModelParams,
         n_epochs: int, 
-        group_experiment_save_path: str, 
+        experiment_dir_path: str,
+        experiment_hash: str, 
         lr: float, 
         model_name: str,
         model_in_channels: int,
@@ -49,9 +50,6 @@ def train_triplet(
     ):
 
     logging.info(f"Initiating experiment")
-
-    experiment_hash = uuid4().hex
-    experiment_dir_path = create_hash_dir(group_experiment_save_path, experiment_hash)
     
     statistics = Statistics(n_epochs, experiment_dir_path, experiment_hash, optimized_param_name, early_stop_window_size)
     best_seed_models = {}

@@ -5,6 +5,8 @@ import os
 import importlib
 from nearest_neighbors_loss_function.models import GINEConvEncoderResidualModel
 from torch_geometric import seed_everything
+from dataclasses import asdict
+import yaml
 
 def set_seed(seed: int):
     '''Set randomness for random, numpy, PyTorch CPU, PyTorch GPU, '''
@@ -59,3 +61,14 @@ def get_model(model_name, in_channels, hidden_dim, model_n_blocks, embedding_siz
     model = cls(in_channels, hidden_dim, model_n_blocks, embedding_size)
 
     return model
+
+
+def save_conf(conf, path, hash):
+    "Saves group of experiments / experiment configuration to a yaml file"
+
+    d_conf = asdict(conf)
+    d_conf["hash"] = hash
+    conf_path = os.path.join(path, "conf.yaml")
+
+    with open(conf_path, "w") as f:
+        yaml.safe_dump(d_conf, f, sort_keys=False)

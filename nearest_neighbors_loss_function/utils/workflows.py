@@ -6,7 +6,7 @@ import logging
 from nearest_neighbors_loss_function.utils.statistics import Statistics
 from nearest_neighbors_loss_function.utils.evaluate_model_params import EvaluateModelParams
 from nearest_neighbors_loss_function.utils.train_param_holder import TrainParamHolder
-from nearest_neighbors_loss_function.utils.auxiliary_functions import create_hash_dir
+from nearest_neighbors_loss_function.utils.auxiliary_functions import create_hash_dir, save_conf
 import os
 from pathlib import Path
 from uuid import uuid4
@@ -27,10 +27,12 @@ def train_workflow(args):
 
     group_experiment_hash = uuid4().hex
     group_experiment_save_path = create_hash_dir(args.save_path, group_experiment_hash)
+    save_conf(args, group_experiment_save_path, group_experiment_hash)
 
     for train_params in train_param_holder:
 
-        print(f"train_params: {train_params}")
+        experiment_hash = uuid4().hex
+        experiment_dir_path = create_hash_dir(group_experiment_save_path, experiment_hash)
 
         statistics, best_seed_models, n_train_samples = train_triplet(
             seeds=train_params.seeds,
@@ -52,7 +54,8 @@ def train_workflow(args):
             n_evaluation_models=train_params.n_evaluation_models,
             evaluate_model_params=evaluate_model_params,
             n_epochs=train_params.n_epochs,
-            group_experiment_save_path=group_experiment_save_path,
+            experiment_dir_path=experiment_dir_path,
+            experiment_hash=experiment_hash,
             lr=train_params.lr,
             model_name=train_params.model_name,
             model_in_channels=train_params.model_in_channels,
