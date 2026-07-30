@@ -6,7 +6,7 @@ import importlib
 from nearest_neighbors_loss_function.models import GINEConvEncoderResidualModel
 from torch_geometric import seed_everything
 from dataclasses import asdict, is_dataclass
-import yaml
+import json
 from argparse import Namespace
 
 def set_seed(seed: int):
@@ -78,4 +78,4 @@ def save_conf(conf, path, hash):
     conf_path = os.path.join(path, "conf.yaml")
 
     with open(conf_path, "w") as f:
-        yaml.safe_dump(d_conf, f, sort_keys=False)
+        json.dump(d_conf, f, indent=2)
