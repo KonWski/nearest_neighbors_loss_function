@@ -27,12 +27,13 @@ def train_workflow(args):
 
     group_experiment_hash = uuid4().hex
     group_experiment_save_path = create_hash_dir(args.save_path, group_experiment_hash)
-    save_conf(args, group_experiment_save_path, group_experiment_hash)
+    save_conf(args, group_experiment_save_path, group_experiment_hash, "group_experiment")
 
     for train_params in train_param_holder:
 
         experiment_hash = uuid4().hex
         experiment_dir_path = create_hash_dir(group_experiment_save_path, experiment_hash)
+        save_conf(train_params, experiment_dir_path, experiment_hash, "experiment")
 
         statistics, best_seed_models, n_train_samples = train_triplet(
             seeds=train_params.seeds,

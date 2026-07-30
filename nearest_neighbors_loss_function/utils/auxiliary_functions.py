@@ -64,7 +64,7 @@ def get_model(model_name, in_channels, hidden_dim, model_n_blocks, embedding_siz
     return model
 
 
-def save_conf(conf, path, hash):
+def save_conf(conf, path, hash, file_name_prefix):
     "Saves group of experiments / experiment configuration to a yaml file"
 
     if is_dataclass(conf):
@@ -75,7 +75,7 @@ def save_conf(conf, path, hash):
         raise Exception("save_conf did not recognize the conf's class")
 
     d_conf["hash"] = hash
-    conf_path = os.path.join(path, "conf.json")
+    conf_path = os.path.join(path, f"{file_name_prefix}_conf.json")
 
     with open(conf_path, "w") as f:
         json.dump(d_conf, f, indent=2)
