@@ -75,7 +75,7 @@ def save_conf(conf, path, hash):
         raise Exception("save_conf did not recognize the conf's class")
 
     d_conf["hash"] = hash
-    conf_path = os.path.join(path, "conf.yaml")
+    conf_path = os.path.join(path, "conf.json")
 
     with open(conf_path, "w") as f:
         json.dump(d_conf, f, indent=2)
