@@ -63,4 +63,5 @@ class GraphAugmentation(BaseTransform):
 class FloatTransformation(BaseTransform):
   
     def forward(self, data):
-        return data.x.to(torch.float32)
+        data.x = data.x.to(torch.float32)
+        return data
