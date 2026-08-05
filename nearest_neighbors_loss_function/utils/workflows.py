@@ -4,9 +4,10 @@ from .train import train_triplet
 from .evaluate_model import test_best_seed_model, test_model
 import logging
 from nearest_neighbors_loss_function.utils.statistics import Statistics
-from nearest_neighbors_loss_function.utils.evaluate_model_params import EvaluateModelParams
-from nearest_neighbors_loss_function.utils.train_param_holder import TrainParamHolder
-from nearest_neighbors_loss_function.utils.auxiliary_functions import create_hash_dir, save_conf
+from nearest_neighbors_loss_function.params.evaluate_model_params import EvaluateModelParams
+from nearest_neighbors_loss_function.params.train_param_holder import TrainParamHolder
+from nearest_neighbors_loss_function.utils.auxiliary_functions import create_hash_dir, save_conf, args_validation
+from nearest_neighbors_loss_function.params.data_augmentation_params import DataAugmentationParams
 import os
 from pathlib import Path
 from uuid import uuid4
@@ -16,7 +17,17 @@ def train_workflow(args):
     log_args(args)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, debug=args.debug)
+    train_augmentation_params = DataAugmentationParams(
+        prob_add_gaussian_noise = args.prob_add_gaussian_noise,
+        feature_noise_std = args.feature_noise_std,
+        prob_mask_node_features = args.prob_mask_node_features,
+        mask_node_share = args.mask_node_share,
+        prob_mask_edge_features = args.prob_mask_edge_features,
+        mask_edge_share = args.mask_edge_share,
+    )
+
+    train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, 
+                                                          train_augmentation_params, debug=args.debug)
     
     evaluate_model_params = EvaluateModelParams(
         evaluation_model_name="knn",
@@ -90,11 +101,22 @@ def train_workflow(args):
 def test_workflow(args):
 
     log_args(args)
+    args_validation(args, args.workflow)
     experiment_hash = args.save_path.split("/")[-1]
     statistics = Statistics(args.n_epochs, args.save_path, experiment_hash, args.optimized_param_name, -1, "test_report")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, debug=False)
+    train_augmentation_params = DataAugmentationParams(
+        prob_add_gaussian_noise = args.prob_add_gaussian_noise,
+        feature_noise_std = args.feature_noise_std,
+        prob_mask_node_features = args.prob_mask_node_features,
+        mask_node_share = args.mask_node_share,
+        prob_mask_edge_features = args.prob_mask_edge_features,
+        mask_edge_share = args.mask_edge_share,
+    )
+
+    train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, 
+                                                          train_augmentation_params, debug=False)
     n_train_samples = len(train_loader.dataset)
     n_valid_samples = len(valid_loader.dataset)
     n_test_samples = len(test_loader.dataset)
@@ -102,7 +124,6 @@ def test_workflow(args):
     evaluate_model_params = EvaluateModelParams(
         evaluation_model_name=args.evaluation_model_name,
         knn_n_neighbors=args.knn_n_neighbors,
-
         rf_n_estimators=args.rf_n_estimators,
         rf_min_samples_split=args.rf_min_samples_split,
         rf_min_samples_leaf=args.rf_min_samples_leaf,

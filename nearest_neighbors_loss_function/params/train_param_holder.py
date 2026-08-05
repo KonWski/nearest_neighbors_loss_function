@@ -26,24 +26,17 @@ class TrainParamHolder:
                 list_args[param] = argument
                 list_params.append(param)
                 n_combinations = n_combinations * len(argument)
-        # print(f"list_params: {list_params}")
         list_param_combinations = product(*list_args.values())
 
         training_params = TrainModelParams().get_keys()
         starting_combination = {param: arguments for param, arguments in self.args.items() 
                                 if param not in list_params and param in training_params}
 
-        # print(f"training_params: {training_params}")
-        # print(f"args: {self.args}")
-        # print(f"starting_combination: {starting_combination}")
-
         for args_combination in list_param_combinations:
-            # print(f"args_combination: {args_combination}")
             combination = TrainModelParams()
 
             # add arguments from list parameters
             for param_name, argument in zip(list_params, args_combination):
-                # print(f"{param_name}: {argument}")
                 combination = replace(combination, **{param_name: argument})
             
             # add arguments from non-list parameters

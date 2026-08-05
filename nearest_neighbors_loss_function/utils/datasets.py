@@ -1,23 +1,32 @@
 from ogb.graphproppred.dataset_pyg import PygGraphPropPredDataset
 from nearest_neighbors_loss_function.utils.balanced_sampler import BalancedSampler
+from nearest_neighbors_loss_function.utils.transformations import FloatTransformation, GraphAugmentation
+from nearest_neighbors_loss_function.params.data_augmentation_params import DataAugmentationParams
 import math
 from torch_geometric.loader import DataLoader
 import torch
 import logging
 
-def get_datasets(dataset_name = "ogbg-molhiv", dataset_root = 'dataset/', task_id=0, debug=False):
+def get_datasets(dataset_name: str, dataset_root: str, task_id: int, 
+                 train_augmentation_params: DataAugmentationParams, debug: bool):
+    
+    graph_augmentation = GraphAugmentation(train_augmentation_params)
+    basic_graph_transformations = FloatTransformation()
+
     ogbg_dataset = PygGraphPropPredDataset(name = dataset_name, root = dataset_root)
     ogbg_dataset.data.y = ogbg_dataset.data.y[:, task_id].unsqueeze(1)
 
-    train_dataset = prepare_dataset(ogbg_dataset, "train", debug)
-    valid_dataset = prepare_dataset(ogbg_dataset, "valid", debug)
-    test_dataset = prepare_dataset(ogbg_dataset, "test", debug)
+    train_dataset = prepare_dataset(ogbg_dataset, "train", graph_augmentation, debug)
+    valid_dataset = prepare_dataset(ogbg_dataset, "valid", basic_graph_transformations, debug)
+    test_dataset = prepare_dataset(ogbg_dataset, "test", basic_graph_transformations, debug)
 
     return train_dataset, valid_dataset, test_dataset
 
-def get_loaders(batch_size, dataset_name, task_id, dataset_root = 'dataset/', debug=False):
 
-    train_dataset, valid_dataset, test_dataset = get_datasets(dataset_name, dataset_root, task_id, debug)
+def get_loaders(batch_size: int, dataset_name: str, task_id: int, dataset_root: str, 
+                train_augmentation_params: DataAugmentationParams, debug):
+
+    train_dataset, valid_dataset, test_dataset = get_datasets(dataset_name, dataset_root, task_id, train_augmentation_params, debug)
 
     n_batches = math.ceil(len(train_dataset) / batch_size)
     n_train_minority_samples = int(train_dataset.y.sum())
@@ -31,7 +40,7 @@ def get_loaders(batch_size, dataset_name, task_id, dataset_root = 'dataset/', de
     return train_loader, valid_loader, test_loader
 
 
-def prepare_dataset(ogbg_dataset, phase, debug):
+def prepare_dataset(ogbg_dataset, phase: str, transformation, debug):
 
     # find not nan labels
     phase_indices = ogbg_dataset.get_idx_split()[phase]
@@ -44,11 +53,9 @@ def prepare_dataset(ogbg_dataset, phase, debug):
         dataset = ogbg_dataset[phase_indices[:10000]]
     else:
         dataset = ogbg_dataset[phase_indices]
-    
-    # dataset.y = dataset.y[:,task_id].unsqueeze(1)
-    # print(f"dataset.y: {dataset.y}")
-    # print(f"dataset.y.shape: {dataset.y.shape}")
-    
+
+    dataset.transform = transformation
+
     logging.info(f"{phase}_dataset, n_obs_before_filter: {n_obs_before_filter},  n_obs_after_filter: {len(dataset)}, n_minority_class: {dataset.y.sum()}")
 
     return dataset

@@ -17,11 +17,20 @@ def parse_training_args():
                         help="List of random seeds")
     
     parser.add_argument("--dataset_name", type=str, default="ogbg-molhiv")
+    parser.add_argument("--dataset_root", type=str, default='dataset/')
     parser.add_argument("--task_id", type=int, default=0)
     parser.add_argument("--training_type", type=str, required=True)
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--triplet_loss_margin", type=float, default=0.5)
     parser.add_argument("--batch_shaper_margin", type=float, default=0.5)
+
+    # augmentation
+    parser.add_argument("--prob_add_gaussian_noise", type=float, default=0.0)
+    parser.add_argument("--feature_noise_std", type=float, default=1.0)
+    parser.add_argument("--prob_mask_node_features", type=float, default=0.0)
+    parser.add_argument("--mask_node_share", type=float, default=0.15)
+    parser.add_argument("--prob_mask_edge_features", type=float, default=0.0)
+    parser.add_argument("--mask_edge_share", type=float, default=0.15)
 
     parser.add_argument("--gamma_recalculation_strategy", nargs="+", type=int, required=True)
     

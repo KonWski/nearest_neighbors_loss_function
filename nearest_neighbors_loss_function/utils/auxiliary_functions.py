@@ -79,3 +79,22 @@ def save_conf(conf, path, hash, file_name_prefix):
 
     with open(conf_path, "w") as f:
         json.dump(d_conf, f, indent=2)
+
+
+def args_validation(args, workflow):
+
+    if workflow == "train":
+        pass
+    
+    elif workflow == "test":
+
+        # augmentation
+        if any([args.prob_add_gaussian_noise, 
+                args.feature_noise_std,
+                args.prob_mask_node_features,
+                args.mask_node_share,
+                args.prob_mask_edge_features,
+                args.mask_edge_share
+                ]):
+            
+            raise Exception("Data augmentation is turned on!")
