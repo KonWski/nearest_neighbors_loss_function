@@ -88,7 +88,6 @@ def train_triplet(
                                                                  batch_shaper, gamma_calculator, seed, epoch, model_epoch_hash, device)
 
             train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_length, device)
-            print("VALID GENERATE_EMBEDDINGS")
             valid_embeddings, valid_labels = generate_embeddings(model, valid_loader, n_valid_samples, embedding_length, device)
 
             train_stats, embeddings_with_nans = evaluate_model(model, "train", train_embeddings, train_labels, train_embeddings, 

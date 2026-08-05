@@ -19,7 +19,6 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, device)
     with torch.no_grad():
         
         for _, data in enumerate(data_loader):
-            print(f"batch_id: {_}")
             data = data.to(device)
             data = adjust_graph_data_dtype(data, model)
             n_samples_batch = data.y.shape[0]
