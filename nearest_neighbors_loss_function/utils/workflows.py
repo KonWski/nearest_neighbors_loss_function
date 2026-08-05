@@ -27,7 +27,7 @@ def train_workflow(args):
     )
 
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, 
-                                                          train_augmentation_params, debug=args.debug)
+                                                          args.dataset_root, train_augmentation_params, debug=args.debug)
     
     evaluate_model_params = EvaluateModelParams(
         evaluation_model_name="knn",
@@ -116,7 +116,7 @@ def test_workflow(args):
     )
 
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, 
-                                                          train_augmentation_params, debug=False)
+                                                          args.dataset_root, train_augmentation_params, debug=False)
     n_train_samples = len(train_loader.dataset)
     n_valid_samples = len(valid_loader.dataset)
     n_test_samples = len(test_loader.dataset)
