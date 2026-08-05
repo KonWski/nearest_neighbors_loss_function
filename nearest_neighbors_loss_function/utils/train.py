@@ -14,7 +14,7 @@ from typing import List
 import numpy as np
 import os
 from .generate_embeddings import generate_embeddings
-from .evaluate_model_params import EvaluateModelParams
+from nearest_neighbors_loss_function.params.evaluate_model_params import EvaluateModelParams
 
 def train_triplet(
         seeds: List[int], 
