@@ -9,6 +9,7 @@ import torch
 import logging
 from sklearn.ensemble import RandomForestClassifier
 from nearest_neighbors_loss_function.utils.auxiliary_functions import set_seed
+from nearest_neighbors_loss_function.utils.transformations import FloatTransformation
 
 def evaluate_model(model, evaluation_mode, train_embeddings, train_labels, test_embeddings, 
                    test_labels, evaluate_model_params, stats_prefix, seed=None):
@@ -152,8 +153,8 @@ def test_best_seed_model(model_name, statistics, best_seed_models, in_channels, 
             model.to(device)
             n_test_samples = len(test_loader.dataset)
 
-            train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_size, device)
-            test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_size, device)
+            train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_size, False, device)
+            test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_size, False, device)
 
             test_stats, _ = evaluate_model(model, phase, train_embeddings, train_labels, test_embeddings, 
                                            test_labels, evaluate_model_params, phase)
@@ -174,9 +175,9 @@ def test_model(model_path, model_name, model_in_channels, model_hidden_channels,
     model, checkpoint = load_model(model_path, model_name, model_in_channels, model_hidden_channels, model_n_blocks, embedding_length)
     model.to(device)
 
-    train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_length, device)
-    valid_embeddings, valid_labels = generate_embeddings(model, valid_loader, n_valid_samples, embedding_length, device)        
-    test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_length, device)
+    train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_length, False, device)
+    valid_embeddings, valid_labels = generate_embeddings(model, valid_loader, n_valid_samples, embedding_length, False, device)        
+    test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_length, False, device)
 
     valid_stats, _ = evaluate_model(model, "valid", train_embeddings, train_labels, valid_embeddings, 
                                     valid_labels, evaluate_model_params, "valid", seed)

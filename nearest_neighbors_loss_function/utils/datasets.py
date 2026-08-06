@@ -59,3 +59,8 @@ def prepare_dataset(ogbg_dataset, phase: str, transformation, debug):
     logging.info(f"{phase}_dataset, n_obs_before_filter: {n_obs_before_filter},  n_obs_after_filter: {len(dataset)}, n_minority_class: {dataset.y.sum()}")
 
     return dataset
+
+
+def turn_off_augmentations(dataloader):
+    dataloader.dataset.transform = FloatTransformation()
+    return dataloader
