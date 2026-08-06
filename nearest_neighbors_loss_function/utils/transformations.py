@@ -19,7 +19,8 @@ class GraphAugmentation(BaseTransform):
     def forward(self, data):
 
         data = data.clone()
-        data.x = data.x.to(torch.float32)
+        data.x = data.x.float()
+        data.edge_attr = data.edge_attr.float()
 
         if self.prob_add_gaussian_noise > 0 and np.random.uniform(0, 1) <= self.prob_add_gaussian_noise:
             data = self.add_gaussian_noise(data)
