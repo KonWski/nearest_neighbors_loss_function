@@ -1,6 +1,6 @@
 from nearest_neighbors_loss_function.utils.batch_shaper import BatchShaper
 from nearest_neighbors_loss_function.utils.auxiliary_functions import create_hash_dir, \
-    create_model_dir, set_seed, adjust_graph_data_dtype, get_model
+    create_model_dir, set_seed, get_model
 from nearest_neighbors_loss_function.utils.gamma_calculator import GammaCalculator
 from nearest_neighbors_loss_function.utils.statistics import Statistics
 from nearest_neighbors_loss_function.utils.evaluate_model import evaluate_model
@@ -165,7 +165,6 @@ def train(model, train_loader, n_train_samples, task_id, optimizer, loss_functio
             
             model.train()
             optimizer.zero_grad()
-            data = adjust_graph_data_dtype(data, model)
             anchor_mfs = model(data)
             anchor_mf, positive_mf, positive_mf_distances, negative_mf, negative_mf_distances, _ = batch_shaper.shape_batch(anchor_mfs, labels)
 

@@ -37,15 +37,6 @@ def create_model_dir(experiment_dir_path: str, seed: int):
     return model_dir_path
 
 
-def adjust_graph_data_dtype(data, model):
-
-    if not isinstance(model, GINEConvEncoderResidualModel):
-        data.x = data.x.float()
-        data.edge_attr = data.edge_attr.float()
-
-    return data
-
-
 def ignore_top_weight(distances):
     weights = 1 / (distances + 1e-9)
     max_idx = np.argmax(weights, axis=1)

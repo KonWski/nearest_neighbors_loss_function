@@ -1,5 +1,4 @@
 import torch
-from .auxiliary_functions import adjust_graph_data_dtype
 from nearest_neighbors_loss_function.utils.transformations import FloatTransformation
 
 def generate_embeddings(model, data_loader, n_samples, embedding_length, use_original_transformation, device):
@@ -26,7 +25,6 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, use_ori
         
         for _, data in enumerate(data_loader):
             data = data.to(device)
-            data = adjust_graph_data_dtype(data, model)
             n_samples_batch = data.y.shape[0]
             batch_embeddings = model(data)
             embeddings[start_id: start_id + n_samples_batch] = batch_embeddings.detach().cpu()
