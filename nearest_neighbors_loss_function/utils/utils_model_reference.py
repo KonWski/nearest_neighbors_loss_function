@@ -43,7 +43,8 @@ def save_model(model, model_dir_path, epoch, experiment_hash):
     with open(model_path, 'wb') as f:
         pickle.dump({
           "model": model,
-          "experiment_hash": experiment_hash
+          "experiment_hash": experiment_hash,
+          "epoch": epoch
         }, f)
 
 
