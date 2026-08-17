@@ -6,6 +6,17 @@ import math
 from torch_geometric.loader import DataLoader
 import torch
 import logging
+import os
+import pandas as pd
+
+class SmileDataset(PygGraphPropPredDataset):
+
+    def __init__(self, dataset_name, dataset_root):
+        PygGraphPropPredDataset.__init__(name = dataset_name, root = dataset_root)
+        
+        df_smiles = pd.read_csv(os.path.join(dataset_root, "ogbg_molhiv", "mapping", "mol.csv.gz"))
+        self.data.smiles = list(df_smiles["smiles"])
+
 
 def get_datasets(dataset_name: str, dataset_root: str, task_id: int, 
                  train_augmentation_params: DataAugmentationParams, debug: bool):
@@ -13,7 +24,7 @@ def get_datasets(dataset_name: str, dataset_root: str, task_id: int,
     graph_augmentation = GraphAugmentation(train_augmentation_params)
     basic_graph_transformations = FloatTransformation()
 
-    ogbg_dataset = PygGraphPropPredDataset(name = dataset_name, root = dataset_root)
+    ogbg_dataset = SmileDataset(name = dataset_name, root = dataset_root)
     ogbg_dataset.data.y = ogbg_dataset.data.y[:, task_id].unsqueeze(1)
 
     train_dataset = prepare_dataset(ogbg_dataset, "train", graph_augmentation, debug)
@@ -40,7 +51,7 @@ def get_loaders(batch_size: int, dataset_name: str, task_id: int, dataset_root: 
     return train_loader, valid_loader, test_loader
 
 
-def prepare_dataset(ogbg_dataset, phase: str, transformation, debug):
+def prepare_dataset(ogbg_dataset: SmileDataset, phase: str, transformation, debug):
 
     # find not nan labels
     phase_indices = ogbg_dataset.get_idx_split()[phase]
