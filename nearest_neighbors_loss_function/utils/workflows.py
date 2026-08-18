@@ -11,6 +11,7 @@ from nearest_neighbors_loss_function.params.data_augmentation_params import Data
 import os
 from pathlib import Path
 from uuid import uuid4
+from nearest_neighbors_loss_function.utils.generate_embeddings import generate_all_splits_embeddings
 
 def train_workflow(args):
     
@@ -27,7 +28,8 @@ def train_workflow(args):
     )
 
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, 
-                                                          args.dataset_root, train_augmentation_params, debug=args.debug)
+                                                          args.dataset_root, False, False, False, 
+                                                          train_augmentation_params, debug=args.debug)
     
     evaluate_model_params = EvaluateModelParams(
         evaluation_model_name="knn",
@@ -116,7 +118,8 @@ def test_workflow(args):
     )
 
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, 
-                                                          args.dataset_root, train_augmentation_params, debug=False)
+                                                          args.dataset_root, args.morgan_fingerprints, args.rdkit_fp, 
+                                                          args.maccs_keys, train_augmentation_params, debug=False)
     n_train_samples = len(train_loader.dataset)
     n_valid_samples = len(valid_loader.dataset)
     n_test_samples = len(test_loader.dataset)
@@ -152,6 +155,59 @@ def test_workflow(args):
                                 evaluate_model_params, statistics, int(seed), device)
 
     statistics.save()
+
+
+def generate_embeddings_workflow(args):
+
+    log_args(args)
+    args_validation(args, args.workflow)
+    experiment_hash = args.save_path.split("/")[-1]
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    
+    train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, 
+                                                          args.dataset_root, args.morgan_fingerprints, args.rdkit_fp, 
+                                                          args.maccs_keys, None, debug=False)
+
+    n_train_samples = len(train_loader.dataset)
+    n_valid_samples = len(valid_loader.dataset)
+    n_test_samples = len(test_loader.dataset)
+
+    for seed in os.listdir(args.save_path):
+
+        # double check if its the seed dir
+        try:
+            int(seed)
+        except ValueError:
+            continue
+        
+        seed_path = Path(os.path.join(args.save_path, str(seed)))
+        models = list(seed_path.rglob("*.pt"))
+        n_models = len(models)
+
+        if n_models > 1:
+            raise Exception(f"Directory {seed_path} contains more than 1 model")
+
+        train_embeddings, train_labels, valid_embeddings, valid_labels, test_embeddings, test_labels = \
+            generate_all_splits_embeddings(
+                seed, 
+                train_loader, 
+                n_train_samples, 
+                valid_loader, 
+                n_valid_samples, 
+                test_loader,
+                n_test_samples, 
+                str(models[0]), 
+                args.model_name, 
+                args.model_in_channels, 
+                args.model_hidden_channels,
+                args.model_n_blocks, 
+                args.embedding_length, 
+                device
+            )
+
+        if n_models > 1:
+            raise Exception(f"Directory {seed_path} contains more than 1 model")
+
 
 
 def log_args(args):

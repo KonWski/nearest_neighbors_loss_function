@@ -1,5 +1,5 @@
 import argparse
-from .utils.workflows import train_workflow, test_workflow
+from .utils.workflows import train_workflow, test_workflow, generate_embeddings_workflow
 import nearest_neighbors_loss_function.utils.set_torch_geometrics
 import logging
 
@@ -104,6 +104,26 @@ def parse_testing_args():
     return args
 
 
+def parse_generate_embeddings_args():
+    parser = argparse.ArgumentParser(description="Generating embeddings of molecules")
+
+    parser.add_argument("--dataset_name", type=str, default="ogbg-molhiv")
+
+    parser.add_argument("--model_name", type=str, required=True)
+    parser.add_argument("--model_hidden_channels", type=int, required=True)
+    parser.add_argument("--model_in_channels", type=int, required=True)
+    parser.add_argument("--model_n_blocks", type=int, required=True)
+    parser.add_argument("--embedding_length", type=int, required=True)
+
+    parser.add_argument("--morgan_fingerprints", action="store_true")
+    parser.add_argument("--rdkit_fp", action="store_true")
+    parser.add_argument("--maccs_keys", action="store_true")
+
+    args = parser.parse_known_args()[0]
+    return args
+
+
+
 def main():
     
     workflow = parse_workflow_args()
@@ -116,6 +136,11 @@ def main():
         args = parse_testing_args()
         print(args)
         test_workflow(args)
+
+    elif workflow == "generate_embeddings_workflow":
+        args = parse_generate_embeddings_args()
+        print(args)
+        generate_embeddings_workflow(args)
 
     else:
         raise Exception(f"Workflow {workflow} not implmeneted")

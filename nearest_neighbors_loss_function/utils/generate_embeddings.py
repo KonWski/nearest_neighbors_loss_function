@@ -1,5 +1,7 @@
 import torch
 from nearest_neighbors_loss_function.utils.transformations import FloatTransformation
+from nearest_neighbors_loss_function.utils.auxiliary_functions import set_seed
+from .checkpoints import load_model
 
 def generate_embeddings(model, data_loader, n_samples, embedding_length, use_original_transformation, device):
 
@@ -43,3 +45,20 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, use_ori
     labels = labels.detach()
 
     return embeddings, labels
+
+
+def generate_all_splits_embeddings(seed, train_loader, n_train_samples, valid_loader, n_valid_samples, test_loader, 
+                                   n_test_samples, model_path, model_name, model_in_channels, model_hidden_channels, 
+                                   model_n_blocks, embedding_length, device):
+    
+    set_seed(seed)
+    train_loader.batch_sampler.shuffle_data()
+    model, _ = load_model(model_path, model_name, model_in_channels, model_hidden_channels, 
+                                   model_n_blocks, embedding_length)
+    model.to(device)
+
+    train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_length, False, device)
+    valid_embeddings, valid_labels = generate_embeddings(model, valid_loader, n_valid_samples, embedding_length, False, device)        
+    test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_length, False, device)
+
+    return train_embeddings, train_labels, valid_embeddings, valid_labels, test_embeddings, test_labels
