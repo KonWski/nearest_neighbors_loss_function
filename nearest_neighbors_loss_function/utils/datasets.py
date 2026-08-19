@@ -63,7 +63,7 @@ class SmileDataset(PygGraphPropPredDataset):
 
         for mol in mols:
             if mol is not None:
-                fingerprint = Chem.RDKFingerprint(mol, maxPath = 5, fpSize=self.fpSize, bitInfo=rdkbi)
+                fingerprint = Chem.RDKFingerprint(mol, maxPath = 5, nBits=self.fpSize, bitInfo=rdkbi)
                 fingerprints.append(fingerprint)
             else:
                 fingerprints.append([0 for bit in range(self.fpSize)])    
