@@ -48,7 +48,7 @@ class SmileDataset(PygGraphPropPredDataset):
 
         for mol in mols:
             if mol is not None:
-                fingerprint = AllChem.GetFingerprint(mol, radius=3, fpSize=self.fpSize)
+                fingerprint = AllChem.GetMorganFingerprintAsBitVect(mol, radius=3, fpSize=self.fpSize)
                 fingerprints.append(fingerprint)
             else:
                 fingerprints.append([0 for bit in range(self.fpSize)])    
