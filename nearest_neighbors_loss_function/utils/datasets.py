@@ -27,7 +27,7 @@ class SmileDataset(PygGraphPropPredDataset):
         self.data.maccs_keys = None
         self.faulty_indices = None
 
-        if any(morgan_fingerprint, rdkit_fp, maccs_keys):
+        if any([morgan_fingerprint, rdkit_fp, maccs_keys]):
 
             mols, faulty_indices = self.__smiles_to_mols(self.data.smiles)
             self.faulty_indices = faulty_indices
