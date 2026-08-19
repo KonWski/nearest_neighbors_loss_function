@@ -16,7 +16,7 @@ class SmileDataset(PygGraphPropPredDataset):
 
     def __init__(self, dataset_name, dataset_root, morgan_fingerprint: bool = False, 
                  rdkit_fp: bool = False, maccs_keys: bool = False, fpSize: int = 2048):
-        PygGraphPropPredDataset.__init__(name = dataset_name, root = dataset_root)
+        PygGraphPropPredDataset.__init__(self, name = dataset_name, root = dataset_root)
         
         df_smiles = pd.read_csv(os.path.join(dataset_root, "ogbg_molhiv", "mapping", "mol.csv.gz"))
         self.data.smiles = list(df_smiles["smiles"])
