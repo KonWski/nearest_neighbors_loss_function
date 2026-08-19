@@ -89,3 +89,16 @@ def args_validation(args, workflow):
                 ]):
             
             raise Exception("Data augmentation is turned on!")
+        
+
+def save_embeddings(seed_path, hash, train_embeddings, train_labels, valid_embeddings, 
+                        valid_labels, test_embeddings, test_labels):
+    
+    torch.save(train_embeddings, os.path.join(seed_path, f"train_embeddings_{hash}.pt"))
+    torch.save(train_labels, os.path.join(seed_path, f"train_labels_{hash}.pt"))
+    
+    torch.save(valid_embeddings, os.path.join(seed_path, f"valid_embeddings_{hash}.pt"))
+    torch.save(valid_labels, os.path.join(seed_path, f"valid_labels_{hash}.pt"))
+
+    torch.save(test_embeddings, os.path.join(seed_path, f"test_embeddings_{hash}.pt"))
+    torch.save(test_labels, os.path.join(seed_path, f"test_labels_{hash}.pt"))

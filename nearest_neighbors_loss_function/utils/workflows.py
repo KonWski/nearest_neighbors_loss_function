@@ -6,12 +6,14 @@ import logging
 from nearest_neighbors_loss_function.utils.statistics import Statistics
 from nearest_neighbors_loss_function.params.evaluate_model_params import EvaluateModelParams
 from nearest_neighbors_loss_function.params.train_param_holder import TrainParamHolder
-from nearest_neighbors_loss_function.utils.auxiliary_functions import create_hash_dir, save_conf, args_validation
+from nearest_neighbors_loss_function.utils.auxiliary_functions import create_hash_dir, save_conf, \
+    args_validation, save_embeddings
 from nearest_neighbors_loss_function.params.data_augmentation_params import DataAugmentationParams
 import os
 from pathlib import Path
 from uuid import uuid4
 from nearest_neighbors_loss_function.utils.generate_embeddings import generate_all_splits_embeddings
+from pathlib import Path
 
 def train_workflow(args):
     
@@ -160,10 +162,10 @@ def test_workflow(args):
 def generate_embeddings_workflow(args):
 
     log_args(args)
-    args_validation(args, args.workflow)
+    # args_validation(args, args.workflow)
     experiment_hash = args.save_path.split("/")[-1]
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    
+
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, 
                                                           args.dataset_root, args.morgan_fingerprints, args.rdkit_fp, 
                                                           args.maccs_keys, None, debug=False)
@@ -182,6 +184,7 @@ def generate_embeddings_workflow(args):
         
         seed_path = Path(os.path.join(args.save_path, str(seed)))
         models = list(seed_path.rglob("*.pt"))
+        model_hash = Path(models[0]).stem
         n_models = len(models)
 
         if n_models > 1:
@@ -205,9 +208,11 @@ def generate_embeddings_workflow(args):
                 device
             )
 
+        save_embeddings(seed_path, model_hash, train_embeddings, train_labels, valid_embeddings, 
+                        valid_labels, test_embeddings, test_labels)
+
         if n_models > 1:
             raise Exception(f"Directory {seed_path} contains more than 1 model")
-
 
 
 def log_args(args):
