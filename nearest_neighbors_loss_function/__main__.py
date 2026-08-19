@@ -108,6 +108,8 @@ def parse_generate_embeddings_args():
     parser = argparse.ArgumentParser(description="Generating embeddings of molecules")
 
     parser.add_argument("--dataset_name", type=str, default="ogbg-molhiv")
+    parser.add_argument("--batch_size", type=int, required=True)
+    parser.add_argument("--save_path", type=str, required=True)
 
     parser.add_argument("--model_name", type=str, required=True)
     parser.add_argument("--model_hidden_channels", type=int, required=True)
