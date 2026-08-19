@@ -163,12 +163,12 @@ def generate_embeddings_workflow(args):
 
     log_args(args)
     # args_validation(args, args.workflow)
-    experiment_hash = args.save_path.split("/")[-1]
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    train_augmentation_params = DataAugmentationParams()
 
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, 
                                                           args.dataset_root, args.morgan_fingerprints, args.rdkit_fp, 
-                                                          args.maccs_keys, None, debug=False)
+                                                          args.maccs_keys, train_augmentation_params, debug=False)
 
     n_train_samples = len(train_loader.dataset)
     n_valid_samples = len(valid_loader.dataset)
