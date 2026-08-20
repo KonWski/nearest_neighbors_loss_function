@@ -99,7 +99,7 @@ class SmileDataset(PygGraphPropPredDataset):
 
             mols.append(mol)
 
-        return mols, faulty_indices
+        return mols, torch.tensor(faulty_indices)
 
 
     def get_idx_split(self):
@@ -108,10 +108,9 @@ class SmileDataset(PygGraphPropPredDataset):
 
         if self.faulty_indices is not None:
 
-            faulty_index = torch.tensor(faulty_index)
-            train_idx = idx_split["train"][~torch.isin(idx_split["train"], faulty_index)]
-            valid_idx = idx_split["valid"][~torch.isin(idx_split["valid"], faulty_index)]
-            test_idx = idx_split["test"][~torch.isin(idx_split["test"], faulty_index)]
+            train_idx = idx_split["train"][~torch.isin(idx_split["train"], self.faulty_indices)]
+            valid_idx = idx_split["valid"][~torch.isin(idx_split["valid"], self.faulty_indices)]
+            test_idx = idx_split["test"][~torch.isin(idx_split["test"], self.faulty_indices)]
             
             idx_split = {
                 "train": train_idx,
