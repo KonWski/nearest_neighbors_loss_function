@@ -192,7 +192,7 @@ def generate_embeddings_workflow(args):
 
         train_embeddings, train_labels, valid_embeddings, valid_labels, test_embeddings, test_labels = \
             generate_all_splits_embeddings(
-                seed, 
+                int(seed), 
                 train_loader, 
                 n_train_samples, 
                 valid_loader, 
