@@ -120,9 +120,6 @@ class SmileDataset(PygGraphPropPredDataset):
 
         return idx_split
 
-    def __len__(self):
-        return len()
-
 
 def get_datasets(dataset_name: str, dataset_root: str, task_id: int, 
                  morgan_fingerprints: bool, rdkit_fp: bool, maccs_keys: bool,
