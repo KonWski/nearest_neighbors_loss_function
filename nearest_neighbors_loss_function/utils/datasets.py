@@ -14,45 +14,45 @@ import numpy as np
 
 class SmileDataset(PygGraphPropPredDataset):
 
-    def __init__(self, dataset_name, dataset_root, morgan_fingerprint: bool = False, 
-                 rdkit_fp: bool = False, maccs_keys: bool = False, fpSize: int = 2048):
+    def __init__(self, dataset_name, dataset_root, use_morgan_fingerprint: bool = False, 
+                 use_rdkit_fp: bool = False, use_maccs_keys: bool = False, fpSize: int = 2048):
         PygGraphPropPredDataset.__init__(self, name = dataset_name, root = dataset_root)
         
         df_smiles = pd.read_csv(os.path.join(dataset_root, "ogbg_molhiv", "mapping", "mol.csv.gz"))
-        self.data.smiles = list(df_smiles["smiles"])
+        self.smiles = list(df_smiles["smiles"])
         self.fpSize = fpSize
 
-        self.morgan_fingerprints = morgan_fingerprint
-        self.rdkit_fp = rdkit_fp
-        self.maccs_keys = maccs_keys
+        self.use_morgan_fingerprints = use_morgan_fingerprint
+        self.use_rdkit_fp = use_rdkit_fp
+        self.use_maccs_keys = use_maccs_keys
 
-        self.data.morgan_fingerprints = None
-        self.data.rdkit_fp = None
-        self.data.maccs_keys = None
+        self.morgan_fingerprints = None
+        self.rdkit_fp = None
+        self.maccs_keys = None
 
         self.faulty_indices = None
         self.embedding_extra_length = 0
-        self.use_extra_embeddings = any([morgan_fingerprint, rdkit_fp, maccs_keys])
+        self.use_extra_embeddings = any([use_morgan_fingerprint, use_rdkit_fp, use_maccs_keys])
         self.extra_embeddings_methods = []
 
         if self.use_extra_embeddings:
 
-            mols, faulty_indices = self.__smiles_to_mols(self.data.smiles)
+            mols, faulty_indices = self.__smiles_to_mols(self.smiles)
             self.faulty_indices = faulty_indices
 
-            if morgan_fingerprint:
-                self.data.morgan_fingerprints = self.__get_morgan_fingerprints(mols)
-                self.embedding_extra_length += self._data.morgan_fingerprints.shape[1]
+            if use_morgan_fingerprint:
+                self.morgan_fingerprints = self.__get_morgan_fingerprints(mols)
+                self.embedding_extra_length += self.morgan_fingerprints.shape[1]
                 self.extra_embeddings_methods.append("morgan_fingerprints")
 
-            if rdkit_fp:
-                self.data.rdkit_fp = self.__get_rdkit_fps(mols)
-                self.embedding_extra_length += self._data.rdkit_fp.shape[1]
+            if use_rdkit_fp:
+                self.rdkit_fp = self.__get_rdkit_fps(mols)
+                self.embedding_extra_length += self.rdkit_fp.shape[1]
                 self.extra_embeddings_methods.append("rdkit_fp")
 
-            if maccs_keys:
-                self.data.maccs_keys = self.__get_maccs_keys(mols)
-                self.embedding_extra_length += self._data.maccs_keys.shape[1]
+            if use_maccs_keys:
+                self.maccs_keys = self.__get_maccs_keys(mols)
+                self.embedding_extra_length += self.maccs_keys.shape[1]
                 self.extra_embeddings_methods.append("maccs_keys")
             
             self.__rearrange_data()
@@ -66,7 +66,7 @@ class SmileDataset(PygGraphPropPredDataset):
                 fingerprint = AllChem.GetMorganFingerprintAsBitVect(mol, radius=3, nBits=self.fpSize)
                 fingerprints.append(fingerprint)
             else:
-                fingerprints.append([0 for bit in range(self.fpSize)])    
+                fingerprints.append([0 for _ in range(self.fpSize)])    
 
         return np.array(fingerprints)
 
@@ -122,9 +122,10 @@ class SmileDataset(PygGraphPropPredDataset):
         data_list = []
 
         for i in range(len(self)):
-            print(self[i])
-            print(type(self[i]))
             data = self[i]
+
+            for method in self.extra_embeddings_methods:
+                data[method] = getattr(self, method)
 
             data_list.append(data)
 
