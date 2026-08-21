@@ -19,7 +19,7 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, use_ori
     if not use_original_transformation:
         data_loader.dataset.transform = FloatTransformation()
 
-    embeddings = torch.zeros([n_samples, embedding_length], dtype=float)
+    embeddings = torch.zeros([n_samples, embedding_length + data_loader.dataset.embedding_extra_length], dtype=float)
     labels = torch.zeros([n_samples, 1], dtype=int)
 
     start_id = 0
@@ -29,6 +29,13 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, use_ori
             data = data.to(device)
             n_samples_batch = data.y.shape[0]
             batch_embeddings = model(data)
+
+            # concatenate fingegrprints from the chosen methods
+            if data_loader.dataset.use_extra_embeddings:
+                extra_fingerprints = [getattr(data, embedding_name) 
+                                      for embedding_name in data_loader.dataset.extra_embeddings_methods]
+                batch_embeddings = torch.concat([batch_embeddings, extra_fingerprints])
+
             embeddings[start_id: start_id + n_samples_batch] = batch_embeddings.detach().cpu()
             labels[start_id: start_id + n_samples_batch] = data.y
             start_id += n_samples_batch

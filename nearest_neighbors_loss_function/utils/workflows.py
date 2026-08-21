@@ -176,6 +176,8 @@ def generate_embeddings_workflow(args):
 
     for seed in os.listdir(args.save_path):
 
+        logging.info(f"Started generating for seed: {seed}")
+
         # double check if its the seed dir
         try:
             int(seed)
@@ -210,10 +212,6 @@ def generate_embeddings_workflow(args):
 
         save_embeddings(seed_path, model_hash, train_embeddings, train_labels, valid_embeddings, 
                         valid_labels, test_embeddings, test_labels)
-
-        if n_models > 1:
-            raise Exception(f"Directory {seed_path} contains more than 1 model")
-
 
 def log_args(args):
     for arg, value in sorted(vars(args).items()):

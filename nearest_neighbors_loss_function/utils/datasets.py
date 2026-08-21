@@ -22,25 +22,38 @@ class SmileDataset(PygGraphPropPredDataset):
         self.data.smiles = list(df_smiles["smiles"])
         self.fpSize = fpSize
 
+        self.morgan_fingerprints = morgan_fingerprint
+        self.rdkit_fp = rdkit_fp
+        self.maccs_keys = maccs_keys
+
         self.data.morgan_fingerprints = None
         self.data.rdkit_fp = None
         self.data.maccs_keys = None
-        self.faulty_indices = None
 
-        if any([morgan_fingerprint, rdkit_fp, maccs_keys]):
+        self.faulty_indices = None
+        self.embedding_extra_length = 0
+        self.use_extra_embeddings = any([morgan_fingerprint, rdkit_fp, maccs_keys])
+        self.extra_embeddings_methods = []
+
+        if self.use_extra_embeddings:
 
             mols, faulty_indices = self.__smiles_to_mols(self.data.smiles)
             self.faulty_indices = faulty_indices
 
             if morgan_fingerprint:
                 self.data.morgan_fingerprints = self.__get_morgan_fingerprints(mols)
+                self.embedding_extra_length += self.data.morgan_fingerprints.shape[1]
+                self.extra_embeddings_methods.append("morgan_fingerprints")
 
             if rdkit_fp:
                 self.data.rdkit_fp = self.__get_rdkit_fps(mols)
+                self.embedding_extra_length += self.data.rdkit_fp.shape[1]
+                self.extra_embeddings_methods.append("rdkit_fp")
 
             if maccs_keys:
                 self.data.maccs_keys = self.__get_maccs_keys(mols)
-
+                self.embedding_extra_length += self.data.maccs_keys.shape[1]
+                self.extra_embeddings_methods.append("maccs_keys")
 
     def __get_morgan_fingerprints(self, mols):
         
