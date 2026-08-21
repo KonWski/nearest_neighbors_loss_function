@@ -26,9 +26,9 @@ class SmileDataset(PygGraphPropPredDataset):
         self.rdkit_fp = rdkit_fp
         self.maccs_keys = maccs_keys
 
-        self.data.morgan_fingerprints = None
-        self.data.rdkit_fp = None
-        self.data.maccs_keys = None
+        self._data.morgan_fingerprints = None
+        self._data.rdkit_fp = None
+        self._data.maccs_keys = None
 
         self.faulty_indices = None
         self.embedding_extra_length = 0
@@ -42,17 +42,17 @@ class SmileDataset(PygGraphPropPredDataset):
 
             if morgan_fingerprint:
                 self.data.morgan_fingerprints = self.__get_morgan_fingerprints(mols)
-                self.embedding_extra_length += self.data.morgan_fingerprints.shape[1]
+                self.embedding_extra_length += self._data.morgan_fingerprints.shape[1]
                 self.extra_embeddings_methods.append("morgan_fingerprints")
 
             if rdkit_fp:
-                self.data.rdkit_fp = self.__get_rdkit_fps(mols)
-                self.embedding_extra_length += self.data.rdkit_fp.shape[1]
+                self._data.rdkit_fp = self.__get_rdkit_fps(mols)
+                self.embedding_extra_length += self._data.rdkit_fp.shape[1]
                 self.extra_embeddings_methods.append("rdkit_fp")
 
             if maccs_keys:
-                self.data.maccs_keys = self.__get_maccs_keys(mols)
-                self.embedding_extra_length += self.data.maccs_keys.shape[1]
+                self._data.maccs_keys = self.__get_maccs_keys(mols)
+                self.embedding_extra_length += self._data.maccs_keys.shape[1]
                 self.extra_embeddings_methods.append("maccs_keys")
 
     def __get_morgan_fingerprints(self, mols):
@@ -113,6 +113,17 @@ class SmileDataset(PygGraphPropPredDataset):
             mols.append(mol)
 
         return mols, torch.tensor(faulty_indices)
+
+
+    def __rearrange_data(self):
+
+        # data_list = []
+
+        # for i in range(len(self.data)):
+        #     data = self.data[i]
+        #     data_list.append(data)
+
+        self.data, self.slices = self.collate(self.data)
 
 
     def get_idx_split(self):
