@@ -122,7 +122,10 @@ class SmileDataset(PygGraphPropPredDataset):
         data_list = []
 
         for i in range(len(self.data)):
+            print(data)
+            print(type(data))
             data = self.data[i]
+
             data_list.append(data)
 
         self.data, self.slices = self.collate(data_list)
