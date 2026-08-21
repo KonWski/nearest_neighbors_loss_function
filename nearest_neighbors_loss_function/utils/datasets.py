@@ -119,13 +119,13 @@ class SmileDataset(PygGraphPropPredDataset):
 
     def __rearrange_data(self):
 
-        # data_list = []
+        data_list = []
 
-        # for i in range(len(self.data)):
-        #     data = self.data[i]
-        #     data_list.append(data)
+        for i in range(len(self.data)):
+            data = self.data[i]
+            data_list.append(data)
 
-        self.data, self.slices = self.collate(self.data)
+        self.data, self.slices = self.collate(data_list)
 
 
     def get_idx_split(self):
