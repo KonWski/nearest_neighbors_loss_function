@@ -31,10 +31,10 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, use_ori
             batch_embeddings = model(data)
 
             # concatenate fingegrprints from the chosen methods
-            # if data_loader.dataset.use_extra_embeddings:
-            #     extra_fingerprints = [getattr(data, embedding_name) 
-            #                           for embedding_name in data_loader.dataset.extra_embeddings_methods]
-            #     batch_embeddings = torch.concat([batch_embeddings, extra_fingerprints])
+            if data_loader.dataset.use_extra_embeddings:
+                extra_fingerprints = [getattr(data, embedding_name) 
+                                      for embedding_name in data_loader.dataset.extra_embeddings_methods]
+                batch_embeddings = torch.concat([batch_embeddings, extra_fingerprints], axis=1)
 
             embeddings[start_id: start_id + n_samples_batch] = batch_embeddings.detach().cpu()
             labels[start_id: start_id + n_samples_batch] = data.y
