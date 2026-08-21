@@ -121,10 +121,10 @@ class SmileDataset(PygGraphPropPredDataset):
 
         data_list = []
 
-        for i in range(len(self.data)):
-            print(self.data)
-            print(type(self.data))
-            data = self.data[i]
+        for i in range(len(self)):
+            print(self)
+            print(type(self))
+            data = self[i]
 
             data_list.append(data)
 
