@@ -3,7 +3,6 @@ import numpy as np
 import torch
 import os
 import importlib
-from nearest_neighbors_loss_function.models import GINEConvEncoderResidualModel
 from torch_geometric import seed_everything
 from dataclasses import asdict, is_dataclass
 import json
@@ -108,7 +107,7 @@ def save_embeddings(seed_path, hash, train_embeddings, train_labels, valid_embed
 def find_model_path(seed, save_path):
 
     seed_path = Path(os.path.join(save_path, str(seed)))
-    models = list(seed_path.rglob("*.pt"))
+    models = [path for path in seed_path.rglob("*.pt") if Path(path).stem[:6] == "model_"]
     n_models = len(models)
 
     if n_models > 1:
