@@ -54,6 +54,8 @@ class SmileDataset(PygGraphPropPredDataset):
                 self._data.maccs_keys = self.__get_maccs_keys(mols)
                 self.embedding_extra_length += self._data.maccs_keys.shape[1]
                 self.extra_embeddings_methods.append("maccs_keys")
+            
+            self.__rearrange_data()
 
     def __get_morgan_fingerprints(self, mols):
         
