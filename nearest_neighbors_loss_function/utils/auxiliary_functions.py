@@ -8,6 +8,7 @@ from torch_geometric import seed_everything
 from dataclasses import asdict, is_dataclass
 import json
 from argparse import Namespace
+from pathlib import Path
 
 def set_seed(seed: int):
     '''Set randomness for random, numpy, PyTorch CPU, PyTorch GPU, '''
@@ -102,3 +103,18 @@ def save_embeddings(seed_path, hash, train_embeddings, train_labels, valid_embed
 
     torch.save(test_embeddings, os.path.join(seed_path, f"test_embeddings_{hash}.pt"))
     torch.save(test_labels, os.path.join(seed_path, f"test_labels_{hash}.pt"))
+
+
+def find_model_path(seed, save_path):
+
+    seed_path = Path(os.path.join(save_path, str(seed)))
+    models = list(seed_path.rglob("*.pt"))
+    n_models = len(models)
+
+    if n_models > 1:
+        raise Exception(f"Directory {seed_path} contains more than 1 model")
+
+    model_path = models[0]
+    model_hash = Path(models[0]).stem
+
+    return model_path, model_hash, seed_path
