@@ -60,16 +60,28 @@ class SmileDataset(PygGraphPropPredDataset):
 
     def __get_morgan_fingerprints(self, mols):
         
-        fingerprints = []
+        fingerprints_array = np.zeros((len(mols), self.fpSize), dtype=np.int8)
 
-        for mol in mols:
+        for mol_id, mol in enumerate(mols):
             if mol is not None:
                 fingerprint = AllChem.GetMorganFingerprintAsBitVect(mol, radius=3, nBits=self.fpSize)
-                fingerprints.append(fingerprint)
+                DataStructs.ConvertToNumpyArray(fingerprint, fingerprints_array[mol_id])
             else:
-                fingerprints.append(np.array([0 for _ in range(self.fpSize)]))    
+                fingerprints_array[mol_id] = np.array([0 for _ in range(self.fpSize)])
+
+        return torch.from_numpy(fingerprints_array)
+
+
+        # fingerprints = []
+
+        # for mol in mols:
+        #     if mol is not None:
+        #         fingerprint = AllChem.GetMorganFingerprintAsBitVect(mol, radius=3, nBits=self.fpSize)
+        #         fingerprints.append(fingerprint)
+        #     else:
+        #         fingerprints.append(np.array([0 for _ in range(self.fpSize)]))    
         
-        return self.__convert_fingerprints_to_tensor(fingerprints)
+        # return self.__convert_fingerprints_to_tensor(fingerprints)
 
 
     def __get_rdkit_fps(self, mols):
@@ -112,7 +124,7 @@ class SmileDataset(PygGraphPropPredDataset):
             else:
                 DataStructs.ConvertToNumpyArray(fingerprint, fingerprints_array[i])
 
-        return torch.from_numpy(fingerprints_array).float()
+        return torch.from_numpy(fingerprints_array)
 
 
     def __smiles_to_mols(self, smiles):
