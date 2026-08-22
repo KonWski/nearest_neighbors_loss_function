@@ -11,6 +11,7 @@ import pandas as pd
 from rdkit.Chem import AllChem, MACCSkeys
 from rdkit import Chem
 import numpy as np
+from rdkit import DataStructs
 
 class SmileDataset(PygGraphPropPredDataset):
 
@@ -68,10 +69,17 @@ class SmileDataset(PygGraphPropPredDataset):
             else:
                 fingerprints.append([0 for _ in range(self.fpSize)])    
 
-        print(f"len(fingerprints): {len(fingerprints)}")
-        print(f"type(fingerprints[0]): {type(fingerprints[0])}")
-        print(f"fingerprints[0].shape: {fingerprints[0].shape}")
-        return torch.tensor(fingerprints)
+        fingerprints_array = np.zeros((len(fingerprints), fingerprints[0].GetNumBits()), dtype=np.int8)
+
+        for i, fingerprint in enumerate(fingerprints):
+            DataStructs.ConvertToNumpyArray(fingerprint, fingerprints_array[i])
+
+        # print(f"len(fingerprints): {len(fingerprints)}")
+        # print(f"type(fingerprints[0]): {type(fingerprints[0])}")
+        # print(f"fingerprints[0].shape: {fingerprints[0].shape}")
+
+        return torch.from_numpy(fingerprints_array).float()
+
 
 
     def __get_rdkit_fps(self, mols):
