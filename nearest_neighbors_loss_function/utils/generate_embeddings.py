@@ -40,6 +40,8 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, use_ori
                     print(f"embedding_name: {embedding_name}")
                     print(f"type(getattr(data, embedding_name)): {type(getattr(data, embedding_name))}")
                     print(getattr(data, embedding_name)[:2])
+                    print(getattr(data, embedding_name)[0].shape)
+                    print(getattr(data, embedding_name)[0].dtype)
                     print(f"len(getattr(data, embedding_name)): {len(getattr(data, embedding_name))}")
                     embeddings = torch.stack([torch.from_numpy(x) for x in getattr(data, embedding_name)])
                     print("Stacked tensors")
