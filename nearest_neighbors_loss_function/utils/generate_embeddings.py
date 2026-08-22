@@ -26,10 +26,12 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, use_ori
     start_id = 0
     with torch.no_grad():
         
-        for _, data in enumerate(data_loader):
+        for _, data in enumerate(data_loader):            
             data = data.to(device)
             n_samples_batch = data.y.shape[0]
-            batch_embeddings = model(data)
+            model_embeddings = model(data)
+            batch_embeddings = [model_embeddings]
+            print(f"batch_embeddings.shape: {model_embeddings.shape}")
 
             # concatenate fingegrprints from the chosen methods
             if data_loader.dataset.use_extra_embeddings:
@@ -37,16 +39,18 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, use_ori
                     print(f"embedding_name: {embedding_name}")
                     print(f"type(getattr(data, embedding_name)): {type(getattr(data, embedding_name))}")
                     print(getattr(data, embedding_name)[:2])
+                    embeddings = torch.stack([torch.from_numpy(x) for x in getattr(data, embedding_name)])
+                    batch_embeddings.append(embeddings)
+                
+                # extra_fingerprints = [getattr(data, embedding_name) 
+                #                     for embedding_name in data_loader.dataset.extra_embeddings_methods]
+                batch_embeddings = torch.concat(batch_embeddings, axis=1)
 
-                extra_fingerprints = [getattr(data, embedding_name) 
-                                    for embedding_name in data_loader.dataset.extra_embeddings_methods]
-                batch_embeddings = torch.concat([batch_embeddings, extra_fingerprints], axis=1)
-
-            embeddings[start_id: start_id + n_samples_batch] = batch_embeddings.detach().cpu()
+            embeddings[start_id: start_id + n_samples_batch] = model_embeddings.detach().cpu()
             labels[start_id: start_id + n_samples_batch] = data.y
             start_id += n_samples_batch
 
-            del data, batch_embeddings
+            del data, model_embeddings
 
     # return to initial settings
     if original_shuffle == True:
