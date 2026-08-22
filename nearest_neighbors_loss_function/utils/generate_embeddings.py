@@ -26,12 +26,16 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, use_ori
     with torch.no_grad():
         
         for _, data in enumerate(data_loader):
+            print("generate embeddings")
+            print(data)
+            print(type(data))
             data = data.to(device)
             n_samples_batch = data.y.shape[0]
             batch_embeddings = model(data)
 
             # concatenate fingegrprints from the chosen methods
             if data_loader.dataset.use_extra_embeddings:
+                # TODO chyba trzeba zmienic ponizsze na tensor
                 extra_fingerprints = [getattr(data, embedding_name) 
                                       for embedding_name in data_loader.dataset.extra_embeddings_methods]
                 batch_embeddings = torch.concat([batch_embeddings, extra_fingerprints], axis=1)
