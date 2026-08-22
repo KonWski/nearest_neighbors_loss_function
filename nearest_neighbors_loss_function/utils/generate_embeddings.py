@@ -39,7 +39,6 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, use_ori
             # concatenate fingegrprints from the chosen methods
             if data_loader.dataset.use_extra_embeddings:
 
-                print(f"data.morgan_fingerprints: {data.morgan_fingerprints}")
                 print(f"type(data.morgan_fingerprints): {type(data.morgan_fingerprints)}")
                 fingerprints = [batch_embeddings]
 
