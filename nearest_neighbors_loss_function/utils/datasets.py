@@ -67,20 +67,9 @@ class SmileDataset(PygGraphPropPredDataset):
                 fingerprint = AllChem.GetMorganFingerprintAsBitVect(mol, radius=3, nBits=self.fpSize)
                 fingerprints.append(fingerprint)
             else:
-                fingerprints.append([0 for _ in range(self.fpSize)])    
-
-        fingerprints_array = np.zeros((len(fingerprints), fingerprints[0].GetNumBits()), dtype=np.int8)
-
-        for i, fingerprint in enumerate(fingerprints):
-            print(f"ConvertToNumpyArray type(fingerprint): {type(fingerprint)}")
-            DataStructs.ConvertToNumpyArray(fingerprint, fingerprints_array[i])
-
-        # print(f"len(fingerprints): {len(fingerprints)}")
-        # print(f"type(fingerprints[0]): {type(fingerprints[0])}")
-        # print(f"fingerprints[0].shape: {fingerprints[0].shape}")
-
-        return torch.from_numpy(fingerprints_array).float()
-
+                fingerprints.append(np.array([0 for _ in range(self.fpSize)]))    
+        
+        return self.__convert_fingerprints_to_tensor(fingerprints)
 
 
     def __get_rdkit_fps(self, mols):
@@ -93,9 +82,9 @@ class SmileDataset(PygGraphPropPredDataset):
                 fingerprint = Chem.RDKFingerprint(mol, maxPath = 5, fpSize=self.fpSize, bitInfo=rdkbi)
                 fingerprints.append(fingerprint)
             else:
-                fingerprints.append([0 for bit in range(self.fpSize)])    
+                fingerprints.append(np.array([0 for _ in range(self.fpSize)]))
 
-        return np.array(fingerprints)
+        return self.__convert_fingerprints_to_tensor(fingerprints)
 
 
     def __get_maccs_keys(self, mols):
@@ -109,7 +98,21 @@ class SmileDataset(PygGraphPropPredDataset):
             else:
                 fingerprints.append([0 for bit in range(167)])    
 
-        return np.array(fingerprints)
+        return self.__convert_fingerprints_to_tensor(fingerprints)
+
+
+    def __convert_fingerprints_to_tensor(self, fingerprints):
+        
+        fingerprints_array = np.zeros((len(fingerprints), fingerprints[0].GetNumBits()), dtype=np.int8)
+
+        for i, fingerprint in enumerate(fingerprints):
+
+            if isinstance(fingerprint, np.array):
+                fingerprints_array[i] = fingerprint
+            else:
+                DataStructs.ConvertToNumpyArray(fingerprint, fingerprints_array[i])
+
+        return torch.from_numpy(fingerprints_array).float()
 
 
     def __smiles_to_mols(self, smiles):
