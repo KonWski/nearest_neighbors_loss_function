@@ -60,14 +60,19 @@ class SmileDataset(PygGraphPropPredDataset):
 
     def __get_morgan_fingerprints(self, mols):
         
+        n_mols = len(mols)
         fingerprints_array = np.zeros((len(mols), self.fpSize), dtype=np.int8)
 
         for mol_id, mol in enumerate(mols):
+            print(f"progress: {mol_id + 1/n_mols}")
+            
             if mol is not None:
                 fingerprint = AllChem.GetMorganFingerprintAsBitVect(mol, radius=3, nBits=self.fpSize)
                 DataStructs.ConvertToNumpyArray(fingerprint, fingerprints_array[mol_id])
             else:
                 fingerprints_array[mol_id] = np.array([0 for _ in range(self.fpSize)])
+
+        print("Generated all morgan fingerprints")
 
         return torch.from_numpy(fingerprints_array)
 
