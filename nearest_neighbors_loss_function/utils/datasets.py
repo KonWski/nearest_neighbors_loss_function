@@ -73,8 +73,10 @@ class SmileDataset(PygGraphPropPredDataset):
                 fingerprints_array[mol_id] = np.array([0 for _ in range(self.fpSize)])
 
         print("Generated all morgan fingerprints")
+        fingerprints = torch.from_numpy(fingerprints_array)
+        print(f"Converted np array to tensor")
 
-        return torch.from_numpy(fingerprints_array)
+        return fingerprints
 
 
         # fingerprints = []
