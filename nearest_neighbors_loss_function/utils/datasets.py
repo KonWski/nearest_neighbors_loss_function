@@ -68,6 +68,9 @@ class SmileDataset(PygGraphPropPredDataset):
             else:
                 fingerprints.append([0 for _ in range(self.fpSize)])    
 
+        print(f"len(fingerprints): {len(fingerprints)}")
+        print(f"type(fingerprints[0]): {type(fingerprints[0])}")
+        print(f"fingerprints[0].shape: {fingerprints[0].shape}")
         return torch.tensor(fingerprints)
 
 
