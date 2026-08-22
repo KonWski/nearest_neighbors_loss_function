@@ -107,7 +107,7 @@ class SmileDataset(PygGraphPropPredDataset):
 
         for i, fingerprint in enumerate(fingerprints):
 
-            if isinstance(fingerprint, np.array):
+            if isinstance(fingerprint, np.ndarray):
                 fingerprints_array[i] = fingerprint
             else:
                 DataStructs.ConvertToNumpyArray(fingerprint, fingerprints_array[i])
