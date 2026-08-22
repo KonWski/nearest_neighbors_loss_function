@@ -11,7 +11,6 @@ import pandas as pd
 from rdkit.Chem import AllChem, MACCSkeys
 from rdkit import Chem
 import numpy as np
-from rdkit import DataStructs
 
 class SmileDataset(PygGraphPropPredDataset):
 
@@ -56,40 +55,20 @@ class SmileDataset(PygGraphPropPredDataset):
                 self.embedding_extra_length += self.maccs_keys.shape[1]
                 self.extra_embeddings_methods.append("maccs_keys")
             
-            print("Starting rearranging data")
             self.__rearrange_data()
 
     def __get_morgan_fingerprints(self, mols):
         
-        n_mols = len(mols)
-        fingerprints_array = np.zeros((len(mols), self.fpSize), dtype=np.int8)
+        fingerprints = []
 
-        for mol_id, mol in enumerate(mols):
-            print(f"progress: {mol_id + 1}/{n_mols}")
-            
+        for mol in mols:
             if mol is not None:
                 fingerprint = AllChem.GetMorganFingerprintAsBitVect(mol, radius=3, nBits=self.fpSize)
-                DataStructs.ConvertToNumpyArray(fingerprint, fingerprints_array[mol_id])
+                fingerprints.append(fingerprint)
             else:
-                fingerprints_array[mol_id] = np.array([0 for _ in range(self.fpSize)])
+                fingerprints.append([0 for _ in range(self.fpSize)])    
 
-        print("Generated all morgan fingerprints")
-        fingerprints = torch.from_numpy(fingerprints_array)
-        print(f"Converted np array to tensor")
-
-        return fingerprints
-
-
-        # fingerprints = []
-
-        # for mol in mols:
-        #     if mol is not None:
-        #         fingerprint = AllChem.GetMorganFingerprintAsBitVect(mol, radius=3, nBits=self.fpSize)
-        #         fingerprints.append(fingerprint)
-        #     else:
-        #         fingerprints.append(np.array([0 for _ in range(self.fpSize)]))    
-        
-        # return self.__convert_fingerprints_to_tensor(fingerprints)
+        return np.array(fingerprints)
 
 
     def __get_rdkit_fps(self, mols):
@@ -102,9 +81,9 @@ class SmileDataset(PygGraphPropPredDataset):
                 fingerprint = Chem.RDKFingerprint(mol, maxPath = 5, fpSize=self.fpSize, bitInfo=rdkbi)
                 fingerprints.append(fingerprint)
             else:
-                fingerprints.append(np.array([0 for _ in range(self.fpSize)]))
+                fingerprints.append([0 for bit in range(self.fpSize)])    
 
-        return self.__convert_fingerprints_to_tensor(fingerprints)
+        return np.array(fingerprints)
 
 
     def __get_maccs_keys(self, mols):
@@ -118,21 +97,7 @@ class SmileDataset(PygGraphPropPredDataset):
             else:
                 fingerprints.append([0 for bit in range(167)])    
 
-        return self.__convert_fingerprints_to_tensor(fingerprints)
-
-
-    def __convert_fingerprints_to_tensor(self, fingerprints):
-        
-        fingerprints_array = np.zeros((len(fingerprints), fingerprints[0].GetNumBits()), dtype=np.int8)
-
-        for i, fingerprint in enumerate(fingerprints):
-
-            if isinstance(fingerprint, np.ndarray):
-                fingerprints_array[i] = fingerprint
-            else:
-                DataStructs.ConvertToNumpyArray(fingerprint, fingerprints_array[i])
-
-        return torch.from_numpy(fingerprints_array)
+        return np.array(fingerprints)
 
 
     def __smiles_to_mols(self, smiles):
@@ -155,11 +120,8 @@ class SmileDataset(PygGraphPropPredDataset):
     def __rearrange_data(self):
 
         data_list = []
-        n_dataset = len(self)
-        print("Started rearranging data")
 
-        for i in range(n_dataset):
-            print(f"Progress: {i}/{n_dataset}")
+        for i in range(len(self)):
             data = self[i]
 
             for method in self.extra_embeddings_methods:
@@ -168,7 +130,7 @@ class SmileDataset(PygGraphPropPredDataset):
             data_list.append(data)
 
         self.data, self.slices = self.collate(data_list)
-        print("Finished rearranging data")
+
 
     def get_idx_split(self):
 

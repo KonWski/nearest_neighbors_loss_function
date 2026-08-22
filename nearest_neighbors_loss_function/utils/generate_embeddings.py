@@ -27,26 +27,20 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, use_ori
     with torch.no_grad():
         
         for _, data in enumerate(data_loader):
-            print("generate embeddings")
-            print(data)
-            print(type(data))
             data = data.to(device)
             n_samples_batch = data.y.shape[0]
             batch_embeddings = model(data)
 
-            print(f"BEFORE CONCAT batch_embeddings.shape: {batch_embeddings.shape}")
-
             # concatenate fingegrprints from the chosen methods
             if data_loader.dataset.use_extra_embeddings:
-
-                print(f"type(data.morgan_fingerprints): {type(data.morgan_fingerprints)}")
-                fingerprints = [batch_embeddings]
-
                 for embedding_name in data_loader.dataset.extra_embeddings_methods:
-                    extra_embedding = getattr(data, embedding_name)                                        
-                    fingerprints.append(extra_embedding)
-                batch_embeddings = torch.concat(fingerprints, axis=1)
-                print(f"AFTER CONCAT batch_embeddings.shape: {batch_embeddings.shape}")
+                    print(f"embedding_name: {embedding_name}")
+                    print(f"type(getattr(data, embedding_name)): {type(getattr(data, embedding_name))}")
+                    print(getattr(data, embedding_name)[:2])
+
+                extra_fingerprints = [getattr(data, embedding_name) 
+                                    for embedding_name in data_loader.dataset.extra_embeddings_methods]
+                batch_embeddings = torch.concat([batch_embeddings, extra_fingerprints], axis=1)
 
             embeddings[start_id: start_id + n_samples_batch] = batch_embeddings.detach().cpu()
             labels[start_id: start_id + n_samples_batch] = data.y
