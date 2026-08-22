@@ -2,6 +2,7 @@ import torch
 from nearest_neighbors_loss_function.utils.transformations import FloatTransformation
 from nearest_neighbors_loss_function.utils.auxiliary_functions import set_seed
 from .checkpoints import load_model
+import numpy as np
 
 def generate_embeddings(model, data_loader, n_samples, embedding_length, use_original_transformation, device):
 
@@ -33,16 +34,20 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, use_ori
             n_samples_batch = data.y.shape[0]
             batch_embeddings = model(data)
 
+            print(f"BEFORE CONCAT batch_embeddings.shape: {batch_embeddings.shape}")
+
             # concatenate fingegrprints from the chosen methods
             if data_loader.dataset.use_extra_embeddings:
 
                 print(f"data.morgan_fingerprints: {data.morgan_fingerprints}")
                 print(f"type(data.morgan_fingerprints): {type(data.morgan_fingerprints)}")
+                fingerprints = [batch_embeddings]
 
-                # TODO chyba trzeba zmienic ponizsze na tensor
-                extra_fingerprints = [getattr(data, embedding_name) 
-                                      for embedding_name in data_loader.dataset.extra_embeddings_methods]
-                batch_embeddings = torch.concat([batch_embeddings, extra_fingerprints], axis=1)
+                for embedding_name in data_loader.dataset.extra_embeddings_methods:
+                    extra_embedding = torch.from_numpy(np.stack(getattr(data, embedding_name)))
+                    fingerprints.append(extra_embedding)
+                batch_embeddings = torch.concat(fingerprints, axis=1)
+                print(f"AFTER CONCAT batch_embeddings.shape: {batch_embeddings.shape}")
 
             embeddings[start_id: start_id + n_samples_batch] = batch_embeddings.detach().cpu()
             labels[start_id: start_id + n_samples_batch] = data.y
