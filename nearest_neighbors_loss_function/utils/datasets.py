@@ -72,6 +72,7 @@ class SmileDataset(PygGraphPropPredDataset):
         fingerprints_array = np.zeros((len(fingerprints), fingerprints[0].GetNumBits()), dtype=np.int8)
 
         for i, fingerprint in enumerate(fingerprints):
+            print(f"ConvertToNumpyArray type(fingerprint): {type(fingerprint)}")
             DataStructs.ConvertToNumpyArray(fingerprint, fingerprints_array[i])
 
         # print(f"len(fingerprints): {len(fingerprints)}")
