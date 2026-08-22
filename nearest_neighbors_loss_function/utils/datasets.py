@@ -68,7 +68,7 @@ class SmileDataset(PygGraphPropPredDataset):
             else:
                 fingerprints.append([0 for _ in range(self.fpSize)])    
 
-        return np.array(fingerprints)
+        return torch.tensor(fingerprints)
 
 
     def __get_rdkit_fps(self, mols):

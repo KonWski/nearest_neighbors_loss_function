@@ -43,8 +43,8 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, use_ori
                 fingerprints = [batch_embeddings]
 
                 for embedding_name in data_loader.dataset.extra_embeddings_methods:
-                    extra_embedding = torch.from_numpy(np.stack(getattr(data, embedding_name)))
-                    fingerprints.append(extra_embedding)
+                    # extra_embedding = torch.from_numpy(np.stack(getattr(data, embedding_name)))
+                    fingerprints.append(getattr(data, embedding_name))
                 batch_embeddings = torch.concat(fingerprints, axis=1)
                 print(f"AFTER CONCAT batch_embeddings.shape: {batch_embeddings.shape}")
 
