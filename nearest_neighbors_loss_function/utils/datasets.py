@@ -56,6 +56,7 @@ class SmileDataset(PygGraphPropPredDataset):
                 self.embedding_extra_length += self.maccs_keys.shape[1]
                 self.extra_embeddings_methods.append("maccs_keys")
             
+            print("Starting rearranging data")
             self.__rearrange_data()
 
     def __get_morgan_fingerprints(self, mols):
@@ -64,7 +65,7 @@ class SmileDataset(PygGraphPropPredDataset):
         fingerprints_array = np.zeros((len(mols), self.fpSize), dtype=np.int8)
 
         for mol_id, mol in enumerate(mols):
-            print(f"progress: {mol_id + 1/n_mols}")
+            print(f"progress: {mol_id + 1}/{n_mols}")
             
             if mol is not None:
                 fingerprint = AllChem.GetMorganFingerprintAsBitVect(mol, radius=3, nBits=self.fpSize)
@@ -154,8 +155,10 @@ class SmileDataset(PygGraphPropPredDataset):
     def __rearrange_data(self):
 
         data_list = []
+        n_dataset = len(self)
 
-        for i in range(len(self)):
+        for i in range(n_dataset):
+            print(f"Progress: {i}/{n_dataset}")
             data = self[i]
 
             for method in self.extra_embeddings_methods:
