@@ -156,6 +156,7 @@ class SmileDataset(PygGraphPropPredDataset):
 
         data_list = []
         n_dataset = len(self)
+        print("Started rearranging data")
 
         for i in range(n_dataset):
             print(f"Progress: {i}/{n_dataset}")
@@ -167,7 +168,7 @@ class SmileDataset(PygGraphPropPredDataset):
             data_list.append(data)
 
         self.data, self.slices = self.collate(data_list)
-
+        print("Finished rearranging data")
 
     def get_idx_split(self):
 
