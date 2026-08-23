@@ -27,31 +27,19 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, use_ori
     with torch.no_grad():
         
         for _, data in enumerate(data_loader):
-            print(f"data id: {_}") 
             data = data.to(device)
             n_samples_batch = data.y.shape[0]
             model_embeddings = model(data)
             batch_embeddings = [model_embeddings]
-            print(f"batch_embeddings.shape: {model_embeddings.shape}")
 
             # concatenate fingegrprints from the chosen methods
             if data_loader.dataset.use_extra_embeddings:
                 for embedding_name in data_loader.dataset.extra_embeddings_methods:
-                    print(f"embedding_name: {embedding_name}")
-                    print(f"type(getattr(data, embedding_name)): {type(getattr(data, embedding_name))}")
-                    print(getattr(data, embedding_name)[:2])
-                    print(getattr(data, embedding_name)[0].shape)
-                    print(getattr(data, embedding_name)[0].dtype)
-                    print(f"len(getattr(data, embedding_name)): {len(getattr(data, embedding_name))}")
                     extra_embeddings = torch.stack([torch.from_numpy(x) for x in getattr(data, embedding_name)])
                     extra_embeddings = extra_embeddings.to(device)
-                    print("Stacked tensors")
                     batch_embeddings.append(extra_embeddings)
                 
-                # extra_fingerprints = [getattr(data, embedding_name) 
-                #                     for embedding_name in data_loader.dataset.extra_embeddings_methods]
                 batch_embeddings = torch.concat(batch_embeddings, axis=1)
-                print("Concatenated embeddings")
 
             embeddings[start_id: start_id + n_samples_batch] = batch_embeddings.detach().cpu()
             labels[start_id: start_id + n_samples_batch] = data.y
