@@ -43,10 +43,10 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, use_ori
                     print(getattr(data, embedding_name)[0].shape)
                     print(getattr(data, embedding_name)[0].dtype)
                     print(f"len(getattr(data, embedding_name)): {len(getattr(data, embedding_name))}")
-                    embeddings = torch.stack([torch.from_numpy(x) for x in getattr(data, embedding_name)])
-                    embeddings = embeddings.to(device)
+                    extra_embeddings = torch.stack([torch.from_numpy(x) for x in getattr(data, embedding_name)])
+                    extra_embeddings = extra_embeddings.to(device)
                     print("Stacked tensors")
-                    batch_embeddings.append(embeddings)
+                    batch_embeddings.append(extra_embeddings)
                 
                 # extra_fingerprints = [getattr(data, embedding_name) 
                 #                     for embedding_name in data_loader.dataset.extra_embeddings_methods]
