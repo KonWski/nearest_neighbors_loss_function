@@ -53,7 +53,7 @@ def generate_embeddings(model, data_loader, n_samples, embedding_length, use_ori
                 batch_embeddings = torch.concat(batch_embeddings, axis=1)
                 print("Concatenated embeddings")
 
-            embeddings[start_id: start_id + n_samples_batch] = model_embeddings.detach().cpu()
+            embeddings[start_id: start_id + n_samples_batch] = batch_embeddings.detach().cpu()
             labels[start_id: start_id + n_samples_batch] = data.y
             start_id += n_samples_batch
 
