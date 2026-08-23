@@ -125,7 +125,7 @@ class SmileDataset(PygGraphPropPredDataset):
             data = self[i]
 
             for method in self.extra_embeddings_methods:
-                data[method] = getattr(self, method)
+                data[method] = getattr(self, method)[i]
 
             data_list.append(data)
 
