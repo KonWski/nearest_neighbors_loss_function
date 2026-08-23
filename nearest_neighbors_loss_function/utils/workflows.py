@@ -170,7 +170,7 @@ def generate_embeddings_workflow(args):
 
     for seed in os.listdir(args.save_path):
 
-        logging.info(f"Started generating for seed: {seed}")
+        logging.info(f"Generating embeddings for seed: {seed}")
 
         # double check if its the seed dir
         try:

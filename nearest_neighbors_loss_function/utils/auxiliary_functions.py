@@ -114,6 +114,6 @@ def find_model_path(seed, save_path):
         raise Exception(f"Directory {seed_path} contains more than 1 model")
 
     model_path = models[0]
-    model_hash = Path(models[0]).stem
+    model_hash = Path(models[0]).stem[6:]
 
     return model_path, model_hash, seed_path
