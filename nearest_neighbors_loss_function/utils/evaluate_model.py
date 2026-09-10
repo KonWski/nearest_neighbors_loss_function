@@ -136,7 +136,7 @@ def calculate_stats(y_test, y_pred, y_pred_proba):
     mcc = round(matthews_corrcoef(y_test, y_pred), 4)
     ef01 = round(enrichment_factor(y_test, y_pred, fraction=0.01), 4)
     ef05 = round(enrichment_factor(y_test, y_pred, fraction=0.05), 4)
-    bedroc = bedroc_score(y_test, y_pred_proba)
+    bedroc = round(bedroc_score(y_test, y_pred_proba), 4)
 
     return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc, bedroc
 
