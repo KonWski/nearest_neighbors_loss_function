@@ -1,6 +1,6 @@
 from sklearn.metrics import precision_score, accuracy_score, recall_score, f1_score, roc_auc_score, matthews_corrcoef, average_precision_score
 from sklearn.neighbors import KNeighborsClassifier
-from skfp.metrics import enrichment_factor
+from skfp.metrics import enrichment_factor, bedroc_score
 from .generate_embeddings import generate_embeddings
 from .checkpoints import load_model
 from .auxiliary_functions import ignore_top_weight
@@ -9,7 +9,6 @@ import torch
 import logging
 from sklearn.ensemble import RandomForestClassifier
 from nearest_neighbors_loss_function.utils.auxiliary_functions import set_seed
-from scikit-chem import bedroc_score
 
 
 def evaluate_model(model, evaluation_mode, train_embeddings, train_labels, test_embeddings, 
@@ -137,7 +136,7 @@ def calculate_stats(y_test, y_pred, y_pred_proba):
     mcc = round(matthews_corrcoef(y_test, y_pred), 4)
     ef01 = round(enrichment_factor(y_test, y_pred, fraction=0.01), 4)
     ef05 = round(enrichment_factor(y_test, y_pred, fraction=0.05), 4)
-    bedroc = bedroc_score(y_test, y_pred)
+    bedroc = bedroc_score(y_test, y_pred_proba)
 
     return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc, bedroc
 
