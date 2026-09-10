@@ -9,7 +9,8 @@ import torch
 import logging
 from sklearn.ensemble import RandomForestClassifier
 from nearest_neighbors_loss_function.utils.auxiliary_functions import set_seed
-from nearest_neighbors_loss_function.utils.transformations import FloatTransformation
+from scikit-chem import bedroc_score
+
 
 def evaluate_model(model, evaluation_mode, train_embeddings, train_labels, test_embeddings, 
                    test_labels, evaluate_model_params, stats_prefix, seed=None):
@@ -136,8 +137,9 @@ def calculate_stats(y_test, y_pred, y_pred_proba):
     mcc = round(matthews_corrcoef(y_test, y_pred), 4)
     ef01 = round(enrichment_factor(y_test, y_pred, fraction=0.01), 4)
     ef05 = round(enrichment_factor(y_test, y_pred, fraction=0.05), 4)
+    bedroc = bedroc_score(y_test, y_pred)
 
-    return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc
+    return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc, bedroc
 
 
 def test_best_seed_model(model_name, statistics, best_seed_models, in_channels, hidden_dim, n_blocks,
