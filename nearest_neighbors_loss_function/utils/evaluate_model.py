@@ -133,8 +133,8 @@ def calculate_stats(y_test, y_pred, y_pred_proba):
     roc_auc = round(roc_auc_score(y_test, y_pred_proba), 4)
     pr_auc = round(average_precision_score(y_test, y_pred_proba), 4)
     mcc = round(matthews_corrcoef(y_test, y_pred), 4)
-    ef01 = round(enrichment_factor(y_test, y_pred, fraction=0.01), 4)
-    ef05 = round(enrichment_factor(y_test, y_pred, fraction=0.05), 4)
+    ef01 = round(enrichment_factor(y_test, y_pred_proba, fraction=0.01), 4)
+    ef05 = round(enrichment_factor(y_test, y_pred_proba, fraction=0.05), 4)
 
     return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc
 
