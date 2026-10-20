@@ -2,7 +2,6 @@ import torch
 from nearest_neighbors_loss_function.utils.transformations import FloatTransformation
 from nearest_neighbors_loss_function.utils.auxiliary_functions import set_seed
 from .checkpoints import load_model
-import numpy as np
 
 def generate_embeddings(model, data_loader, n_samples, embedding_length, use_original_transformation, device):
 

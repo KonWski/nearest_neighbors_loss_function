@@ -10,7 +10,6 @@ from nearest_neighbors_loss_function.utils.auxiliary_functions import create_has
     args_validation, save_embeddings, find_model_path
 from nearest_neighbors_loss_function.params.data_augmentation_params import DataAugmentationParams
 import os
-from pathlib import Path
 from uuid import uuid4
 from nearest_neighbors_loss_function.utils.generate_embeddings import generate_all_splits_embeddings
 
