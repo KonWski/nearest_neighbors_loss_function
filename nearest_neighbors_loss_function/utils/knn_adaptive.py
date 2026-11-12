@@ -1,3 +1,4 @@
+from .constants import EPSILON
 import torch
 
 class KNeigborsAdaptiveClassifier():
@@ -7,10 +8,11 @@ class KNeigborsAdaptiveClassifier():
         self.density_function = density_function
         self.pred_probas = None
 
+
     def fit(self, distances, labels):
 
         n_neigbors_per_row = self._get_n_neigbors_per_row(distances)
-        
+
         # fill diagonal with inf to ommit these elements
         distances_diag_inf = distances.masked_fill(
             torch.eye(distances.size(0), dtype=torch.bool, device=distances.device),
@@ -20,12 +22,13 @@ class KNeigborsAdaptiveClassifier():
         # indices of k nearest neighbors
         _, idx = torch.topk(distances_diag_inf, k=self.initial_n_neighbors, dim=1, largest=False)
 
-        # labels of k nearest neighbors        
+        # labels of k nearest neighbors
         labels_k_nn = labels[idx]
 
         # mask to select specific number of neighbors per row
         mask = torch.arange(self.initial_n_neighbors)[None, :] < n_neigbors_per_row[:, None]
-        
+
+        # prediction
         self.pred_probas = (labels_k_nn * mask).sum(dim=1) / n_neigbors_per_row
 
 
@@ -33,17 +36,22 @@ class KNeigborsAdaptiveClassifier():
 
         local_density = self._local_reachability_density(distances)
         avg_density = torch.mean(local_density)
-        
+
         n_neigbors_per_row_computed = torch.floor(self.initial_n_neighbors * (avg_density / local_density))
-        n_neigbors_per_row_min = torch.full_like(n_neigbors_per_row_computed, self.initial_n_neighbors)
-        n_neigbors_per_row = torch.minimum(n_neigbors_per_row_computed, n_neigbors_per_row_min)
+
+        const_initial_n_neighbors = torch.full_like(n_neigbors_per_row_computed, self.initial_n_neighbors)
+        const_1 = torch.full_like(n_neigbors_per_row_computed, 1)
+
+        n_neigbors_per_row_max = torch.max(const_1, n_neigbors_per_row_computed)
+        n_neigbors_per_row = torch.min(const_initial_n_neighbors, n_neigbors_per_row_max)
 
         return n_neigbors_per_row
+
 
     def _local_reachability_density(self, distances):
         '''
         local reachability distance calculated according to the LOF method
-        
+
         lrd = n_neighbors / sum_reachability_distances
         '''
 
@@ -51,7 +59,7 @@ class KNeigborsAdaptiveClassifier():
         indices_nn = torch.argsort(distances, dim=1)[:, 1:self.initial_n_neighbors+1] # skip self
         distances_nn = torch.gather(distances, 1, indices_nn)
 
-        # distances to the most distance neighbor
+        # distances to the k-th most distant neighbor
         k_dist = torch.sort(distances_nn, dim=1).values[:, self.initial_n_neighbors-1]
 
         # k_dist for all of the k neighbors
@@ -59,12 +67,12 @@ class KNeigborsAdaptiveClassifier():
 
         # reachability distances necessary to calculate the local density
         reach_dist = torch.maximum(distances_nn, k_dist_neighbors)
-        
+
         # local_reachability_density
-        lrd = self.initial_n_neighbors / (torch.sum(reach_dist, dim=1) + 1e-10)
-        
+        lrd = self.initial_n_neighbors / (torch.sum(reach_dist, dim=1) + EPSILON)
+
         return lrd
-    
+
 
     def predict_proba(self, id):
         return self.pred_probas[id]

@@ -5,7 +5,7 @@ from sklearn.neighbors import KNeighborsClassifier
 import torch
 import math
 import torch.nn.functional as F
-import numpy as np
+from .constants import EPSILON
 
 class GammaCalculator():
 
@@ -63,15 +63,15 @@ class GammaCalculator():
         y = y.ravel()
         proba_thrash_threshold = 1 / self.n_neighbors
         self.n_samples = n_samples
-        mask_1 = (y == 1)
+        self.mask_1 = (y == 1)
 
         if self.density_awareness:
             knn = KNeigborsAdaptiveClassifier(self.n_neighbors, self.density_function)
             knn.fit(distances, y)
-            proba_1 = knn.predict_proba(mask_1)
+            proba_1 = knn.predict_proba(self.mask_1)
             gamma_1 = self._calculate_gamma(proba_1)
             self.gamma_values = torch.ones(n_samples, dtype=gamma_1.dtype)
-            self.gamma_values[mask_1] = gamma_1
+            self.gamma_values[self.mask_1] = gamma_1
 
         else:
 
@@ -86,19 +86,27 @@ class GammaCalculator():
             y = y.numpy()
 
             knn.fit(distances, y)
-            distances_1 = distances[mask_1, :]
+            distances_1 = distances[self.mask_1, :]
             proba_1 = knn.predict_proba(distances_1)[0][1] - proba_thrash_threshold
             gamma_1 = self._calculate_gamma(proba_1)
             self.gamma_values = torch.ones(n_samples)
-            self.gamma_values[mask_1] = gamma_1
+            self.gamma_values[self.mask_1] = gamma_1
 
 
     def get_gamma_values(self, gamma_start_id, gamma_end_id, positive_mf_distances, negative_mf_distances):
+
         batch_gamma_values = self.gamma_values[gamma_start_id: gamma_end_id]
         
         if self.samples_difficultness:
-            samples_difficultness = positive_mf_distances / negative_mf_distances
-            batch_gamma_values = batch_gamma_values * (1 + self.lambda_samples_difficultness * samples_difficultness)
+
+            batch_mask_1 = self.mask_1[gamma_start_id: gamma_end_id]
+
+            # h_i
+            samples_difficultness = positive_mf_distances / (negative_mf_distances + EPSILON)
+
+            # gamma = 2 - 1 / ( (2 - p(x_i)) * (1 + lambda * h_i) )
+            batch_gamma_values[batch_mask_1] = 2 - 1 / (batch_gamma_values[batch_mask_1] * (1 + self.lambda_samples_difficultness * samples_difficultness))
+
 
         return batch_gamma_values.detach()
 
@@ -114,7 +122,7 @@ class GammaCalculator():
     
 
     def _focal_gamma(self, sample_proba):
-        sample_proba = max(sample_proba, 1e-8)
+        sample_proba = max(sample_proba, EPSILON)
         gamma = - math.pow(1 - sample_proba, self.focal_pow) * math.log(sample_proba)
 
         if gamma < 1:
