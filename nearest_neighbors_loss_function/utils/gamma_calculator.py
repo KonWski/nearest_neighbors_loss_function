@@ -55,7 +55,7 @@ class GammaCalculator():
             self.gamma_values = self.gamma_values.to(self.device)
 
     def _refresh_gamma_values(self, model, data_loader, n_samples):
-
+        
         X, y = generate_embeddings(model, data_loader, n_samples, self.embedding_length, self.device)
         X = F.normalize(X, dim=1)
         distances = torch.cdist(X,X)
@@ -91,6 +91,8 @@ class GammaCalculator():
             gamma_1 = self._calculate_gamma(proba_1)
             self.gamma_values = torch.ones(n_samples)
             self.gamma_values[self.mask_1] = gamma_1
+
+        print(f"Gamma values were refreshed")
 
 
     def get_gamma_values(self, gamma_start_id, gamma_end_id, positive_mf_distances, negative_mf_distances):
