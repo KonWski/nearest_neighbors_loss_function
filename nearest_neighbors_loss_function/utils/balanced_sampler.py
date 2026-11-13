@@ -23,6 +23,7 @@ class BalancedSampler(BatchSampler):
 
 
     def shuffle_data(self):
+        print(f"Data was shuffled")
         random.shuffle(self.minority_indices)
         random.shuffle(self.majority_indices)
         self.extra_minority_batch_ids = set(random.sample([i for i in range(self.n_batches)], self.n_extra_minority_batches))

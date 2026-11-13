@@ -145,7 +145,7 @@ def train_triplet(
     return statistics, best_seed_models, n_train_samples
 
 
-def train(model, train_loader, n_train_samples, task_id, optimizer, loss_function, batch_shaper, gamma_calculator, seed, epoch, model_epoch_hash, device):
+def train(model, train_loader, n_train_samples, task_id, optimizer, loss_function, batch_shaper, gamma_calculator: GammaCalculator, seed, epoch, model_epoch_hash, device):
 
     model.train()
 
@@ -156,6 +156,9 @@ def train(model, train_loader, n_train_samples, task_id, optimizer, loss_functio
     gamma_start_id = 0
 
     for data_id, data in enumerate(train_loader):
+
+        print(f"data_id: {data_id}")
+        print(f"data: {data}")
 
         data = data.to(device)
         gamma_calculator.recalculate_gamma_values(model, train_loader, n_train_samples, data_id)
