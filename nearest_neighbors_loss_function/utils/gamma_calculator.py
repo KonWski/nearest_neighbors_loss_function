@@ -102,7 +102,7 @@ class GammaCalculator():
             batch_mask_1 = self.mask_1[gamma_start_id: gamma_end_id]
 
             # h_i
-            samples_difficultness = positive_mf_distances[gamma_start_id: gamma_end_id] / (negative_mf_distances[gamma_start_id: gamma_end_id] + EPSILON)
+            samples_difficultness = positive_mf_distances[batch_mask_1] / (negative_mf_distances[batch_mask_1] + EPSILON)
 
             # debug
             print(f"self.mask_1.shape: {self.mask_1.shape}")
