@@ -157,8 +157,8 @@ def train(model, train_loader, n_train_samples, task_id, optimizer, loss_functio
 
     for data_id, data in enumerate(train_loader):
 
-        print(f"data_id: {data_id}")
-        print(f"data: {data}")
+        # print(f"data_id: {data_id}")
+        # print(f"data: {data}")
 
         data = data.to(device)
         gamma_calculator.recalculate_gamma_values(model, train_loader, n_train_samples, data_id)
