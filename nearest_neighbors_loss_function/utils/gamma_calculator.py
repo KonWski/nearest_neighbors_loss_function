@@ -107,8 +107,6 @@ class GammaCalculator():
             # gamma = 2 - 1 / ( (2 - p(x_i)) * (1 + lambda * h_i) )
             batch_gamma_values[batch_mask_1] = 2 - 1 / (batch_gamma_values[batch_mask_1] * (1 + self.lambda_samples_difficultness * samples_difficultness))
 
-            print(f"batch_gamma_values: {batch_gamma_values}")
-
         return batch_gamma_values.detach()
 
 
