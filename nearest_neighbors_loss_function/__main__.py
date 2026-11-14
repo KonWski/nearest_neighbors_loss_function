@@ -13,6 +13,9 @@ def parse_workflow_args():
 def parse_training_args():
     parser = argparse.ArgumentParser(description="Siamese graph neural net training")
 
+    # continue training
+    parser.add_argument("--experiment_hash", type=str, required=False, default="")
+
     parser.add_argument("--seeds", type=int, nargs="+", required=True,
                         help="List of random seeds")
     

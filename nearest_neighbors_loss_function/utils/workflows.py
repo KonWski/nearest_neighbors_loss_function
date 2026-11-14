@@ -20,6 +20,7 @@ def train_workflow(args):
     )
 
     statistics, best_seed_models, n_train_samples = train_triplet(
+        experiment_hash=args.experiment_hash,
         seeds=args.seeds,
         train_loader=train_loader,
         valid_loader=valid_loader,

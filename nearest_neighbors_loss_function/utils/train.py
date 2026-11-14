@@ -1,11 +1,10 @@
 from nearest_neighbors_loss_function.utils.batch_shaper import BatchShaper
 from nearest_neighbors_loss_function.utils.auxiliary_functions import create_experiment_dir, \
-    create_model_dir, set_seed, adjust_graph_data_dtype, get_model
+    create_model_dir, set_seed, adjust_graph_data_dtype, get_model, get_experiment_hash
 from nearest_neighbors_loss_function.utils.gamma_calculator import GammaCalculator
 from nearest_neighbors_loss_function.utils.statistics import Statistics
 from nearest_neighbors_loss_function.utils.evaluate_model import evaluate_model
 from nearest_neighbors_loss_function.utils.checkpoints import save_model
-from uuid import uuid4
 from torch.nn import TripletMarginLoss
 from torch.optim import Adam
 import logging
@@ -15,8 +14,11 @@ import numpy as np
 import os
 from .generate_embeddings import generate_embeddings
 from .evaluate_model_params import EvaluateModelParams
+from uuid import uuid4
+
 
 def train_triplet(
+        experiment_hash: str,
         seeds: List[int], 
         train_loader, 
         valid_loader, 
@@ -50,7 +52,7 @@ def train_triplet(
 
     logging.info(f"Initiating experiment")
 
-    experiment_hash = uuid4().hex
+    experiment_hash = get_experiment_hash(experiment_hash)
     experiment_dir_path = create_experiment_dir(save_path, experiment_hash)
     
     statistics = Statistics(n_epochs, experiment_dir_path, experiment_hash, optimized_param_name, early_stop_window_size)
@@ -61,6 +63,10 @@ def train_triplet(
 
     # iterate over all given seeds
     for id_seed, seed in enumerate(seeds):
+
+        if statistics.seed_processed(seed):
+            logging.info(f"Seed: {seed} already calculated. Proceeding to the next seed.")
+            continue
 
         loss_function = TripletMarginLoss(reduction="none", margin=triplet_loss_margin)
         batch_shaper = BatchShaper(device, training_type, batch_shaper_margin)
@@ -141,6 +147,7 @@ def train_triplet(
                 break
 
         best_seed_models[seed] = {"epoch": best_epochs, "model_path": best_model_paths}
+        statistics.save()
 
     return statistics, best_seed_models, n_train_samples
 
@@ -156,9 +163,6 @@ def train(model, train_loader, n_train_samples, task_id, optimizer, loss_functio
     gamma_start_id = 0
 
     for data_id, data in enumerate(train_loader):
-
-        # print(f"data_id: {data_id}")
-        # print(f"data: {data}")
 
         data = data.to(device)
         gamma_calculator.recalculate_gamma_values(model, train_loader, n_train_samples, data_id)

@@ -19,8 +19,24 @@ class Statistics():
         "accuracy": a, "precision": b, "recall": c, "f1": d, "ef01": e, "ef05": f,
         "roc_auc": j, "mcc": k}]
         '''
-        self.agglomerated_statistics = []
+        self.agglomerated_statistics = self._load_statistics()
     
+    def _load_statistics(self):
+        if os.path.isfile(self.report_path):
+            df = pd.read_excel(self.report_path)
+            agglomerated_statistics = df.to_dict(orient="records")
+        else:
+            agglomerated_statistics = []
+        
+        return agglomerated_statistics
+    
+    def seed_processed(self, seed):
+        for record in self.agglomerated_statistics:
+            if seed == record["seed"]:
+                return True
+        
+        return False
+
     def add(self, train_stats, test_stats):
         train_test_stats = train_stats | test_stats
         self.agglomerated_statistics.append(train_test_stats)

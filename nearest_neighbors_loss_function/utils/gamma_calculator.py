@@ -92,8 +92,6 @@ class GammaCalculator():
             self.gamma_values = torch.ones(n_samples)
             self.gamma_values[self.mask_1] = gamma_1
 
-        print(f"Gamma values were refreshed")
-
 
     def get_gamma_values(self, gamma_start_id, gamma_end_id, positive_mf_distances, negative_mf_distances):
 

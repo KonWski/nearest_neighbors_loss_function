@@ -5,6 +5,16 @@ import os
 import importlib
 from nearest_neighbors_loss_function.models import GINEConvEncoderResidualModel
 from torch_geometric import seed_everything
+from uuid import uuid4
+import logging
+
+def get_experiment_hash(experiment_hash: str):
+
+    if len(experiment_hash) == 0:
+        experiment_hash = uuid4().hex
+
+    return experiment_hash
+
 
 def set_seed(seed: int):
     '''Set randomness for random, numpy, PyTorch CPU, PyTorch GPU, '''
@@ -30,8 +40,14 @@ def create_experiment_dir(path: str, experiment_hash: str):
 
 
 def create_model_dir(experiment_dir_path: str, seed: int):
+
     model_dir_path = os.path.join(experiment_dir_path, str(seed))
-    os.makedirs(model_dir_path)
+    
+    if not os.path.isdir(model_dir_path):
+        os.makedirs(model_dir_path)
+    else:
+        logging.info(f"Directory for seed: {str(seed)} already exists. Skipping directory creation.")
+
     return model_dir_path
 
 
