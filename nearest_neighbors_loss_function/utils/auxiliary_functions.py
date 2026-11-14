@@ -35,12 +35,16 @@ def set_seed(seed: int):
 
 def create_experiment_dir(path: str, experiment_hash: str):
     experiment_dir_path = os.path.join(path, experiment_hash)
-    os.makedirs(experiment_dir_path)
+    
+    if not os.path.isdir(experiment_dir_path):
+        os.makedirs(experiment_dir_path)
+    else:
+        logging.info(f"Experiment directory already exists. Skipping directory creation.")
+
     return experiment_dir_path
 
 
 def create_model_dir(experiment_dir_path: str, seed: int):
-
     model_dir_path = os.path.join(experiment_dir_path, str(seed))
     
     if not os.path.isdir(model_dir_path):
