@@ -7,6 +7,7 @@ from nearest_neighbors_loss_function.models import GINEConvEncoderResidualModel
 from torch_geometric import seed_everything
 from uuid import uuid4
 import logging
+from pathlib import Path
 
 def get_experiment_hash(experiment_hash: str):
 
@@ -53,6 +54,13 @@ def create_model_dir(experiment_dir_path: str, seed: int):
         logging.info(f"Directory for seed: {str(seed)} already exists. Skipping directory creation.")
 
     return model_dir_path
+
+
+def delete_last_model(model_dir_path):
+    '''deletes all files ending with .pt'''
+
+    for file in Path(model_dir_path).glob("*.pt"):
+        file.unlink()
 
 
 def adjust_graph_data_dtype(data, model):

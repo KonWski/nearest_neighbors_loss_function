@@ -1,6 +1,6 @@
 from nearest_neighbors_loss_function.utils.batch_shaper import BatchShaper
 from nearest_neighbors_loss_function.utils.auxiliary_functions import create_experiment_dir, \
-    create_model_dir, set_seed, adjust_graph_data_dtype, get_model, get_experiment_hash
+    create_model_dir, set_seed, adjust_graph_data_dtype, get_model, get_experiment_hash, delete_last_model
 from nearest_neighbors_loss_function.utils.gamma_calculator import GammaCalculator
 from nearest_neighbors_loss_function.utils.statistics import Statistics
 from nearest_neighbors_loss_function.utils.evaluate_model import evaluate_model
@@ -10,8 +10,6 @@ from torch.optim import Adam
 import logging
 import torch
 from typing import List
-import numpy as np
-import os
 from .generate_embeddings import generate_embeddings
 from .evaluate_model_params import EvaluateModelParams
 from uuid import uuid4
@@ -119,6 +117,7 @@ def train_triplet(
             
             if score > best_score:
 
+                delete_last_model(model_dir_path)
                 model_path = save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
                         train_stats["loss"], evaluate_model_params.knn_n_neighbors, valid_optimized_param_value, training_type, batch_size, 
                         gamma_recalculation_strategy, density_awareness, samples_difficultness, lambda_samples_difficultness)
