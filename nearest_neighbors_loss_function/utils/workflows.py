@@ -19,7 +19,7 @@ def train_workflow(args):
         knn_n_neighbors=args.knn_n_neighbors
     )
 
-    statistics, best_seed_models, n_train_samples = train_triplet(
+    statistics, n_train_samples = train_triplet(
         experiment_hash=args.experiment_hash,
         seeds=args.seeds,
         train_loader=train_loader,
@@ -37,7 +37,6 @@ def train_workflow(args):
         density_function=args.density_function,
         samples_difficultness=args.samples_difficultness,
         lambda_samples_difficultness=args.lambda_samples_difficultness,
-        n_evaluation_models=args.n_evaluation_models,
         evaluate_model_params=evaluate_model_params,
         n_epochs=args.n_epochs,
         save_path=args.save_path,
@@ -55,7 +54,6 @@ def train_workflow(args):
     statistics = test_best_seed_model(
         args.model_name,
         statistics, 
-        best_seed_models, 
         args.model_in_channels, 
         args.model_hidden_channels,
         args.model_n_blocks,

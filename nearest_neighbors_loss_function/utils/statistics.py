@@ -38,11 +38,22 @@ class Statistics():
         return False
 
     def add(self, train_stats, test_stats):
-        train_test_stats = train_stats | test_stats
-        self.agglomerated_statistics.append(train_test_stats)
+        auxiliary_fields = {"best_model": 0, "model_path": None}
+        full_stats = train_stats | test_stats | auxiliary_fields
+        self.agglomerated_statistics.append(full_stats)
+
+    def mark_best_model(self, seed, best_epoch, model_path):
+        for stat_id in range(len(self.agglomerated_statistics)):
+            if self.agglomerated_statistics[stat_id]["seed"] == seed and self.agglomerated_statistics[stat_id]["epoch"] == best_epoch:
+                self.agglomerated_statistics[stat_id]["best_model"] = 1
+                self.agglomerated_statistics[stat_id]["model_path"] = model_path
 
     def log_last_train_stats(self):
         logging.info(self.agglomerated_statistics[-1])
+
+    def get_best_models_info(self):
+        df = pd.DataFrame(self.agglomerated_statistics)
+        return df[df["best_model"] == 1].to_dict(orient="records")
 
     def upload_test_stats(self, test_stats, seed, epoch):
         for stat_id in range(len(self.agglomerated_statistics)):
@@ -65,7 +76,6 @@ class Statistics():
         df.to_excel(self.report_path, index=False)
 
     def early_stop_training(self, seed, alpha=0.0):
-
         seed_agglomerated_statistics = [stat for stat in self.agglomerated_statistics if stat["seed"] == seed]
         n_seed_stats = len(seed_agglomerated_statistics)
 

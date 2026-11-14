@@ -139,28 +139,27 @@ def calculate_stats(y_test, y_pred, y_pred_proba):
     return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc
 
 
-def test_best_seed_model(model_name, statistics, best_seed_models, in_channels, hidden_dim, n_blocks,
+def test_best_seed_model(model_name, statistics, in_channels, hidden_dim, n_blocks,
                 embedding_size, train_loader, n_train_samples, test_loader, evaluate_model_params, phase, device):
 
-    for seed, seed_data in best_seed_models.items():
+    best_models_info = statistics.get_best_models_info()
 
-        set_seed(seed)
+    for model_info in best_models_info:
+        set_seed(model_info["seed"])
 
-        for epoch, model_path in zip(seed_data["epoch"], seed_data["model_path"]):
+        model, _ = load_model(model_info["model_path"], model_name, in_channels, hidden_dim, n_blocks, embedding_size)
+        model.to(device)
+        n_test_samples = len(test_loader.dataset)
 
-            model, _ = load_model(model_path, model_name, in_channels, hidden_dim, n_blocks, embedding_size)
-            model.to(device)
-            n_test_samples = len(test_loader.dataset)
+        train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_size, device)
+        test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_size, device)
 
-            train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_size, device)
-            test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_size, device)
+        test_stats, _ = evaluate_model(model, phase, train_embeddings, train_labels, test_embeddings, 
+                                        test_labels, evaluate_model_params, phase)
+        
+        logging.info(f"Seed: {model_info["seed"]}, {test_stats}")
 
-            test_stats, _ = evaluate_model(model, phase, train_embeddings, train_labels, test_embeddings, 
-                                           test_labels, evaluate_model_params, phase)
-            
-            logging.info(f"Seed: {seed}, {test_stats}")
-
-            statistics.upload_test_stats(test_stats, seed, epoch)
+        statistics.upload_test_stats(test_stats, model_info["seed"], model_info["epoch"])
 
     return statistics
 

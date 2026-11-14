@@ -46,8 +46,6 @@ def parse_training_args():
     parser.add_argument("--rf_max_depth", type=int, default=None)
     parser.add_argument("--rf_class_weight", type=str, default=None)
 
-    parser.add_argument("--n_evaluation_models", type=int, default=3)
-
     parser.add_argument("--n_epochs", type=int, required=True)
     parser.add_argument("--save_path", type=str, required=True)
     parser.add_argument("--lr", type=float, required=True)

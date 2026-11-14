@@ -35,7 +35,6 @@ def train_triplet(
         density_function: str,
         samples_difficultness: bool,
         lambda_samples_difficultness: float,
-        n_evaluation_models: int,
         evaluate_model_params: EvaluateModelParams,
         n_epochs: int, 
         save_path: str, 
@@ -56,7 +55,6 @@ def train_triplet(
     experiment_dir_path = create_experiment_dir(save_path, experiment_hash)
     
     statistics = Statistics(n_epochs, experiment_dir_path, experiment_hash, optimized_param_name, early_stop_window_size)
-    best_seed_models = {}
 
     n_train_samples = len(train_loader.dataset)
     n_valid_samples = len(valid_loader.dataset)
@@ -83,9 +81,8 @@ def train_triplet(
         optimizer = Adam(model.parameters(), lr=lr)
 
         # save auxiliary params
-        best_scores = []
-        best_epochs = []
-        best_model_paths = []
+        best_score = float("-inf")
+        best_epoch = None
 
         for epoch in range(0, n_epochs):
 
@@ -119,37 +116,23 @@ def train_triplet(
             train_optimized_param_value = train_stats[f"train_{optimized_param_name}"]
             penalty = max(train_optimized_param_value - valid_optimized_param_value, 0)            
             score = valid_optimized_param_value - 0.25 * penalty
-            n_best_models = len(best_scores) 
             
-            if score > min(best_scores, default=float("-inf")) or n_best_models < n_evaluation_models:
+            if score > best_score:
 
-                best_model_path = save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
+                model_path = save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
                         train_stats["loss"], evaluate_model_params.knn_n_neighbors, valid_optimized_param_value, training_type, batch_size, 
                         gamma_recalculation_strategy, density_awareness, samples_difficultness, lambda_samples_difficultness)
 
-                if n_best_models < n_evaluation_models:
-                    best_scores.append(valid_optimized_param_value)
-                    best_model_paths.append(best_model_path)
-                    best_epochs.append(epoch)
+                best_epoch = epoch
 
-                # replace worst with best model
-                elif n_best_models == n_evaluation_models:
-                    
-                    id_worst_model = np.argmin(best_scores)
-                    os.remove(best_model_paths[id_worst_model])
-
-                    best_scores[id_worst_model] = valid_optimized_param_value
-                    best_model_paths[id_worst_model] = best_model_path
-                    best_epochs[id_worst_model] = epoch
-            
             if statistics.early_stop_training(seed):
                 logging.info(f"Training stopped because of lack of improvement. Current window mean: {statistics.current_window_mean}, last window mean: {statistics.last_window_mean}")
                 break
 
-        best_seed_models[seed] = {"epoch": best_epochs, "model_path": best_model_paths}
+        statistics.mark_best_model(seed, best_epoch, model_path)
         statistics.save()
 
-    return statistics, best_seed_models, n_train_samples
+    return statistics, n_train_samples
 
 
 def train(model, train_loader, n_train_samples, task_id, optimizer, loss_function, batch_shaper, gamma_calculator: GammaCalculator, seed, epoch, model_epoch_hash, device):
