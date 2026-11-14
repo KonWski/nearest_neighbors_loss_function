@@ -123,6 +123,7 @@ def train_triplet(
                         gamma_recalculation_strategy, density_awareness, samples_difficultness, lambda_samples_difficultness)
 
                 best_epoch = epoch
+                best_score = score
 
             if statistics.early_stop_training(seed):
                 logging.info(f"Training stopped because of lack of improvement. Current window mean: {statistics.current_window_mean}, last window mean: {statistics.last_window_mean}")
