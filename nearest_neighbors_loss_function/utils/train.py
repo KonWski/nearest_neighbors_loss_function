@@ -5,6 +5,7 @@ from nearest_neighbors_loss_function.utils.gamma_calculator import GammaCalculat
 from nearest_neighbors_loss_function.utils.statistics import Statistics
 from nearest_neighbors_loss_function.utils.evaluate_model import evaluate_model
 from nearest_neighbors_loss_function.utils.checkpoints import save_model
+from nearest_neighbors_loss_function.utils.data_orchestrator import DataOrchestrator
 from torch.nn import TripletMarginLoss
 from torch.optim import Adam
 import logging
@@ -16,6 +17,7 @@ from uuid import uuid4
 
 
 def train_triplet(
+        orchestrator: DataOrchestrator,
         experiment_hash: str,
         seeds: List[int], 
         train_loader, 
@@ -48,11 +50,9 @@ def train_triplet(
     ):
 
     logging.info(f"Initiating experiment")
-
-    experiment_hash = get_experiment_hash(experiment_hash)
-    experiment_dir_path = create_experiment_dir(save_path, experiment_hash)
+    orchestrator.create_experiment_dir(save_path, experiment_hash)
     
-    statistics = Statistics(n_epochs, experiment_dir_path, experiment_hash, optimized_param_name, early_stop_window_size)
+    statistics = Statistics(n_epochs, orchestrator, experiment_hash, optimized_param_name, early_stop_window_size)
 
     n_train_samples = len(train_loader.dataset)
     n_valid_samples = len(valid_loader.dataset)
@@ -71,7 +71,8 @@ def train_triplet(
                                            samples_difficultness, lambda_samples_difficultness)
 
         logging.info(f"Running training process for seed: {seed}. Progress: {id_seed + 1}/{len(seeds)}")
-        model_dir_path = create_model_dir(experiment_dir_path, seed)
+        orchestrator.create_model_dir(seed)
+        model_dir_path = orchestrator.get_model_dir(seed)
         set_seed(seed)
 
         model = get_model(model_name, model_in_channels, model_hidden_channels, model_n_blocks, embedding_length)
@@ -117,8 +118,9 @@ def train_triplet(
             
             if score > best_score:
 
-                delete_last_model(model_dir_path)
-                model_path = save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
+                orchestrator.delete_last_model(model_dir_path)
+                model_path = orchestrator.get_model_path(model_dir_path, model_epoch_hash)
+                save_model(model_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
                         train_stats["loss"], evaluate_model_params.knn_n_neighbors, valid_optimized_param_value, training_type, batch_size, 
                         gamma_recalculation_strategy, density_awareness, samples_difficultness, lambda_samples_difficultness)
 

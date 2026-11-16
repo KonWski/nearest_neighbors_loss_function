@@ -5,8 +5,7 @@ from .evaluate_model import test_best_seed_model, test_model
 import logging
 from nearest_neighbors_loss_function.utils.statistics import Statistics
 from nearest_neighbors_loss_function.utils.evaluate_model_params import EvaluateModelParams
-import os
-from pathlib import Path
+from nearest_neighbors_loss_function.utils.data_orchestrator import get_orchestrator
 
 def train_workflow(args):
     
@@ -18,8 +17,10 @@ def train_workflow(args):
         evaluation_model_name="knn",
         knn_n_neighbors=args.knn_n_neighbors
     )
+    orchestrator = get_orchestrator(args.env, args.save_path, args.exeriment_hash, args.project_name, args.bucket_name, "train_report")
 
     statistics, n_train_samples = train_triplet(
+        orchestrator=orchestrator,
         experiment_hash=args.experiment_hash,
         seeds=args.seeds,
         train_loader=train_loader,
@@ -72,8 +73,8 @@ def train_workflow(args):
 def test_workflow(args):
 
     log_args(args)
-    experiment_hash = args.save_path.split("/")[-1]
-    statistics = Statistics(args.n_epochs, args.save_path, experiment_hash, args.optimized_param_name, -1, "test_report")
+    orchestrator = get_orchestrator(args.env, args.save_path, args.exeriment_hash, args.project_name, args.bucket_name, "test_report")
+    statistics = Statistics(args.n_epochs, args.save_path, args.experiment_hash, args.optimized_param_name, -1)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, debug=False)
@@ -93,7 +94,10 @@ def test_workflow(args):
         rf_class_weight=args.rf_class_weight
     )
 
-    for seed in os.listdir(args.save_path):
+    for seed_path in orchestrator.listdir(args.save_path):
+
+        logging.info(f"Testing: {seed_path}")
+        seed = orchestrator.extract_folder_name(seed_path)
 
         # double check if its the seed dir
         try:
@@ -101,14 +105,15 @@ def test_workflow(args):
         except ValueError:
             continue
         
-        seed_path = Path(os.path.join(args.save_path, str(seed)))
-        models = list(seed_path.rglob("*.pt"))
+        models = orchestrator.rglob(seed_path, ".pt")
         n_models = len(models)
 
         if n_models > 1:
             raise Exception(f"Directory {seed_path} contains more than 1 model")
 
-        statistics = test_model(str(models[0]), args.model_name, args.model_in_channels, args.model_hidden_channels, args.model_n_blocks, args.embedding_length, 
+        model_path = models[0]
+
+        statistics = test_model(model_path, args.model_name, args.model_in_channels, args.model_hidden_channels, args.model_n_blocks, args.embedding_length, 
                                 train_loader, n_train_samples, valid_loader, n_valid_samples, test_loader, n_test_samples, 
                                 evaluate_model_params, statistics, int(seed), device)
 

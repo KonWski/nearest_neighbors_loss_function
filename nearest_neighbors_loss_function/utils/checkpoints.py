@@ -1,10 +1,9 @@
 from torch import save, load
 import logging
 from datetime import datetime
-import os
 from nearest_neighbors_loss_function.utils.auxiliary_functions import get_model
 
-def save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash,  lr, model_state_dict,
+def save_model(checkpoint_path, experiment_hash, seed, epoch, model_epoch_hash,  lr, model_state_dict,
                train_loss, n_neighbors, optimized_param_value, training_type, batch_size, 
                gamma_recalculation_strategy, 
                density_awareness: bool, 
@@ -31,11 +30,8 @@ def save_model(model_dir_path, experiment_hash, seed, epoch, model_epoch_hash,  
     checkpoint["lambda_samples_difficultness"] = lambda_samples_difficultness
     checkpoint["save_model_dttm"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    checkpoint_path = os.path.join(model_dir_path, f"{model_epoch_hash}.pt")
     save(checkpoint, checkpoint_path)
     logging.info(f"Saved model to checkpoint: {checkpoint_path}")
-
-    return checkpoint_path
 
 
 def load_model(model_path, model_name, in_channels, hidden_dim, model_n_blocks, embedding_size):

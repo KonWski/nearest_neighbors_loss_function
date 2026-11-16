@@ -1,18 +1,19 @@
 import pandas as pd
-import os
 import logging
 from statistics import mean
+from nearest_neighbors_loss_function.utils.data_orchestrator import DataOrchestrator
 
 class Statistics():
 
-    def __init__(self, n_epochs, experiment_dir_path, experiment_hash, optimized_param_name, early_stop_window_size, report_name = "train_report"):
+    def __init__(self, n_epochs: int, orchestrator: DataOrchestrator, experiment_hash, optimized_param_name: str, 
+                 early_stop_window_size: int, report_name = "train_report"):
         self.n_epochs = n_epochs
-        self.experiment_dir_path = experiment_dir_path
+        self.orchestrator = orchestrator
         self.experiment_hash = experiment_hash
         self.optimized_param = optimized_param_name
         self.early_stop_window_size = early_stop_window_size
         self.report_name = report_name
-        self.report_path = os.path.join(self.experiment_dir_path, f"{self.report_name}.xlsx")
+        self.report_path = orchestrator.report_path
 
         '''
         as [{"seed": x, "state": y, "epoch": z, "loss": q, "experiment_hash": p, "model_hash": w,
@@ -22,7 +23,7 @@ class Statistics():
         self.agglomerated_statistics = self._load_statistics()
     
     def _load_statistics(self):
-        if os.path.isfile(self.report_path):
+        if self.orchestrator.isfile(self.report_path):
             df = pd.read_excel(self.report_path)
             agglomerated_statistics = df.to_dict(orient="records")
         else:

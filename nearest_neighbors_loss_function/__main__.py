@@ -13,6 +13,10 @@ def parse_workflow_args():
 def parse_training_args():
     parser = argparse.ArgumentParser(description="Siamese graph neural net training")
 
+    parser.add_argument("--env", type=str, default="os")
+    parser.add_argument("--project_name", type=str)
+    parser.add_argument("--bucket_name", type=str)
+
     # continue training
     parser.add_argument("--experiment_hash", type=str, required=False, default="")
 
@@ -66,6 +70,10 @@ def parse_training_args():
 def parse_testing_args():
     parser = argparse.ArgumentParser(description="Siamese graph neural net testing")
 
+    parser.add_argument("--env", type=str, default="os")
+    parser.add_argument("--project_name", type=str)
+    parser.add_argument("--bucket_name", type=str)
+
     parser.add_argument("--dataset_name", type=str, default="ogbg-molhiv")
     parser.add_argument("--task_id", type=int, default=0)
     parser.add_argument("--n_evaluation_models", type=int, default=3)
@@ -82,6 +90,7 @@ def parse_testing_args():
     parser.add_argument("--batch_size", type=int, required=True)
     parser.add_argument("--n_epochs", type=int, required=True)
     parser.add_argument("--save_path", type=str, required=True)
+    parser.add_argument("--experiment_hash", type=str, required=True)
 
     parser.add_argument("--model_name", type=str, required=True)
     parser.add_argument("--model_hidden_channels", type=int, required=True)
