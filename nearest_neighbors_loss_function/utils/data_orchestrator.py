@@ -98,7 +98,7 @@ class OsOrchestrator(DataOrchestrator):
 
 
     def isfile(self, path):
-        os.path.isfile(path)
+        return os.path.isfile(path)
 
 
 class GcpOrchestrator(DataOrchestrator):
