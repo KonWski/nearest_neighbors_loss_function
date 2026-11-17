@@ -6,13 +6,12 @@ from nearest_neighbors_loss_function.utils.data_orchestrator import DataOrchestr
 class Statistics():
 
     def __init__(self, n_epochs: int, orchestrator: DataOrchestrator, experiment_hash, optimized_param_name: str, 
-                 early_stop_window_size: int, report_name = "train_report.xlsx"):
+                 early_stop_window_size: int):
         self.n_epochs = n_epochs
         self.orchestrator = orchestrator
         self.experiment_hash = experiment_hash
         self.optimized_param = optimized_param_name
         self.early_stop_window_size = early_stop_window_size
-        self.report_name = report_name
         self.report_path = orchestrator.report_path
 
         '''

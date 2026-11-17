@@ -17,7 +17,7 @@ def train_workflow(args):
         evaluation_model_name="knn",
         knn_n_neighbors=args.knn_n_neighbors
     )
-    orchestrator = get_orchestrator(args.env, args.save_path, args.experiment_hash, args.project_name, args.bucket_name, "train_report")
+    orchestrator = get_orchestrator(args.env, args.save_path, args.experiment_hash, args.project_name, args.bucket_name, "train_report.xlsx")
 
     statistics, n_train_samples = train_triplet(
         orchestrator=orchestrator,
@@ -73,7 +73,7 @@ def train_workflow(args):
 def test_workflow(args):
 
     log_args(args)
-    orchestrator = get_orchestrator(args.env, args.save_path, args.experiment_hash, args.project_name, args.bucket_name, "test_report")
+    orchestrator = get_orchestrator(args.env, args.save_path, args.experiment_hash, args.project_name, args.bucket_name, "test_report.xlsx")
     statistics = Statistics(args.n_epochs, args.save_path, args.experiment_hash, args.optimized_param_name, -1)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
