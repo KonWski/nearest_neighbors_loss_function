@@ -36,7 +36,6 @@ def train_triplet(
         lambda_samples_difficultness: float,
         evaluate_model_params: EvaluateModelParams,
         n_epochs: int, 
-        save_path: str, 
         lr: float, 
         model_name: str,
         model_in_channels: int,

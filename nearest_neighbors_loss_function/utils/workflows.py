@@ -40,7 +40,6 @@ def train_workflow(args):
         lambda_samples_difficultness=args.lambda_samples_difficultness,
         evaluate_model_params=evaluate_model_params,
         n_epochs=args.n_epochs,
-        save_path=args.save_path,
         lr=args.lr,
         model_name=args.model_name,
         model_in_channels=args.model_in_channels,

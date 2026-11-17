@@ -49,7 +49,7 @@ class OsOrchestrator(DataOrchestrator):
     def __init__(self, save_path: str, experiment_hash: str, report_name: str):
         super().__init__()
         self.experiment_dir_path = os.path.join(save_path, experiment_hash)
-        self.report_path = os.path.join(save_path, report_name)
+        self.report_path = os.path.join(save_path, experiment_hash, report_name)
 
 
     def create_experiment_dir(self):        
@@ -109,7 +109,7 @@ class GcpOrchestrator(DataOrchestrator):
         self.bucket = self.client.bucket(bucket_name)
 
         self.experiment_dir_path = posixpath.join(save_path, experiment_hash)
-        self.report_path = posixpath.join(save_path, f"{report_name}.xlsx")
+        self.report_path = posixpath.join(save_path, experiment_hash, report_name)
 
 
     def create_experiment_dir(self):        
