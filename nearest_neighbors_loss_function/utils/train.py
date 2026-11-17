@@ -50,7 +50,7 @@ def train_triplet(
     ):
 
     logging.info(f"Initiating experiment")
-    orchestrator.create_experiment_dir(save_path, experiment_hash)
+    orchestrator.create_experiment_dir()
     
     statistics = Statistics(n_epochs, orchestrator, experiment_hash, optimized_param_name, early_stop_window_size)
 
