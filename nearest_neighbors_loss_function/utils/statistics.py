@@ -74,6 +74,9 @@ class Statistics():
     def save(self):
         df = pd.DataFrame(self.agglomerated_statistics)
         df["experiment_hash"] = self.experiment_hash
+
+        print(f"Saving the report to {self.report_path}")
+        print(df)
         df.to_excel(self.report_path, index=False)
 
     def early_stop_training(self, seed, alpha=0.0):
