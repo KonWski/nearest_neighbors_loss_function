@@ -64,7 +64,7 @@ class OsOrchestrator(DataOrchestrator):
     
 
     def get_model_path(self, model_dir, model_hash):
-        return os.path.join(model_dir, model_hash, "pt")
+        return os.path.join(model_dir, f"{model_hash}.pt")
 
 
     def create_model_dir(self, seed: int):
@@ -125,7 +125,7 @@ class GcpOrchestrator(DataOrchestrator):
 
 
     def get_model_path(self, model_dir, model_hash):
-        return posixpath.join(model_dir, model_hash, "pt")
+        return posixpath.join(model_dir, f"{model_hash}.pt")
 
 
     def create_model_dir(self, seed: int):
