@@ -1,6 +1,5 @@
 from nearest_neighbors_loss_function.utils.batch_shaper import BatchShaper
-from nearest_neighbors_loss_function.utils.auxiliary_functions import create_experiment_dir, \
-    create_model_dir, set_seed, adjust_graph_data_dtype, get_model, get_experiment_hash, delete_last_model
+from nearest_neighbors_loss_function.utils.auxiliary_functions import set_seed, adjust_graph_data_dtype, get_model
 from nearest_neighbors_loss_function.utils.gamma_calculator import GammaCalculator
 from nearest_neighbors_loss_function.utils.statistics import Statistics
 from nearest_neighbors_loss_function.utils.evaluate_model import evaluate_model

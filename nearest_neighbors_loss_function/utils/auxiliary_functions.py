@@ -25,35 +25,6 @@ def set_seed(seed: int):
     torch.use_deterministic_algorithms(True)
 
 
-def create_experiment_dir(path: str, experiment_hash: str):
-    experiment_dir_path = os.path.join(path, experiment_hash)
-    
-    if not os.path.isdir(experiment_dir_path):
-        os.makedirs(experiment_dir_path)
-    else:
-        logging.info(f"Experiment directory already exists. Skipping directory creation.")
-
-    return experiment_dir_path
-
-
-def create_model_dir(experiment_dir_path: str, seed: int):
-    model_dir_path = os.path.join(experiment_dir_path, str(seed))
-    
-    if not os.path.isdir(model_dir_path):
-        os.makedirs(model_dir_path)
-    else:
-        logging.info(f"Directory for seed: {str(seed)} already exists. Skipping directory creation.")
-
-    return model_dir_path
-
-
-def delete_last_model(model_dir_path):
-    '''deletes all files ending with .pt'''
-
-    for file in Path(model_dir_path).glob("*.pt"):
-        file.unlink()
-
-
 def adjust_graph_data_dtype(data, model):
 
     if not isinstance(model, GINEConvEncoderResidualModel):
