@@ -176,7 +176,7 @@ def get_orchestrator(env: str, save_path: str, experiment_hash: str, project_nam
         orchestrator = OsOrchestrator(save_path, experiment_hash, report_name)
     elif env == "gcp":
 
-        if any(project_name is None, bucket_name is None):
+        if project_name is None and bucket_name is None:
             raise Exception(f"The env was indicated as {env} but either project_name or bucket_name param seem to be missing.")
 
         orchestrator = GcpOrchestrator(save_path, experiment_hash, project_name, bucket_name, report_name)
