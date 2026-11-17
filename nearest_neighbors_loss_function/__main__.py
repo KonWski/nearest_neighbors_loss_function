@@ -1,7 +1,7 @@
 import argparse
 from .utils.workflows import train_workflow, test_workflow
-import nearest_neighbors_loss_function.utils.set_torch_geometrics
 import logging
+from uuid import uuid4
 
 def parse_workflow_args():
     parser = argparse.ArgumentParser(description="Workflow name parsing")    
@@ -18,7 +18,7 @@ def parse_training_args():
     parser.add_argument("--bucket_name", type=str)
 
     # continue training
-    parser.add_argument("--experiment_hash", type=str, required=False, default="")
+    parser.add_argument("--experiment_hash", type=str, required=False, default=uuid4().hex)
 
     parser.add_argument("--seeds", type=int, nargs="+", required=True,
                         help="List of random seeds")

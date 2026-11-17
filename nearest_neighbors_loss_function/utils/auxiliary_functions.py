@@ -5,17 +5,8 @@ import os
 import importlib
 from nearest_neighbors_loss_function.models import GINEConvEncoderResidualModel
 from torch_geometric import seed_everything
-from uuid import uuid4
 import logging
 from pathlib import Path
-
-def get_experiment_hash(experiment_hash: str):
-
-    if len(experiment_hash) == 0:
-        experiment_hash = uuid4().hex
-
-    return experiment_hash
-
 
 def set_seed(seed: int):
     '''Set randomness for random, numpy, PyTorch CPU, PyTorch GPU, '''
