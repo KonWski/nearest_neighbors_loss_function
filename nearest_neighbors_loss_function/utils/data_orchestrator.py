@@ -150,6 +150,7 @@ class GcpOrchestrator(DataOrchestrator):
 
     def _dir_exists(self, path: str):
         blob = self.bucket.blob(path.rstrip("/") + "/")
+        print(f"Method: _dir_exists, blob.exists(): {blob.exists()}")
         return blob.exists()
     
 
