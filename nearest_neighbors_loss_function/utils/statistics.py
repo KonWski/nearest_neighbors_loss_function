@@ -6,7 +6,7 @@ from nearest_neighbors_loss_function.utils.data_orchestrator import DataOrchestr
 class Statistics():
 
     def __init__(self, n_epochs: int, orchestrator: DataOrchestrator, experiment_hash, optimized_param_name: str, 
-                 early_stop_window_size: int, report_name = "train_report"):
+                 early_stop_window_size: int, report_name = "train_report.xlsx"):
         self.n_epochs = n_epochs
         self.orchestrator = orchestrator
         self.experiment_hash = experiment_hash
@@ -74,9 +74,6 @@ class Statistics():
     def save(self):
         df = pd.DataFrame(self.agglomerated_statistics)
         df["experiment_hash"] = self.experiment_hash
-
-        print(f"Saving the report to {self.report_path}")
-        print(df)
         df.to_excel(self.report_path, index=False)
 
     def early_stop_training(self, seed, alpha=0.0):
