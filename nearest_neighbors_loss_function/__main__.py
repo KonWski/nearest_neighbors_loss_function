@@ -1,5 +1,6 @@
 import argparse
 from .utils.workflows import train_workflow, test_workflow
+from .utils import set_torch_geometrics
 import logging
 from uuid import uuid4
 

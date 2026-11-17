@@ -1,12 +1,9 @@
 import random
 import numpy as np
 import torch
-import os
 import importlib
 from nearest_neighbors_loss_function.models import GINEConvEncoderResidualModel
 from torch_geometric import seed_everything
-import logging
-from pathlib import Path
 
 def set_seed(seed: int):
     '''Set randomness for random, numpy, PyTorch CPU, PyTorch GPU, '''
