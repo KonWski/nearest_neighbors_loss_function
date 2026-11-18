@@ -115,6 +115,7 @@ class GcpOrchestrator(DataOrchestrator):
     def create_experiment_dir(self):        
 
         if not self._dir_exists(self.experiment_dir_path):
+            print(f"self.experiment_dir_path: {self.experiment_dir_path}")
             self.bucket.blob(self.experiment_dir_path)
         else:
             logging.info(f"Experiment directory already exists. Skipping directory creation.")
