@@ -108,8 +108,8 @@ class GcpOrchestrator(DataOrchestrator):
         self.client = storage.Client(project=project_name)
         self.bucket = self.client.bucket(bucket_name)
 
-        self.experiment_dir_path = posixpath.join(save_path, experiment_hash)
-        self.report_path = posixpath.join(save_path, experiment_hash, report_name)
+        self.experiment_dir_path = posixpath.join(save_path, experiment_hash).rstrip("/") + "/"
+        self.report_path = posixpath.join(save_path, experiment_hash, report_name).rstrip("/") + "/"
 
 
     def create_experiment_dir(self):        
@@ -122,7 +122,7 @@ class GcpOrchestrator(DataOrchestrator):
 
 
     def get_model_dir(self, seed: int):
-        return posixpath.join(self.experiment_dir_path, str(seed))
+        return posixpath.join(self.experiment_dir_path, str(seed)).rstrip("/") + "/"
 
 
     def get_model_path(self, model_dir, model_hash):
