@@ -130,8 +130,10 @@ class GcpOrchestrator(DataOrchestrator):
 
     def create_model_dir(self, seed: int):
         model_dir_path = self.get_model_dir(seed)
+        print(f"model_dir_path: {model_dir_path}")
 
         if not self._dir_exists(model_dir_path):
+            print("Creating model_dir_path")
             self.bucket.blob(model_dir_path)
         else:
             logging.info(f"Directory for seed: {str(seed)} already exists. Skipping directory creation.")
