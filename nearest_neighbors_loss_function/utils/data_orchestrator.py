@@ -107,7 +107,6 @@ class GcpOrchestrator(DataOrchestrator):
         super().__init__()
         self.client = storage.Client(project=project_name)
         self.bucket = self.client.bucket(bucket_name)
-
         self.experiment_dir_path = posixpath.join(save_path, experiment_hash).rstrip("/") + "/"
         self.report_path = posixpath.join(save_path, experiment_hash, report_name).rstrip("/") + "/"
 
@@ -115,9 +114,7 @@ class GcpOrchestrator(DataOrchestrator):
     def create_experiment_dir(self):        
 
         if not self._dir_exists(self.experiment_dir_path):
-            print(f"self.experiment_dir_path: {self.experiment_dir_path}")
-            blob = self.bucket.blob(self.experiment_dir_path)
-            blob.upload_from_string("")
+            self._create_dir(self.experiment_dir_path)
         else:
             logging.info(f"Experiment directory already exists. Skipping directory creation.")
 
@@ -132,12 +129,9 @@ class GcpOrchestrator(DataOrchestrator):
 
     def create_model_dir(self, seed: int):
         model_dir_path = self.get_model_dir(seed)
-        print(f"model_dir_path: {model_dir_path}")
 
         if not self._dir_exists(model_dir_path):
-            print("Creating model_dir_path")
-            blob = self.bucket.blob(model_dir_path)
-            blob.upload_from_string("")
+            self._create_dir(model_dir_path)
         else:
             logging.info(f"Directory for seed: {str(seed)} already exists. Skipping directory creation.")
 
@@ -155,9 +149,13 @@ class GcpOrchestrator(DataOrchestrator):
 
     def _dir_exists(self, path: str):
         blob = self.bucket.blob(path.rstrip("/") + "/")
-        print(f"Method: _dir_exists, blob.exists(): {blob.exists()}")
         return blob.exists()
     
+
+    def _create_dir(self, path: str):
+        blob = self.bucket.blob(path)
+        blob.upload_from_string("")
+
 
     def list_dir(self, path: str):
         return self.bucket.list_blobs(prefix=path)
