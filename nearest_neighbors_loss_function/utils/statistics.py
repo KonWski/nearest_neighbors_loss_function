@@ -23,7 +23,7 @@ class Statistics():
     
     def _load_statistics(self):
         if self.orchestrator.isfile(self.report_path):
-            df = pd.read_excel(self.report_path)
+            df = self.orchestrator.read_df(self.report_path)
             agglomerated_statistics = df.to_dict(orient="records")
         else:
             agglomerated_statistics = []

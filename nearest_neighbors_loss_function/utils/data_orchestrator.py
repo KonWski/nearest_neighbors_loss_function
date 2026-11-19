@@ -6,6 +6,7 @@ import posixpath
 from google.cloud import storage
 from torch import save
 import io
+import pandas as pd
 
 class DataOrchestrator(ABC):
 
@@ -49,9 +50,12 @@ class DataOrchestrator(ABC):
     def save_model(self, checkpoint, model_path):
         pass
 
-
     @abstractmethod
     def save_df(self, df, path):
+        pass
+
+    @abstractmethod
+    def read_df(self, path):
         pass
 
 
@@ -119,7 +123,11 @@ class OsOrchestrator(DataOrchestrator):
 
     def save_df(self, df, path):
         df.to_excel(path, index=False)
-        
+
+
+    def read_df(self, path):
+        return pd.read_excel(path)
+
 
 class GcpOrchestrator(DataOrchestrator):
 
@@ -160,10 +168,6 @@ class GcpOrchestrator(DataOrchestrator):
 
     def delete_last_model(self, model_dir_path):
         '''deletes all files ending with .pt'''
-
-
-        print("Deleting last model")
-        print(f"model_dir_path: {model_dir_path}")
 
         blobs = self.list_dir(model_dir_path.rstrip("/") + "/")
         for blob in blobs:
@@ -212,6 +216,11 @@ class GcpOrchestrator(DataOrchestrator):
         df.to_excel(buffer, index=False)
         buffer.seek(0)
         self.bucket.blob(path).upload_from_file(buffer)
+
+
+    def read_df(self, path):
+        blob = self.bucket.blob(path)
+        return pd.read_excel(io.BytesIO(blob.download_as_bytes()))
 
 
 def get_orchestrator(env: str, save_path: str, experiment_hash: str, project_name: str, bucket_name: str, report_name: str):
