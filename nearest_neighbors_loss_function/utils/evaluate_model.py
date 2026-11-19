@@ -2,7 +2,7 @@ from sklearn.metrics import precision_score, accuracy_score, recall_score, f1_sc
 from sklearn.neighbors import KNeighborsClassifier
 from skfp.metrics import enrichment_factor
 from .generate_embeddings import generate_embeddings
-from .auxiliary_functions import ignore_top_weight, save_embeddings
+from .auxiliary_functions import ignore_top_weight
 import torch.nn.functional as F
 import torch
 import logging
