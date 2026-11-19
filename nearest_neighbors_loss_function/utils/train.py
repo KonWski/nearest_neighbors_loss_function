@@ -118,7 +118,7 @@ def train_triplet(
 
                 orchestrator.delete_last_model(model_dir_path)
                 model_path = orchestrator.get_model_path(model_dir_path, model_epoch_hash)
-                save_model(model_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
+                save_model(orchestrator, model_path, experiment_hash, seed, epoch, model_epoch_hash, lr, model.state_dict(), 
                         train_stats["loss"], evaluate_model_params.knn_n_neighbors, valid_optimized_param_value, training_type, batch_size, 
                         gamma_recalculation_strategy, density_awareness, samples_difficultness, lambda_samples_difficultness)
 

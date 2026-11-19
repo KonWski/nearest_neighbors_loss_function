@@ -4,6 +4,8 @@ import os
 from pathlib import Path, PurePosixPath
 import posixpath
 from google.cloud import storage
+from torch import save
+import io
 
 class DataOrchestrator(ABC):
 
@@ -41,6 +43,10 @@ class DataOrchestrator(ABC):
 
     @abstractmethod
     def isfile(self, path):
+        pass
+
+    @abstractmethod
+    def save_model(self, checkpoint, model_path):
         pass
 
 
@@ -100,6 +106,11 @@ class OsOrchestrator(DataOrchestrator):
     def isfile(self, path):
         return os.path.isfile(path)
 
+
+    def save_model(self, checkpoint, model_path):
+        save(checkpoint, model_path)
+        logging.info(f"Saved model to checkpoint: {model_path}")
+        
 
 class GcpOrchestrator(DataOrchestrator):
 
@@ -172,6 +183,14 @@ class GcpOrchestrator(DataOrchestrator):
     def isfile(self, path):
         blob = self.bucket.blob(path)
         return blob.exists()
+
+
+    def save_model(self, checkpoint, model_path):
+        blob = self.bucket.blob(model_path)
+        buffer = io.BytesIO()
+        save(checkpoint, buffer)
+        buffer.seek(0)
+        blob.upload_from_file(buffer)
 
 
 def get_orchestrator(env: str, save_path: str, experiment_hash: str, project_name: str, bucket_name: str, report_name: str):

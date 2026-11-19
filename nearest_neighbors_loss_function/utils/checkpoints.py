@@ -2,9 +2,18 @@ from torch import save, load
 import logging
 from datetime import datetime
 from nearest_neighbors_loss_function.utils.auxiliary_functions import get_model
+from nearest_neighbors_loss_function.utils.data_orchestrator import DataOrchestrator
 
-def save_model(checkpoint_path, experiment_hash, seed, epoch, model_epoch_hash,  lr, model_state_dict,
-               train_loss, n_neighbors, optimized_param_value, training_type, batch_size, 
+def save_model(data_orchestrator: DataOrchestrator, 
+               checkpoint_path: str, 
+               experiment_hash: str, 
+               seed: int, 
+               epoch: int, 
+               model_epoch_hash: str,  
+               lr: float, 
+               model_state_dict,
+               train_loss, 
+               n_neighbors, optimized_param_value, training_type, batch_size, 
                gamma_recalculation_strategy, 
                density_awareness: bool, 
                samples_difficultness: bool, 
@@ -30,9 +39,8 @@ def save_model(checkpoint_path, experiment_hash, seed, epoch, model_epoch_hash, 
     checkpoint["lambda_samples_difficultness"] = lambda_samples_difficultness
     checkpoint["save_model_dttm"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    save(checkpoint, checkpoint_path)
-    logging.info(f"Saved model to checkpoint: {checkpoint_path}")
-
+    data_orchestrator.save_model(checkpoint, checkpoint_path)
+    
 
 def load_model(model_path, model_name, in_channels, hidden_dim, model_n_blocks, embedding_size):
 
