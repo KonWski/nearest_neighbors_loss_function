@@ -2,8 +2,7 @@ from sklearn.metrics import precision_score, accuracy_score, recall_score, f1_sc
 from sklearn.neighbors import KNeighborsClassifier
 from skfp.metrics import enrichment_factor
 from .generate_embeddings import generate_embeddings
-from .checkpoints import load_model
-from .auxiliary_functions import ignore_top_weight
+from .auxiliary_functions import ignore_top_weight, save_embeddings
 import torch.nn.functional as F
 import torch
 import logging
@@ -165,18 +164,21 @@ def test_best_seed_model(model_name, orchestrator: DataOrchestrator, statistics,
     return statistics
 
 
-def test_model(model_path, model_name, model_in_channels, model_hidden_channels, model_n_blocks, embedding_length, 
-               train_loader, n_train_samples, valid_loader, n_valid_samples, test_loader, n_test_samples, 
+def test_model(orchestrator: DataOrchestrator, model_path, model_name, model_in_channels, model_hidden_channels, model_n_blocks, embedding_length, 
+               train_loader, n_train_samples, valid_loader, n_valid_samples, test_loader, n_test_samples, save_embeddings,
                evaluate_model_params, statistics, seed, device):
     
     set_seed(seed)
     train_loader.batch_sampler.shuffle_data()
-    model, checkpoint = load_model(model_path, model_name, model_in_channels, model_hidden_channels, model_n_blocks, embedding_length)
+    model, checkpoint = orchestrator.load_model(model_path, model_name, model_in_channels, model_hidden_channels, model_n_blocks, embedding_length)
     model.to(device)
 
     train_embeddings, train_labels = generate_embeddings(model, train_loader, n_train_samples, embedding_length, device)
     valid_embeddings, valid_labels = generate_embeddings(model, valid_loader, n_valid_samples, embedding_length, device)        
     test_embeddings, test_labels = generate_embeddings(model, test_loader, n_test_samples, embedding_length, device)
+
+    if save_embeddings:
+        orchestrator.save_embeddings(train_embeddings, train_labels, valid_embeddings, valid_labels, test_embeddings, test_labels, seed, checkpoint["model_epoch_hash"])
 
     valid_stats, _ = evaluate_model(model, "valid", train_embeddings, train_labels, valid_embeddings, 
                                     valid_labels, evaluate_model_params, "valid", seed)

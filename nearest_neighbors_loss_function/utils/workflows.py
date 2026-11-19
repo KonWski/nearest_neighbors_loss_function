@@ -114,7 +114,7 @@ def test_workflow(args):
         model_path = models[0]
 
         statistics = test_model(model_path, args.model_name, args.model_in_channels, args.model_hidden_channels, args.model_n_blocks, args.embedding_length, 
-                                train_loader, n_train_samples, valid_loader, n_valid_samples, test_loader, n_test_samples, 
+                                train_loader, n_train_samples, valid_loader, n_valid_samples, test_loader, n_test_samples, args.save_embeddings,  
                                 evaluate_model_params, statistics, int(seed), device)
 
     statistics.save()

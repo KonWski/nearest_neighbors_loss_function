@@ -78,6 +78,7 @@ def parse_testing_args():
     parser.add_argument("--dataset_name", type=str, default="ogbg-molhiv")
     parser.add_argument("--task_id", type=int, default=0)
     parser.add_argument("--n_evaluation_models", type=int, default=3)
+    parser.add_argument("--save_embeddings", action="store_true")
 
     parser.add_argument("--evaluation_model_name", type=str, default="knn")
     parser.add_argument("--knn_n_neighbors", type=int, required=True)

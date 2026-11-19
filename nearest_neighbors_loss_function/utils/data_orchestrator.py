@@ -63,6 +63,10 @@ class DataOrchestrator(ABC):
     def read_df(self, path):
         pass
 
+    @abstractmethod
+    def save_embeddings(self, train_embeddings, train_labels, valid_embeddings, valid_labels, test_embeddings, test_labels, seed, model_hash):
+        pass
+
 
 class OsOrchestrator(DataOrchestrator):
 
@@ -85,7 +89,7 @@ class OsOrchestrator(DataOrchestrator):
 
     def get_model_path(self, model_dir, model_hash):
         return os.path.join(model_dir, f"{model_hash}.pt")
-
+    
 
     def create_model_dir(self, seed: int):
         model_dir_path = self.get_model_dir(seed)
@@ -140,6 +144,18 @@ class OsOrchestrator(DataOrchestrator):
 
     def read_df(self, path):
         return pd.read_excel(path)
+    
+
+    def save_embeddings(self, train_embeddings, train_labels, valid_embeddings, valid_labels, test_embeddings, test_labels, seed, model_hash):
+        model_dir = self.get_model_dir(seed)
+
+        save(train_embeddings, os.path.join(model_dir, f"train_embeddings_{model_hash}.pt"))
+        save(train_labels, os.path.join(model_dir, f"train_labels_{model_hash}.pt"))
+        save(valid_embeddings, os.path.join(model_dir, f"valid_embeddings_{model_hash}.pt"))
+        save(valid_labels, os.path.join(model_dir, f"valid_labels_{model_hash}.pt"))
+        save(test_embeddings, os.path.join(model_dir, f"test_embeddings_{model_hash}.pt"))
+        save(test_labels, os.path.join(model_dir, f"test_labels_{model_hash}.pt"))
+
 
 
 class GcpOrchestrator(DataOrchestrator):
@@ -244,6 +260,25 @@ class GcpOrchestrator(DataOrchestrator):
     def read_df(self, path):
         blob = self.bucket.blob(path)
         return pd.read_excel(io.BytesIO(blob.download_as_bytes()))
+
+
+    def save_embeddings(self, train_embeddings, train_labels, valid_embeddings, valid_labels, test_embeddings, test_labels, seed, model_hash):
+        
+        model_dir = self.get_model_dir(seed)
+        self._save_tensor(self, train_embeddings, posixpath.join(model_dir, f"train_embeddings_{model_hash}.pt"))
+        self._save_tensor(self, train_labels, posixpath.join(model_dir, f"train_labels_{model_hash}.pt"))
+        self._save_tensor(self, valid_embeddings, posixpath.join(model_dir, f"valid_embeddings_{model_hash}.pt"))
+        self._save_tensor(self, valid_labels, posixpath.join(model_dir, f"valid_labels_{model_hash}.pt"))
+        self._save_tensor(self, test_embeddings, posixpath.join(model_dir, f"test_embeddings_{model_hash}.pt"))
+        self._save_tensor(self, test_labels, posixpath.join(model_dir, f"test_labels_{model_hash}.pt"))
+    
+
+    def _save_tensor(self, tensor, path):
+        blob = self.bucket.blob(path)
+        buffer = io.BytesIO()
+        save(tensor, buffer)
+        buffer.seek(0)
+        blob.upload_from_file(buffer)
 
 
 def get_orchestrator(env: str, save_path: str, experiment_hash: str, project_name: str, bucket_name: str, report_name: str):
