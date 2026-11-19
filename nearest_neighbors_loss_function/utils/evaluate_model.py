@@ -9,6 +9,7 @@ import torch
 import logging
 from sklearn.ensemble import RandomForestClassifier
 from nearest_neighbors_loss_function.utils.auxiliary_functions import set_seed
+from nearest_neighbors_loss_function.utils.data_orchestrator import DataOrchestrator
 
 def evaluate_model(model, evaluation_mode, train_embeddings, train_labels, test_embeddings, 
                    test_labels, evaluate_model_params, stats_prefix, seed=None):
@@ -139,7 +140,7 @@ def calculate_stats(y_test, y_pred, y_pred_proba):
     return accuracy, precision, recall, f1, ef01, ef05, roc_auc, pr_auc, mcc
 
 
-def test_best_seed_model(model_name, statistics, in_channels, hidden_dim, n_blocks,
+def test_best_seed_model(model_name, orchestrator: DataOrchestrator, statistics, in_channels, hidden_dim, n_blocks,
                 embedding_size, train_loader, n_train_samples, test_loader, evaluate_model_params, phase, device):
 
     best_models_info = statistics.get_best_models_info()
@@ -147,7 +148,7 @@ def test_best_seed_model(model_name, statistics, in_channels, hidden_dim, n_bloc
     for model_info in best_models_info:
         set_seed(model_info["seed"])
 
-        model, _ = load_model(model_info["model_path"], model_name, in_channels, hidden_dim, n_blocks, embedding_size)
+        model, _ = orchestrator.load_model(model_info["model_path"], model_name, in_channels, hidden_dim, n_blocks, embedding_size)
         model.to(device)
         n_test_samples = len(test_loader.dataset)
 

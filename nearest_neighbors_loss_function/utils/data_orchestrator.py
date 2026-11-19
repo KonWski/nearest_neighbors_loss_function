@@ -4,9 +4,10 @@ import os
 from pathlib import Path, PurePosixPath
 import posixpath
 from google.cloud import storage
-from torch import save
+from torch import save, load
 import io
 import pandas as pd
+from nearest_neighbors_loss_function.utils.auxiliary_functions import get_model
 
 class DataOrchestrator(ABC):
 
@@ -44,6 +45,10 @@ class DataOrchestrator(ABC):
 
     @abstractmethod
     def isfile(self, path):
+        pass
+
+    @abstractmethod
+    def load_model(self, model_path, model_name, in_channels, hidden_dim, model_n_blocks, embedding_size):
         pass
 
     @abstractmethod
@@ -120,6 +125,14 @@ class OsOrchestrator(DataOrchestrator):
         save(checkpoint, model_path)
         logging.info(f"Saved model to checkpoint: {model_path}")
     
+
+    def load_model(self, model_path, model_name, in_channels, hidden_dim, model_n_blocks, embedding_size):
+        logging.info(f"Loading model from path: {model_path}")
+        checkpoint = load(model_path, weights_only=False)
+        model = get_model(model_name, in_channels, hidden_dim, model_n_blocks, embedding_size)
+        model.load_state_dict(checkpoint["model_state_dict"])
+        return model, checkpoint
+
 
     def save_df(self, df, path):
         df.to_excel(path, index=False)
@@ -209,6 +222,16 @@ class GcpOrchestrator(DataOrchestrator):
         save(checkpoint, buffer)
         buffer.seek(0)
         blob.upload_from_file(buffer)
+
+
+    def load_model(self, model_path, model_name, in_channels, hidden_dim, model_n_blocks, embedding_size):
+        logging.info(f"Loading model from path: {model_path}")
+        blob = self.bucket.blob(model_path)
+        buffer = io.BytesIO(blob.download_as_bytes())
+        model = get_model(model_name, in_channels, hidden_dim, model_n_blocks, embedding_size)
+        checkpoint = load(buffer, map_location="cpu", weights_only=True)
+        model.load_state_dict(checkpoint)
+        return model, checkpoint
 
 
     def save_df(self, df, path):
