@@ -53,6 +53,7 @@ def train_workflow(args):
 
     statistics = test_best_seed_model(
         args.model_name,
+        orchestrator,
         statistics, 
         args.model_in_channels, 
         args.model_hidden_channels,
