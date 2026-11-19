@@ -229,7 +229,7 @@ class GcpOrchestrator(DataOrchestrator):
         blob = self.bucket.blob(model_path)
         buffer = io.BytesIO(blob.download_as_bytes())
         model = get_model(model_name, in_channels, hidden_dim, model_n_blocks, embedding_size)
-        checkpoint = load(buffer, map_location="cpu", weights_only=True)
+        checkpoint = load(buffer, map_location="cpu", weights_only=False)
         model.load_state_dict(checkpoint)
         return model, checkpoint
 
