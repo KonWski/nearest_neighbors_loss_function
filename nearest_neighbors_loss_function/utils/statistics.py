@@ -73,7 +73,7 @@ class Statistics():
     def save(self):
         df = pd.DataFrame(self.agglomerated_statistics)
         df["experiment_hash"] = self.experiment_hash
-        df.to_excel(self.report_path, index=False)
+        self.orchestrator.save_df(df, self.report_path)
 
     def early_stop_training(self, seed, alpha=0.0):
         seed_agglomerated_statistics = [stat for stat in self.agglomerated_statistics if stat["seed"] == seed]

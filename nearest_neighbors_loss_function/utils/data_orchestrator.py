@@ -50,6 +50,11 @@ class DataOrchestrator(ABC):
         pass
 
 
+    @abstractmethod
+    def save_df(self, df, path):
+        pass
+
+
 class OsOrchestrator(DataOrchestrator):
 
     def __init__(self, save_path: str, experiment_hash: str, report_name: str):
@@ -110,6 +115,10 @@ class OsOrchestrator(DataOrchestrator):
     def save_model(self, checkpoint, model_path):
         save(checkpoint, model_path)
         logging.info(f"Saved model to checkpoint: {model_path}")
+    
+
+    def save_df(self, df, path):
+        df.to_excel(path, index=False)
         
 
 class GcpOrchestrator(DataOrchestrator):
@@ -196,6 +205,13 @@ class GcpOrchestrator(DataOrchestrator):
         save(checkpoint, buffer)
         buffer.seek(0)
         blob.upload_from_file(buffer)
+
+
+    def save_df(self, df, path):
+        buffer = io.BytesIO()
+        df.to_excel(buffer, index=False)
+        buffer.seek(0)
+        self.bucket.blob(path).upload_from_file(buffer)
 
 
 def get_orchestrator(env: str, save_path: str, experiment_hash: str, project_name: str, bucket_name: str, report_name: str):
