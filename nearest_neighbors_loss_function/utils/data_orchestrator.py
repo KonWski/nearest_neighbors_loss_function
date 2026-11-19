@@ -152,9 +152,14 @@ class GcpOrchestrator(DataOrchestrator):
     def delete_last_model(self, model_dir_path):
         '''deletes all files ending with .pt'''
 
+
+        print("Deleting last model")
+        print(f"model_dir_path: {model_dir_path}")
+
         blobs = self.list_dir(model_dir_path + "/")
         for blob in blobs:
             if blob.name.endswith(".pt"):
+                print(f"Deleting: {blob.name}")
                 blob.delete()
     
 

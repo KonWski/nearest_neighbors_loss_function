@@ -1,4 +1,4 @@
-from torch import save, load
+from torch import load
 import logging
 from datetime import datetime
 from nearest_neighbors_loss_function.utils.auxiliary_functions import get_model
@@ -40,7 +40,7 @@ def save_model(data_orchestrator: DataOrchestrator,
     checkpoint["save_model_dttm"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     data_orchestrator.save_model(checkpoint, checkpoint_path)
-    
+
 
 def load_model(model_path, model_name, in_channels, hidden_dim, model_n_blocks, embedding_size):
 
