@@ -116,7 +116,8 @@ class GcpOrchestrator(DataOrchestrator):
 
         if not self._dir_exists(self.experiment_dir_path):
             print(f"self.experiment_dir_path: {self.experiment_dir_path}")
-            self.bucket.blob(self.experiment_dir_path)
+            blob = self.bucket.blob(self.experiment_dir_path)
+            blob.upload_from_string("")
         else:
             logging.info(f"Experiment directory already exists. Skipping directory creation.")
 
@@ -135,7 +136,8 @@ class GcpOrchestrator(DataOrchestrator):
 
         if not self._dir_exists(model_dir_path):
             print("Creating model_dir_path")
-            self.bucket.blob(model_dir_path)
+            blob = self.bucket.blob(model_dir_path)
+            blob.upload_from_string("")
         else:
             logging.info(f"Directory for seed: {str(seed)} already exists. Skipping directory creation.")
 
