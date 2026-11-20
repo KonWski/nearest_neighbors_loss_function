@@ -74,7 +74,7 @@ def test_workflow(args):
 
     log_args(args)
     orchestrator = get_orchestrator(args.env, args.save_path, args.experiment_hash, args.project_name, args.bucket_name, "test_report.xlsx")
-    statistics = Statistics(args.n_epochs, args.save_path, args.experiment_hash, args.optimized_param_name, -1)
+    statistics = Statistics(args.n_epochs, orchestrator, args.experiment_hash, args.optimized_param_name, -1)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     train_loader, valid_loader, test_loader = get_loaders(args.batch_size, args.dataset_name, args.task_id, debug=False)
