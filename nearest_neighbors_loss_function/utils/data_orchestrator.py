@@ -216,7 +216,8 @@ class GcpOrchestrator(DataOrchestrator):
 
 
     def list_dir(self, path: str):
-        return self.bucket.list_blobs(prefix=path)
+        blobs = self.bucket.list_blobs(prefix=path)
+        return [blob.name for blob in blobs]
 
 
     def extract_folder_name(self, path: str):
