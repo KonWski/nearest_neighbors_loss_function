@@ -266,12 +266,12 @@ class GcpOrchestrator(DataOrchestrator):
     def save_embeddings(self, train_embeddings, train_labels, valid_embeddings, valid_labels, test_embeddings, test_labels, seed, model_hash):
         
         model_dir = self.get_model_dir(seed)
-        self._save_tensor(self, train_embeddings, posixpath.join(model_dir, f"train_embeddings_{model_hash}.pt"))
-        self._save_tensor(self, train_labels, posixpath.join(model_dir, f"train_labels_{model_hash}.pt"))
-        self._save_tensor(self, valid_embeddings, posixpath.join(model_dir, f"valid_embeddings_{model_hash}.pt"))
-        self._save_tensor(self, valid_labels, posixpath.join(model_dir, f"valid_labels_{model_hash}.pt"))
-        self._save_tensor(self, test_embeddings, posixpath.join(model_dir, f"test_embeddings_{model_hash}.pt"))
-        self._save_tensor(self, test_labels, posixpath.join(model_dir, f"test_labels_{model_hash}.pt"))
+        self._save_tensor(train_embeddings, posixpath.join(model_dir, f"train_embeddings_{model_hash}.pt"))
+        self._save_tensor(train_labels, posixpath.join(model_dir, f"train_labels_{model_hash}.pt"))
+        self._save_tensor(valid_embeddings, posixpath.join(model_dir, f"valid_embeddings_{model_hash}.pt"))
+        self._save_tensor(valid_labels, posixpath.join(model_dir, f"valid_labels_{model_hash}.pt"))
+        self._save_tensor(test_embeddings, posixpath.join(model_dir, f"test_embeddings_{model_hash}.pt"))
+        self._save_tensor(test_labels, posixpath.join(model_dir, f"test_labels_{model_hash}.pt"))
     
 
     def _save_tensor(self, tensor, path):
