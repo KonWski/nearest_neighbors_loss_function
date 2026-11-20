@@ -94,7 +94,7 @@ def test_workflow(args):
         rf_class_weight=args.rf_class_weight
     )
 
-    for seed_path in orchestrator.list_dir(args.experiment_dir_path):
+    for seed_path in orchestrator.list_dir(orchestrator.experiment_dir_path):
 
         logging.info(f"Testing: {seed_path}")
         seed = orchestrator.extract_folder_name(seed_path)
